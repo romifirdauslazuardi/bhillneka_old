@@ -1,0 +1,1 @@
+<a href="{{route('dashboard.auth.login.index')}}"><img src="{{URL::to('/')}}/templates/dashboard/assets/images/logo-icon.png" class="avatar avatar-small mb-4 d-block mx-auto" alt=""></a>
