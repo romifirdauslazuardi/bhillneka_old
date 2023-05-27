@@ -53,7 +53,7 @@
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Atas Nama <span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" name="name" placeholder="Nama Lengkap" value="{{old('name',$result->name)}}" >
+                                <input type="text" class="form-control" name="name" placeholder="Atas Nama" value="{{old('name',$result->name)}}" >
                             </div>
                         </div>
                         <div class="form-group row mb-3">

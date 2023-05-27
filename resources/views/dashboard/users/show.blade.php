@@ -26,7 +26,7 @@
             <div class="card-body">
                 <div class="text-center d-flex flex-column h-100">
                     <div>
-                        <img src="{{ $result->avatar ? asset('storage/' . $result->avatar) : 'https://avatars.dicebear.com/api/initials/'. $result->name .'.png?background=blue&width=100&height=100' }}"
+                        <img src="{{ $result->avatar ? asset($result->avatar) : 'https://avatars.dicebear.com/api/initials/'. $result->name .'.png?background=blue&width=100&height=100' }}"
                                 alt=""
                                 class="avatar-lg mx-auto img-thumbnail rounded-circle">
                     </div>
