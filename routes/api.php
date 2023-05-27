@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(["as" => "indonesia.", "prefix" => "indonesia"], function () {
+
+	Route::get('/province', 'IndonesiaController@province')->name('province');
+    Route::get('/city', 'IndonesiaController@city')->name('city');
+    Route::get('/district', 'IndonesiaController@district')->name('district');
+    Route::get('/village', 'IndonesiaController@village')->name('village');
+    
 });

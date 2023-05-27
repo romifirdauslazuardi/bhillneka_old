@@ -12,7 +12,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="card form-signin p-4 rounded shadow" style="height: 100vh;overflow-y:scroll;">
-                    <form method="POST" action="{{route('dashboard.auth.register.post')}}">
+                    <form method="POST" action="{{route('dashboard.auth.register.post')}}" autocomplete="off">
                         @csrf
                         @include("dashboard.auth.layouts.logo")
                         <h5 class="mb-3 text-center">Silahkan daftar terlebih dahulu</h5>

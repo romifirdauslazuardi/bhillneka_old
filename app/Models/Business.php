@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Haruncpi\LaravelUserActivity\Traits\Loggable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Business extends Model
+{
+    use HasFactory, Loggable,SoftDeletes;
+    protected $table = "business";
+    protected $fillable = [
+        'name',
+        'location',
+        'description',
+        'user_id',
+        'category_id',
+        'village_code'
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(BusinessCategory::class, 'category_id', 'id');
+    }
+
+    public function village()
+    {
+        return $this->belongsTo(Village::class, 'village_code', 'code');
+    }
+}

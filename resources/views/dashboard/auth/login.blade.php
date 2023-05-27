@@ -12,7 +12,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="card form-signin p-4 rounded shadow">
-                    <form method="POST" action="{{route('dashboard.auth.login.post')}}">
+                    <form method="POST" action="{{route('dashboard.auth.login.post')}}" autocomplete="off">
                         @csrf
                         @include("dashboard.auth.layouts.logo")
                         <h5 class="mb-3 text-center">Silahkan login terlebih dahulu</h5>
@@ -30,7 +30,7 @@
                         <div class="d-flex justify-content-between">
                             <div class="mb-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                    <input class="form-check-input" type="checkbox" value="1" id="flexCheckDefault" name="rememberme">
                                     <label class="form-check-label" for="flexCheckDefault">Ingat Saya</label>
                                 </div>
                             </div>

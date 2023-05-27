@@ -7,6 +7,8 @@
 
     <body>
 
+        @include('sweetalert::alert')
+
         <div class="page-wrapper toggled">
         @include("dashboard.layouts.sidebar")
 

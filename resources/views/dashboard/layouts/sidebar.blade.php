@@ -19,9 +19,10 @@
                 <a href="javascript:void(0)"><i class="ti ti-browser me-2"></i>Master</a>
                 <div class="sidebar-submenu">
                     <ul>
-                        <li><a href="index-dark.html">Kategori Usaha</a></li>
-                        <li><a href="index-dark.html">Usaha</a></li>
-                        <li><a href="index-dark.html">Rekening Bank</a></li>
+                        <li><a href="{{route('dashboard.business-categories.index')}}">Kategori Bisnis</a></li>
+                        <li><a href="{{route('dashboard.business.index')}}">Bisnis</a></li>
+                        <li><a href="{{route('dashboard.banks.index')}}">Bank</a></li>
+                        <li><a href="{{route('dashboard.user-banks.index')}}">Rekening Bank Pengguna</a></li>
                     </ul>
                 </div>
             </li>
@@ -66,11 +67,11 @@
                 <a href="javascript:void(0)"><i class="ti ti-browser me-2"></i>Pengaturan Website</a>
                 <div class="sidebar-submenu">
                     <ul>
-                        <li><a href="index-dark.html">User</a></li>
-                        <li><a href="index-dark.html">Aktivitas User</a></li>
+                        <li><a href="{{route('dashboard.users.index')}}">User</a></li>
+                        <li><a href="{{url('dashboard/user-activity')}}">Aktivitas User</a></li>
                         <li><a href="index-dark.html">Pengaturan Dashboard</a></li>
                         <li><a href="index-dark.html">Pengaturan Landing Page</a></li>
-                        <li><a href="index-dark.html">Logs</a></li>
+                        <li><a href="{{url('dashboard/logs')}}">Logs</a></li>
                     </ul>
                 </div>
             </li>
