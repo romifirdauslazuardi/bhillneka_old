@@ -19,7 +19,7 @@ class DashboardAccessMiddleware
     public function handle(Request $request, Closure $next)
     {
         $user = Auth::user();
-        if (empty($user) || !$user->hasRole([RoleEnum::OWNER, RoleEnum::AGEN,RoleEnum::USER])) {
+        if (empty($user) || !$user->hasRole([RoleEnum::OWNER, RoleEnum::AGEN,RoleEnum::USER,RoleEnum::ADMIN_AGEN])) {
 
             alert()->html('Gagal', "Anda tidak diperbolehkan mengakses halaman ini", 'error');
 

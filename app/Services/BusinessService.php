@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\RoleEnum;
 use App\Services\BaseService;
 use App\Http\Requests\Business\StoreRequest;
 use App\Http\Requests\Business\UpdateRequest;
@@ -26,6 +27,10 @@ class BusinessService extends BaseService
         $search = $request->search;
         $user_id = $request->user_id;
 
+        if(Auth::user()->hasRole([RoleEnum::AGEN])){
+            $user_id = Auth::user()->id;
+        }
+
         $table = $this->business;
         if (!empty($search)) {
             $table = $this->business->where(function ($query2) use ($search) {
@@ -36,6 +41,9 @@ class BusinessService extends BaseService
         }
         if(!empty($user_id)){
             $table = $table->where("user_id",$user_id);
+        }
+        if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
+            $table = $table->where("user_id",Auth::user()->user_id);
         }
         $table = $table->orderBy('created_at', 'DESC');
 
@@ -53,7 +61,15 @@ class BusinessService extends BaseService
     {
         try {
             $result = $this->business;
-            $result = $result->findOrFail($id);
+            if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
+                $result = $result->where("user_id",Auth::user()->user_id);
+            }
+            $result = $result->where('id',$id);
+            $result = $result->first();
+
+            if(!$result){
+                return $this->response(false, "Data tidak ditemukan");
+            }
 
             return $this->response(true, 'Berhasil mendapatkan data', $result);
         } catch (Throwable $th) {
@@ -80,6 +96,7 @@ class BusinessService extends BaseService
                 'category_id' => $category_id,
                 'user_id' => $user_id,
                 'village_code' => $village_code,
+                'author_id' => Auth::user()->id,
             ]);
 
             return $this->response(true, 'Berhasil menambahkan data',$create);

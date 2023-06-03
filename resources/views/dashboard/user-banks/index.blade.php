@@ -37,10 +37,13 @@
                                 <thead>
                                     <th>Aksi</th>
                                     <th>No</th>
-                                    <th>Pengguna</th>
                                     <th>Atas Nama</th>
                                     <th>Nomor Rekening</th>
                                     <th>Bank</th>
+                                    @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
+                                    <th>Pengguna</th>
+                                    @endif
+                                    <th>Status</th>
                                     <th>Dibuat Pada</th>
                                 </thead>
                                 <tbody>
@@ -59,10 +62,15 @@
                                             </div>
                                         </td>
                                         <td>{{$table->firstItem() + $index}}</td>
-                                        <td>{{$row->user->name ?? null}}</td>
                                         <td>{{$row->name}}</td>
                                         <td>{{$row->number}}</td>
                                         <td>{{$row->bank->name ?? null}}</td>
+                                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
+                                        <td>{{$row->user->name ?? null}}</td>
+                                        @endif
+                                        <td>
+                                            <span class="badge bg-{{$row->status()->class ?? null}}">{{$row->status()->msg ?? null}}</span>
+                                        </td>
                                         <td>{{date('d-m-Y H:i:s',strtotime($row->created_at))}}</td>
                                     </tr>
                                     @empty
@@ -80,7 +88,6 @@
         </div>
     </div>
 </div>
-@endsection
 
 @include("dashboard.user-banks.modal.index")
 @include("dashboard.components.loader")
@@ -90,6 +97,8 @@
     @method('DELETE')
     <input type="hidden" name="id" />
 </form>
+
+@endsection
 
 @section("script")
 <script>

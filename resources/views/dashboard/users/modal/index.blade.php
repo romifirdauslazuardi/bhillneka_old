@@ -8,6 +8,11 @@
             <form method="get" action="" autocomplete="off">
                 <div class="modal-body">
                     <div class="form-group mb-3">
+                        <label>Search</label>
+                        <input type="text" class="form-control" placeholder="Search (Nama,Email)" value="{{request()->get('search')}}" name="search">
+                    </div>
+                    @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
+                    <div class="form-group mb-3">
                         <label>Role</label>
                         <select class="form-control select2" name="role" style="width:100%;">
                             <option value="">==Semua Role==</option>
@@ -16,10 +21,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="form-group mb-3">
-                        <label>Search</label>
-                        <input type="text" class="form-control" placeholder="Search (Nama,Email)" value="{{request()->get('search')}}" name="search">
-                    </div>
+                    @endif
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>

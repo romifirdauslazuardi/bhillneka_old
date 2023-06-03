@@ -63,22 +63,39 @@
                                 <input type="password" class="form-control" name="password_confirmation" placeholder="Password Konfirmasi" >
                             </div>
                         </div>
+                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Email Verified At</label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control datetimepicker" name="email_verified_at" placeholder="Email Verified At" value="{{old('email_verified_at')}}">
                             </div>
                         </div>
+                        @endif
+                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN]))
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Roles<span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <select class="form-control select2" multiple name="roles[]" >
+                                <select class="form-control select2 select-role" multiple name="roles[]" >
                                     @foreach ($roles as $index => $row)
                                     <option value="{{$row}}" @if($row == old('roles')) selected @endif>{{$row}}</option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
+                        @endif
+                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
+                        <div class="form-group row mb-3 display-agen d-none">
+                            <label class="col-md-3 col-form-label">Agen<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <select class="form-control select2" name="user_id" >
+                                    <option value="">==Pilih Agen==</option>
+                                    @foreach ($users as $index => $row)
+                                    <option value="{{$row->id}}" @if($row->id == old('user_id')) selected @endif>{{$row->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
                 <div class="row">
@@ -91,9 +108,10 @@
         </div>
     </div>
 </div>
-@endsection
 
 @include("dashboard.components.loader")
+
+@endsection
 
 @section("script")
 <script src="{{URL::to('/')}}/templates/dashboard/assets/libs/moment/moment.min.js"></script>
@@ -108,6 +126,24 @@
               format:'YYYY-MM-DD HH:mm:ss',
               formatTime:'HH:mm:ss',
               formatDate:'YYYY-MM-DD'
+        });
+
+        $(document).on('change','.select-role',function(e){
+            e.preventDefault();
+            let val = $(this).val();
+            let agen = false;
+            $.each(val,function(index,element){
+                if(element == '{{\App\Enums\RoleEnum::USER}}' || element == '{{\App\Enums\RoleEnum::ADMIN_AGEN}}'){
+                    agen = true;
+                }
+            });
+
+            if(agen == true){
+                $(".display-agen").removeClass("d-none");
+            }
+            else{
+                $(".display-agen").addClass("d-none");
+            }
         });
 
         $(document).on('submit','#frmStore',function(e){

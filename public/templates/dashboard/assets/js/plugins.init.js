@@ -932,21 +932,21 @@ try {
 
         switch (theme) {
             case "style-dark":
-                bootstarpHref =  `assets/css/bootstrap-dark.min.css`
-                styleHref = "assets/css/style-dark.min.css"
+                bootstarpHref =  `templates/dashboard/assets/css/bootstrap-dark.min.css`
+                styleHref = "templates/dashboard/assets/css/style-dark.min.css"
                 break;
                 case "style-rtl":
-                bootstarpHref =  `assets/css/bootstrap-rtl.min.css`
-                styleHref = "assets/css/style-rtl.min.css"
+                bootstarpHref =  `templates/dashboard/assets/css/bootstrap-rtl.min.css`
+                styleHref = "templates/dashboard/assets/css/style-rtl.min.css"
                 break;
                 case "style-dark-rtl":
-                bootstarpHref =  `assets/css/bootstrap-dark-rtl.min.css`
-                styleHref = "assets/css/style-dark-rtl.min.css"
+                bootstarpHref =  `templates/dashboard/assets/css/bootstrap-dark-rtl.min.css`
+                styleHref = "templates/dashboard/assets/css/style-dark-rtl.min.css"
                 break;               
         
             default:
-                bootstarpHref =  `assets/css/bootstrap.min.css`
-                styleHref = "assets/css/style.min.css"
+                bootstarpHref =  `templates/dashboard/assets/css/bootstrap.min.css`
+                styleHref = "templates/dashboard/assets/css/style.min.css"
                 break;
         }
 

@@ -3,7 +3,6 @@
 @section("title","Bisnis")
 
 @section("css")
-<link href="{{URL::to('/')}}/templates/dashboard/assets/libs/datetimepicker/jquery.datetimepicker.css" type="text/css" rel="stylesheet" />
 @endsection
 
 @section("breadcumb")
@@ -28,17 +27,19 @@
                 @method("PUT")
                 <div class="row mb-3">
                     <div class="col-lg-12">
+                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Agen<span class="text-danger">*</span></label>
                             <div class="col-md-9">
                                 <select class="form-control select2" name="user_id" >
                                     <option value="">==Pilih Agen==</option>
                                     @foreach ($users as $index => $row)
-                                    <option value="{{$row->id}}" @if($row->id == old('user_id',$result->user_id)) selected @endif>{{$row->name}} ({{$row->phone}})</option>
+                                    <option value="{{$row->id}}" @if($row->id == old('user_id',$result->user_id)) selected @endif>{{$row->name}} - {{$row->phone}}</option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
+                        @endif
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Nama Bisnis <span class="text-danger">*</span></label>
                             <div class="col-md-9">
@@ -112,14 +113,11 @@
         </div>
     </div>
 </div>
-@endsection
 
 @include("dashboard.components.loader")
+@endsection
 
 @section("script")
-<script src="{{URL::to('/')}}/templates/dashboard/assets/libs/moment/moment.min.js"></script>
-<script src="{{URL::to('/')}}/templates/dashboard/assets/libs/datetimepicker/jquery.datetimepicker.min.js"></script>
-<script src="{{URL::to('/')}}/templates/dashboard/assets/libs/axios/axios.min.js"></script>
 <script>
     $(function(){
         @if(!empty($result->village_code))
@@ -139,7 +137,7 @@
             $('.select-district').html('<option value="">==Pilih Kecamatan==</option>');
             $('.select-village').html('<option value="">==Pilih Desa==</option>');
 
-            if(val != "" || val != undefined || val != null){
+            if(val != "" && val != undefined && val != null){
                 getCity('.select-city',val,null);
             }
         });
@@ -151,7 +149,7 @@
             $('.select-district').html('<option value="">==Pilih Kecamatan==</option>');
             $('.select-village').html('<option value="">==Pilih Desa==</option>');
 
-            if(val != "" || val != undefined || val != null){
+            if(val != "" && val != undefined && val != null){
                 getDistrict('.select-district',val,null);
             }
         });
@@ -162,7 +160,7 @@
 
             $('.select-village').html('<option value="">==Pilih Desa==</option>');
 
-            if(val != "" || val != undefined || val != null){
+            if(val != "" && val != undefined && val != null){
                 getVillage('.select-village',val,null);
             }
         });

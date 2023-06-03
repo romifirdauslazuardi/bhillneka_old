@@ -35,5 +35,12 @@ class RoleSeeder extends Seeder
             'name' => RoleEnum::USER,
             'guard_name' => 'web'
         ]);
+
+        Role::firstOrCreate([
+            'name' => RoleEnum::ADMIN_AGEN,
+        ], [
+            'name' => RoleEnum::ADMIN_AGEN,
+            'guard_name' => 'web'
+        ]);
     }
 }

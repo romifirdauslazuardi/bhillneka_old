@@ -28,6 +28,7 @@ class ProfileService extends BaseService
             $result = Auth::user();
 
             $name = $request->name;
+            $phone = $request->phone;
             $email = $request->email;
             $password = $request->password;
             $avatar = $request->file("avatar");
@@ -52,6 +53,7 @@ class ProfileService extends BaseService
 
             $result->update([
                 'name' => $name,
+                'phone' => $phone,
                 'email' => $email,
                 'password' => $password,
                 'avatar' => $avatar,

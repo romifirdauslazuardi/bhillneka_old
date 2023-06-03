@@ -13,10 +13,11 @@ use App\Models\UserBank;
 use App\Services\UserBankService;
 use App\Services\UserService;
 use App\Services\BankService;
+use App\Enums\UserBankEnum;
 use Log;
 use Auth;
 
-class UserBankControLler extends Controller
+class UserBankController extends Controller
 {
     protected $route;
     protected $view;
@@ -37,12 +38,15 @@ class UserBankControLler extends Controller
     {
         $response = $this->userBankService->index($request);
 
-        $users = $this->userService->index(new Request(['role' => RoleEnum::AGEN]),false);
+        $users = $this->userService->index(new Request([]),false);
         $users = $users->data;
+
+        $status = UserBankEnum::status();
 
         $data = [
             'table' => $response->data,
-            'users' => $users
+            'users' => $users,
+            'status' => $status,
         ];
 
         return view($this->view . 'index', $data);
@@ -56,9 +60,12 @@ class UserBankControLler extends Controller
         $banks = $this->bankService->index(new Request([]),false);
         $banks = $banks->data;
 
+        $status = UserBankEnum::status();
+
         $data = [
             'users' => $users,
             'banks' => $banks,
+            'status' => $status,
         ];
 
         return view($this->view . "create", $data);
@@ -95,9 +102,12 @@ class UserBankControLler extends Controller
         $banks = $this->bankService->index(new Request([]),false);
         $banks = $banks->data;
 
+        $status = UserBankEnum::status();
+
         $data = [
             'users' => $users,
             'banks' => $banks,
+            'status' => $status,
             'result' => $result
         ];
 

@@ -76,6 +76,18 @@
                     <h6 class="">{{ $result->email }}</h6>
                 </div>
 
+                @if($result->hasRole([\App\Enums\RoleEnum::USER,\App\Enums\RoleEnum::ADMIN_AGEN]))
+                <div class="mt-3">
+                    <p class="font-size-12 text-muted mb-1">Agen</p>
+                    <h6 class="">{{ $result->user->name ?? null }}</h6>
+                </div>
+                @endif
+
+                <div class="mt-3">
+                    <p class="font-size-12 text-muted mb-1">Author</p>
+                    <h6 class="">{{ $result->author->name ?? null }}</h6>
+                </div>
+
                 <div class="mt-3">
                     <p class="font-size-12 text-muted mb-1">Tanggal Dibuat</p>
                     <h6 class="">{{ date('d-m-Y H:i:s',strtotime($result->created_at)) }}</h6>
@@ -108,9 +120,10 @@
     @method('PATCH')
     <input type="hidden" name="id"/>
 </form>
-@endsection
 
 @include("dashboard.components.loader")
+
+@endsection
 
 @section("script")
 <script src="{{URL::to('/')}}/templates/dashboard/assets/libs/moment/moment.min.js"></script>

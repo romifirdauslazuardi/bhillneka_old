@@ -289,7 +289,7 @@
                             <td class="p-3">
                                 <a href="#" class="text-primary">
                                     <div class="d-flex align-items-center">
-                                        <img src="assets/images/client/01.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
+                                        <img src="{{URL::to('/')}}/templates/dashboard/assets/images/client/01.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
                                         <span class="ms-2">Howard Tanner</span>
                                     </div>
                                 </a>
@@ -313,7 +313,7 @@
                             <td class="p-3">
                                 <a href="#" class="text-primary">
                                     <div class="d-flex align-items-center">
-                                        <img src="assets/images/client/02.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
+                                        <img src="{{URL::to('/')}}/templates/dashboard/assets/images/client/02.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
                                         <span class="ms-2">Wendy Filson</span>
                                     </div>
                                 </a>
@@ -337,7 +337,7 @@
                             <td class="p-3">
                                 <a href="#" class="text-primary">
                                     <div class="d-flex align-items-center">
-                                        <img src="assets/images/client/03.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
+                                        <img src="{{URL::to('/')}}/templates/dashboard/assets/images/client/03.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
                                         <span class="ms-2">Faye Bridger</span>
                                     </div>
                                 </a>
@@ -361,7 +361,7 @@
                             <td class="p-3">
                                 <a href="#" class="text-primary">
                                     <div class="d-flex align-items-center">
-                                        <img src="assets/images/client/04.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
+                                        <img src="{{URL::to('/')}}/templates/dashboard/assets/images/client/04.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
                                         <span class="ms-2">Ronald Curtis</span>
                                     </div>
                                 </a>
@@ -385,7 +385,7 @@
                             <td class="p-3">
                                 <a href="#" class="text-primary">
                                     <div class="d-flex align-items-center">
-                                        <img src="assets/images/client/05.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
+                                        <img src="{{URL::to('/')}}/templates/dashboard/assets/images/client/05.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
                                         <span class="ms-2">Melissa Hibner</span>
                                     </div>
                                 </a>
@@ -409,7 +409,7 @@
                             <td class="p-3">
                                 <a href="#" class="text-primary">
                                     <div class="d-flex align-items-center">
-                                        <img src="assets/images/client/06.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
+                                        <img src="{{URL::to('/')}}/templates/dashboard/assets/images/client/06.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
                                         <span class="ms-2">Randall Case</span>
                                     </div>
                                 </a>
@@ -433,7 +433,7 @@
                             <td class="p-3">
                                 <a href="#" class="text-primary">
                                     <div class="d-flex align-items-center">
-                                        <img src="assets/images/client/07.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
+                                        <img src="{{URL::to('/')}}/templates/dashboard/assets/images/client/07.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
                                         <span class="ms-2">Jerry Morena</span>
                                     </div>
                                 </a>
@@ -457,7 +457,7 @@
                             <td class="p-3">
                                 <a href="#" class="text-primary">
                                     <div class="d-flex align-items-center">
-                                        <img src="assets/images/client/08.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
+                                        <img src="{{URL::to('/')}}/templates/dashboard/assets/images/client/08.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
                                         <span class="ms-2">Lester McNally</span>
                                     </div>
                                 </a>
@@ -481,7 +481,7 @@
                             <td class="p-3">
                                 <a href="#" class="text-primary">
                                     <div class="d-flex align-items-center">
-                                        <img src="assets/images/client/09.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
+                                        <img src="{{URL::to('/')}}/templates/dashboard/assets/images/client/09.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
                                         <span class="ms-2">Christopher Burrell</span>
                                     </div>
                                 </a>
@@ -505,7 +505,7 @@
                             <td class="p-3">
                                 <a href="#" class="text-primary">
                                     <div class="d-flex align-items-center">
-                                        <img src="assets/images/client/10.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
+                                        <img src="{{URL::to('/')}}/templates/dashboard/assets/images/client/10.jpg" class="avatar avatar-ex-small rounded-circle shadow" alt="">
                                         <span class="ms-2">Mary Skeens</span>
                                     </div>
                                 </a>

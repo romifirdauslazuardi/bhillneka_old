@@ -6,9 +6,26 @@ use App\Exceptions\CustomValidationException;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Enums\RoleEnum;
+use App\Enums\UserBankEnum;
+use Auth;
 
 class StoreRequest extends FormRequest
 {
+    public function prepareForValidation()
+    {
+        $merge = [];
+        if(Auth::user()->hasRole([RoleEnum::AGEN])){
+            $merge["user_id"] = Auth::user()->id;
+            $merge["status"] = UserBankEnum::STATUS_WAITING_APPROVE;
+        }
+        if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
+            $merge["user_id"] = Auth::user()->user_id;
+            $merge["status"] = UserBankEnum::STATUS_WAITING_APPROVE;
+        }
+        $this->merge($merge);
+    }
+    
     public function rules(): array
     {
         return [
@@ -28,6 +45,10 @@ class StoreRequest extends FormRequest
                 'required',
                 Rule::exists('users', 'id'),
             ],
+            'status' => [
+                'required',
+                'in:'.implode(",",[UserBankEnum::STATUS_WAITING_APPROVE,UserBankEnum::STATUS_APPROVED,UserBankEnum::STATUS_REJECTED])
+            ],
         ];
     }
 
@@ -42,6 +63,8 @@ class StoreRequest extends FormRequest
             'number.required' => 'Nomor rekening harus diisi',
             'number.numeric' => 'Nomor rekening harus berupa angka',
             'number.min' => 'Nomor rekening minimal 1 angka',
+            'status.required' => 'Status harus diisi',
+            'status.in' => 'Status tidak valid',
         ];
     }
 

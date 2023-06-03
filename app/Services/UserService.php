@@ -28,6 +28,11 @@ class UserService extends BaseService
     {
         $search = $request->search;
         $role = $request->role;
+        $user_id = $request->user_id;
+
+        if(Auth::user()->hasRole([RoleEnum::AGEN])){
+            $user_id = Auth::user()->id;
+        }
 
         $table = $this->user;
         if (!empty($search)) {
@@ -47,7 +52,15 @@ class UserService extends BaseService
         if (Auth::user()->hasRole([
             RoleEnum::AGEN
         ])) {
+            $table = $table->role([RoleEnum::USER,RoleEnum::ADMIN_AGEN]);
+        }
+        if (Auth::user()->hasRole([
+            RoleEnum::ADMIN_AGEN
+        ])) {
             $table = $table->role([RoleEnum::USER]);
+        }
+        if(!empty($user_id)){
+            $table = $table->where("user_id",$user_id);
         }
         $table = $table->orderBy('created_at', 'DESC');
 
@@ -70,7 +83,24 @@ class UserService extends BaseService
             ])) {
                 $result = $result->withTrashed();
             }
-            $result = $result->findOrFail($id);
+            if (Auth::user()->hasRole([
+                RoleEnum::AGEN
+            ])) {
+                $result = $result->role([RoleEnum::USER,RoleEnum::ADMIN_AGEN]);
+                $result = $result->where('user_id',Auth::user()->id);
+            }
+            if (Auth::user()->hasRole([
+                RoleEnum::ADMIN_AGEN
+            ])) {
+                $result = $result->role([RoleEnum::USER]);
+                $result = $result->where('user_id',Auth::user()->user_id);
+            }
+            $result = $result->where("id",$id);
+            $result = $result->first();
+
+            if(!$result){
+                return $this->response(false, "Data tidak ditemukan");
+            }
 
             return $this->response(true, 'Berhasil mendapatkan data', $result);
         } catch (Throwable $th) {
@@ -82,6 +112,7 @@ class UserService extends BaseService
 
     public function store(StoreRequest $request)
     {
+        DB::beginTransaction();
         try {
             $name = $request->name;
             $phone = $request->phone;
@@ -90,6 +121,7 @@ class UserService extends BaseService
             $password = $request->password;
             $roles = $request->roles;
             $avatar = $request->file("avatar");
+            $user_id = $request->user_id;
 
             if ($avatar) {
                 $upload = UploadHelper::upload_file($avatar, 'user-avatar', UserEnum::AVATAR_EXT);
@@ -108,12 +140,17 @@ class UserService extends BaseService
                 'email_verified_at' => $email_verified_at,
                 'password' => bcrypt($password),
                 'avatar' => $avatar,
+                'user_id' => $user_id,
+                'author_id' => Auth::user()->id,
             ]);
 
             $create->assignRole($roles);
 
+            DB::commit();
+
             return $this->response(true, 'Berhasil menambahkan data',$create);
         } catch (Throwable $th) {
+            DB::rollback();
             Log::emergency($th->getMessage());
 
             return $this->response(false, "Terjadi kesalahan saat memproses data");
@@ -122,6 +159,7 @@ class UserService extends BaseService
 
     public function update(UpdateRequest $request, $id)
     {
+        DB::beginTransaction();
         try {
             $name = $request->name;
             $phone = $request->phone;
@@ -130,6 +168,7 @@ class UserService extends BaseService
             $password = $request->password;
             $roles = $request->roles;
             $avatar = $request->file("avatar");
+            $user_id = $request->user_id;
 
             $result = $this->user;
             if (Auth::user()->hasRole([
@@ -163,13 +202,17 @@ class UserService extends BaseService
                 'email' => $email,
                 'email_verified_at' => $email_verified_at,
                 'password' => $password,
-                'avatar' => $avatar
+                'avatar' => $avatar,
+                'user_id' => $user_id,
             ]);
 
             $result->syncRoles($roles);
 
+            DB::commit();
+
             return $this->response(true, 'Berhasil mengubah data',$result);
         } catch (Throwable $th) {
+            DB::rollback();;
             Log::emergency($th->getMessage());
 
             return $this->response(false, "Terjadi kesalahan saat memproses data");
@@ -231,6 +274,33 @@ class UserService extends BaseService
             Log::emergency($th->getMessage());
 
             return $this->response(false, "Terjadi kesalahan saat memproses data");
+        }
+    }
+
+    public function getUserCustomer(Request $request,array $column = []){
+        try {
+            $user_id = $request->user_id;
+
+            if(Auth::user()->hasRole([RoleEnum::AGEN])){
+                $user_id = Auth::user()->id;
+            }
+
+            $table = $this->user;
+            if(count($column) >= 1){
+                $table = $table->select($column);
+            }
+            if(!empty($user_id)){
+                $table = $table->where("user_id",$user_id);
+            }
+            $table = $table->role([RoleEnum::USER]);
+            $table = $table->orderBy('created_at', 'DESC');
+            $table = $table->get();            
+
+            return $this->response(true, 'Berhasil mendapatkan data',$table);
+        } catch (Throwable $th) {
+            Log::emergency($th->getMessage());
+
+            return $this->response(false, $th->getMessage());
         }
     }
 }

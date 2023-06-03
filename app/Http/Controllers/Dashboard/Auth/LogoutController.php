@@ -26,6 +26,7 @@ class LogoutController extends Controller
             $manager = app('impersonate');
 
             if ($manager->isImpersonating()) {
+                alert()->html('Berhasil', "Anda berhasil keluar dari impersonate user ".Auth::user()->name, 'success');
                 Auth::user()->leaveImpersonation();
                 return redirect()->route('dashboard.index');
             } else {

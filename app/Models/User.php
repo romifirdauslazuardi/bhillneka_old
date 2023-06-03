@@ -27,7 +27,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'phone',
         'avatar',
-        'email_verified_at'
+        'user_id',
+        'email_verified_at',
+        'author_id',
     ];
 
     /**
@@ -48,6 +50,15 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'phone' => 'integer',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'author_id', 'id');
+    }
 }

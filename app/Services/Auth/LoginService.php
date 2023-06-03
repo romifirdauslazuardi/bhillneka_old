@@ -31,6 +31,7 @@ class LoginService extends BaseService
                     RoleEnum::OWNER,
                     RoleEnum::AGEN,
                     RoleEnum::USER,
+                    RoleEnum::ADMIN_AGEN,
                 ])) {
                     Auth::logout();
                     return $this->response(true, "Login berhasil");

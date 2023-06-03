@@ -73,7 +73,6 @@
         </div>
     </div>
 </div>
-@endsection
 
 @include("dashboard.banks.modal.index")
 @include("dashboard.components.loader")
@@ -83,6 +82,8 @@
     @method('DELETE')
     <input type="hidden" name="id" />
 </form>
+
+@endsection
 
 @section("script")
 <script>

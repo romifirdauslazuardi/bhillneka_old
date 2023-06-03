@@ -3,7 +3,6 @@
 @section("title","Rekening Pengguna")
 
 @section("css")
-<link href="{{URL::to('/')}}/templates/dashboard/assets/libs/datetimepicker/jquery.datetimepicker.css" type="text/css" rel="stylesheet" />
 @endsection
 
 @section("breadcumb")
@@ -28,17 +27,19 @@
                 @method("PUT")
                 <div class="row mb-3">
                     <div class="col-lg-12">
+                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Pengguna<span class="text-danger">*</span></label>
                             <div class="col-md-9">
                                 <select class="form-control select2" name="user_id" >
                                     <option value="">==Pilih Pengguna==</option>
                                     @foreach ($users as $index => $row)
-                                    <option value="{{$row->id}}" @if($row->id == old('user_id',$result->user_id)) selected @endif>{{$row->name}} ({{$row->phone}})</option>
+                                    <option value="{{$row->id}}" @if($row->id == old('user_id',$result->user_id)) selected @endif>{{$row->name}} - {{$row->phone}}</option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
+                        @endif
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Bank<span class="text-danger">*</span></label>
                             <div class="col-md-9">
@@ -62,6 +63,19 @@
                                 <input type="text" class="form-control" name="number" placeholder="Nomor Rekening" value="{{old('number',$result->number)}}" >
                             </div>
                         </div>
+                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
+                        <div class="form-group row mb-3">
+                            <label class="col-md-3 col-form-label">Status<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <select class="form-control select2" name="status" >
+                                    <option value="">==Pilih Status Rekening==</option>
+                                    @foreach ($status as $index => $row)
+                                    <option value="{{$index}}" @if($index == $result->status) selected @endif>{{$row}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
                 <div class="row">
@@ -74,53 +88,14 @@
         </div>
     </div>
 </div>
-@endsection
 
 @include("dashboard.components.loader")
 
+@endsection
+
 @section("script")
-<script src="{{URL::to('/')}}/templates/dashboard/assets/libs/moment/moment.min.js"></script>
-<script src="{{URL::to('/')}}/templates/dashboard/assets/libs/datetimepicker/jquery.datetimepicker.min.js"></script>
-<script src="{{URL::to('/')}}/templates/dashboard/assets/libs/axios/axios.min.js"></script>
 <script>
     $(function(){
-        getProvince('.select-province',null);
-
-        $(document).on("change", ".select-province", function(e) {
-            e.preventDefault();
-            let val = $(this).val();
-
-            $('.select-city').html('<option value="">==Pilih Kota/Kabupaten==</option>');
-            $('.select-district').html('<option value="">==Pilih Kecamatan==</option>');
-            $('.select-village').html('<option value="">==Pilih Desa==</option>');
-
-            if(val != "" || val != undefined || val != null){
-                getCity('.select-city',val,null);
-            }
-        });
-
-        $(document).on("change", ".select-city", function(e) {
-            e.preventDefault();
-            let val = $(this).val();
-
-            $('.select-district').html('<option value="">==Pilih Kecamatan==</option>');
-            $('.select-village').html('<option value="">==Pilih Desa==</option>');
-
-            if(val != "" || val != undefined || val != null){
-                getDistrict('.select-district',val,null);
-            }
-        });
-
-        $(document).on("change", ".select-district", function(e) {
-            e.preventDefault();
-            let val = $(this).val();
-
-            $('.select-village').html('<option value="">==Pilih Desa==</option>');
-
-            if(val != "" || val != undefined || val != null){
-                getVillage('.select-village',val,null);
-            }
-        });
 
         $(document).on('submit','#frmUpdate',function(e){
             e.preventDefault();

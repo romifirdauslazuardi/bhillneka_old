@@ -37,7 +37,9 @@
                                 <thead>
                                     <th>Aksi</th>
                                     <th>No</th>
+                                    @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
                                     <th>Agen</th>
+                                    @endif
                                     <th>Nama Bisnis</th>
                                     <th>Kategori Bisnis</th>
                                     <th>Alamat</th>
@@ -59,7 +61,9 @@
                                             </div>
                                         </td>
                                         <td>{{$table->firstItem() + $index}}</td>
+                                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
                                         <td>{{$row->user->name ?? null}}</td>
+                                        @endif
                                         <td>{{$row->name}}</td>
                                         <td>{{$row->category->name ?? null}}</td>
                                         <td>{{$row->location}}</td>
@@ -80,10 +84,10 @@
         </div>
     </div>
 </div>
-@endsection
 
 @include("dashboard.business.modal.index")
 @include("dashboard.components.loader")
+@endsection
 
 <form id="frmDelete" method="POST">
     @csrf

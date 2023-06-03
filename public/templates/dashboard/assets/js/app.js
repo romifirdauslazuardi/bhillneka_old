@@ -31,8 +31,8 @@
     }
 
     // Menus
-    activateMenu();
-    activateSidebarMenu();
+    // activateMenu();
+    // activateSidebarMenu();
 }
 
 //Menu

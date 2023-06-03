@@ -90,7 +90,6 @@
         </div>
     </div>
 </div>
-@endsection
 
 @include("dashboard.users.modal.index")
 @include("dashboard.components.loader")
@@ -106,6 +105,8 @@
     @method('PUT')
     <input type="hidden" name="id" />
 </form>
+
+@endsection
 
 @section("script")
 <script>

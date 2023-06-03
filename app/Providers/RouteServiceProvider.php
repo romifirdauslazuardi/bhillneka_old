@@ -38,6 +38,7 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(base_path('routes/api.php'));
 
             Route::middleware('web')
+                ->namespace($this->namespace . '\\LandingPage')
                 ->as("landing-page")
                 ->group(base_path('routes/web.php'));
 
@@ -46,6 +47,12 @@ class RouteServiceProvider extends ServiceProvider
                 ->as('dashboard.')
                 ->prefix('dashboard')
                 ->group(base_path('routes/dashboard.php'));
+
+            Route::middleware('web')
+                ->namespace($this->namespace . '\\Base')
+                ->as('base.')
+                ->prefix('base')
+                ->group(base_path('routes/base.php'));
         });
     }
 }

@@ -28,6 +28,7 @@
                         <div class="table">
                             <table class="table table-striped table-bordered">
                                 <thead>
+                                    <th>No</th>
                                     <th>Judul</th>
                                     <th>Deskripsi</th>
                                     <th>Tanggal</th>
@@ -36,8 +37,9 @@
                                 </thead>
                                 <tbody>
                                     @if ($notifications->count() > 0)
-                                    @foreach($notifications as $notification)
+                                    @foreach($notifications as $index => $notification)
                                     <tr>
+                                        <td>{{$notifications->firstItem() + $index}}</td>
                                         <td>{!! $notification->data['title'] !!}</td>
                                         <td>{!! $notification->data['message'] !!}</td>
                                         <td>
@@ -46,13 +48,13 @@
                                         </td>
                                         <td>
                                             @if (empty($notification->read_at))
-                                            <span class="badge badge-danger">Belum Dibaca</span>
+                                            <span class="badge bg-danger">Belum Dibaca</span>
                                             @else
-                                            <span class="badge badge-success">Sudah Dibaca</span>
+                                            <span class="badge bg-success">Sudah Dibaca</span>
                                             @endif
                                         </td>
                                         <td>
-                                            <a href="{{ route("dashboard.notification.read", ["go" => $notification->id]) }}" class="btn btn-primary btn-sm">Baca</a>
+                                            <a href="{{ route("dashboard.notification.read", ["go" => $notification->id]) }}" class="btn btn-success btn-sm">Baca</a>
                                         </td>
                                     </tr>
                                     @endforeach

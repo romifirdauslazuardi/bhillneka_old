@@ -17,7 +17,8 @@ class Business extends Model
         'description',
         'user_id',
         'category_id',
-        'village_code'
+        'village_code',
+        'author_id',
     ];
 
     public function user()
@@ -33,5 +34,10 @@ class Business extends Model
     public function village()
     {
         return $this->belongsTo(Village::class, 'village_code', 'code');
+    }
+
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'author_id', 'id');
     }
 }

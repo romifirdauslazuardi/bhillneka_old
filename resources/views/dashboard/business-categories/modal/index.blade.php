@@ -25,7 +25,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content rounded shadow border-0">
             <div class="modal-header border-bottom">
-                <h5 class="modal-title" id="modalStore-title">Tambah Kategori Bisniss</h5>
+                <h5 class="modal-title" id="modalStore-title">Tambah Kategori Bisnis</h5>
                 <button type="button" class="btn btn-icon btn-close" data-bs-dismiss="modal" id="close-modal"><i class="uil uil-times fs-4 text-dark"></i></button>
             </div>
             <form method="POST" action="{{route('dashboard.business-categories.store')}}" id="frmStore" autocomplete="off">
@@ -50,7 +50,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content rounded shadow border-0">
             <div class="modal-header border-bottom">
-                <h5 class="modal-title" id="modalUpdate-title">Edit Kategori Bisniss</h5>
+                <h5 class="modal-title" id="modalUpdate-title">Edit Kategori Bisnis</h5>
                 <button type="button" class="btn btn-icon btn-close" data-bs-dismiss="modal" id="close-modal"><i class="uil uil-times fs-4 text-dark"></i></button>
             </div>
             <form method="POST" id="frmUpdate" autocomplete="off">

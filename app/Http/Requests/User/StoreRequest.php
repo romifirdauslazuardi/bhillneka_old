@@ -2,12 +2,29 @@
 
 namespace App\Http\Requests\User;
 
+use App\Enums\RoleEnum;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Exceptions\CustomValidationException;
+use Illuminate\Validation\Rule;
+use Auth;
 
 class StoreRequest extends FormRequest
 {
+    public function prepareForValidation()
+    {
+        $merge = [];
+        if(Auth::user()->hasRole([RoleEnum::AGEN])){
+            $merge["user_id"] = Auth::user()->id;
+            $merge["email_verified_at"] = date("Y-m-d H:i:s");
+        }
+        if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
+            $merge["user_id"] = Auth::user()->user_id;
+            $merge["roles"] = [RoleEnum::USER];
+        }
+        $this->merge($merge);
+    }
+
     public function rules(): array
     {
         return [
@@ -15,7 +32,7 @@ class StoreRequest extends FormRequest
                 'required',
                 'email',
                 'max:255',
-                'unique:users',
+                Rule::unique('users','email')->whereNull('deleted_at'),
             ],
             'name' => [
                 'required',
@@ -24,7 +41,7 @@ class StoreRequest extends FormRequest
                 'required',
                 'numeric',
                 'min:8',
-                'unique:users,phone',
+                Rule::unique('users','phone')->whereNull('deleted_at'),
             ],
             'roles' => [
                 'required',
@@ -43,6 +60,10 @@ class StoreRequest extends FormRequest
             'email_verified_at' => [
                 'date_format:Y-m-d H:i:s'
             ],
+            'user_id' => [
+                (in_array(request()->get("roles"),[RoleEnum::USER])) ? "required" : "nullable",
+                Rule::exists('users', 'id'),
+            ]
         ];
     }
 
@@ -69,6 +90,8 @@ class StoreRequest extends FormRequest
             'password.confirmed' => 'Password tidak sama',
             'roles.required' => 'Role tidak boleh kosong',
             'email_verified_at.date_format' => 'Format verifikasi email at tidak sesuai',
+            'user_id.required' => 'User harus diisi',
+            'user_id.exists' => 'User tidak ditemukan',
         ];
     }
 

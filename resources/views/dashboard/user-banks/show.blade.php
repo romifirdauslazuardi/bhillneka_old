@@ -65,6 +65,24 @@
 
                         <div class="row mb-2">
                             <div class="col-md-3">
+                                Status
+                            </div>
+                            <div class="col-md-8">
+                                : <span class="badge bg-{{$result->status()->class ?? null}}">{{$result->status()->msg ?? null}}</span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-3">
+                                Author
+                            </div>
+                            <div class="col-md-8">
+                                : {{$result->author->name ?? null}}
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-3">
                                 Tanggal Dibuat
                             </div>
                             <div class="col-md-8">
@@ -103,9 +121,10 @@
     @method('DELETE')
     <input type="hidden" name="id"/>
 </form>
-@endsection
 
 @include("dashboard.components.loader")
+
+@endsection
 
 @section("script")
 <script>

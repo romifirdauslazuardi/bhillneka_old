@@ -3,10 +3,10 @@
     <div class="header-bar d-flex justify-content-between">
         <div class="d-flex align-items-center">
             <a href="#" class="logo-icon me-3">
-                <img src="{{URL::to('/')}}/templates/dashboard/assets/images/logo-icon.png" height="30" class="small" alt="">
+                <img src="{{!empty(\SettingHelper::settings('dashboard', 'logo_icon')) ? asset(\SettingHelper::settings('dashboard', 'logo_icon')) : URL::to('/').'/templates/dashboard/assets/images/logo-icon.png'}}" height="30" class="small" alt="">
                 <span class="big">
-                    <img src="{{URL::to('/')}}/templates/dashboard/assets/images/logo-dark.png" height="24" class="logo-light-mode" alt="">
-                    <img src="{{URL::to('/')}}/templates/dashboard/assets/images/logo-light.png" height="24" class="logo-dark-mode" alt="">
+                    <img src="{{!empty(\SettingHelper::settings('dashboard', 'logo_dark')) ? asset(\SettingHelper::settings('dashboard', 'logo_dark')) : URL::to('/').'/templates/dashboard/assets/images/logo-icon.png'}}" height="24" class="logo-light-mode" alt="">
+                    <img src="{{!empty(\SettingHelper::settings('dashboard', 'logo')) ? asset(\SettingHelper::settings('dashboard', 'logo')) : URL::to('/').'/templates/dashboard/assets/images/logo-icon.png'}}" height="24" class="logo-dark-mode" alt="">
                 </span>
             </a>
             <a id="close-sidebar" class="btn btn-icon btn-soft-light" href="javascript:void(0)">
@@ -15,11 +15,6 @@
         </div>
 
         <ul class="list-unstyled mb-0">
-            <li class="list-inline-item mb-0">
-                <a href="javascript:void(0)" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
-                    <div class="btn btn-icon btn-soft-light"><i class="fa fa-cog"></i></div>
-                </a>
-            </li>
 
             <li class="list-inline-item mb-0 ms-1">
                 <div class="dropdown dropdown-primary">
@@ -36,14 +31,13 @@
                         <div class="p-3">
                             @if (Auth::user()->unreadNotifications->count() > 0)
                             @foreach (Auth::user()->unreadNotifications as $notification)
-                            <a href="#!" class="dropdown-item features feature-primary key-feature p-0">
+                            <a href="{{$notification['data']['url']}}" class="dropdown-item features feature-primary key-feature p-0">
                                 <div class="d-flex align-items-center">
                                     <div class="icon text-center rounded-circle me-2">
-                                        <i class="ti ti-shopping-cart"></i>
+                                        <i class="fa fa-bell"></i>
                                     </div>
                                     <div class="flex-1">
                                         <h6 class="mb-0 text-dark title">{!! $notification['data']['title'] !!}</h6>
-                                        <small class="text-muted">{!! $notification['data']['message'] !!}</small>
                                     </div>
                                 </div>
                             </a>
@@ -72,7 +66,7 @@
                             </div>
                         </a>
                         <a class="dropdown-item text-dark text-center" href="{{route('dashboard.profile.index')}}"><span class="mb-0 d-inline-block me-1">Profile</a>
-                        <a class="dropdown-item text-dark text-center" href="{{route('dashboard.auth.logout')}}"><span class="mb-0 d-inline-block me-1">Logout</a>
+                        <a class="dropdown-item text-dark text-center" href="{{route('dashboard.auth.logout')}}"><span class="mb-0 d-inline-block me-1">@if(session('impersonated_by')) Leave Impersonate @else Logout @endif</a>
                     </div>
                 </div>
             </li>

@@ -13,12 +13,3 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
-Route::group(["as" => "indonesia.", "prefix" => "indonesia"], function () {
-
-	Route::get('/province', 'IndonesiaController@province')->name('province');
-    Route::get('/city', 'IndonesiaController@city')->name('city');
-    Route::get('/district', 'IndonesiaController@district')->name('district');
-    Route::get('/village', 'IndonesiaController@village')->name('village');
-    
-});

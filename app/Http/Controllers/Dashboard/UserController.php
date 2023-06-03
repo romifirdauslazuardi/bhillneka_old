@@ -44,8 +44,12 @@ class UserController extends Controller
     {
         $roles = RoleEnum::roles();
 
+        $users = $this->userService->getUserAgen();
+        $users = $users->data;
+
         $data = [
-            'roles' => $roles
+            'roles' => $roles,
+            'users' => $users,
         ];
 
         return view($this->view . "create", $data);
@@ -78,9 +82,13 @@ class UserController extends Controller
 
         $roles = RoleEnum::roles();
 
+        $users = $this->userService->getUserAgen();
+        $users = $users->data;
+
         $data = [
             'roles' => $roles,
-            'result' => $result
+            'result' => $result,
+            'users' => $users,
         ];
 
         return view($this->view . "edit", $data);

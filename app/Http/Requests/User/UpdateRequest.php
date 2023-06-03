@@ -6,9 +6,24 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Exceptions\CustomValidationException;
 use Illuminate\Validation\Rule;
+use App\Enums\RoleEnum;
+use Auth;
 
 class UpdateRequest extends FormRequest
 {
+    public function prepareForValidation()
+    {
+        $merge = [];
+        if(Auth::user()->hasRole([RoleEnum::AGEN])){
+            $merge["user_id"] = Auth::user()->id;
+        }
+        if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
+            $merge["user_id"] = Auth::user()->user_id;
+            $merge["roles"] = [RoleEnum::USER];
+        }
+        $this->merge($merge);
+    }
+
     public function rules(): array
     {
         return [
@@ -44,6 +59,10 @@ class UpdateRequest extends FormRequest
             'email_verified_at' => [
                 'date_format:Y-m-d H:i:s'
             ],
+            'user_id' => [
+                (in_array(request()->get("roles"),[RoleEnum::USER])) ? "required" : "nullable",
+                Rule::exists('users', 'id'),
+            ]
         ];
     }
 
@@ -70,6 +89,8 @@ class UpdateRequest extends FormRequest
             'password.confirmed' => 'Password tidak sama',
             'roles.required' => 'Role tidak boleh kosong',
             'email_verified_at.date_format' => 'Format verifikasi email at tidak sesuai',
+            'user_id.required' => 'User harus diisi',
+            'user_id.exists' => 'User tidak ditemukan',
         ];
     }
 

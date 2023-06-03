@@ -22,6 +22,12 @@ class UpdateRequest extends FormRequest
             'name' => [
                 'required',
             ],
+            'phone' => [
+                'required',
+                'numeric',
+                'min:8',
+                Rule::unique('users','phone')->ignore(Auth::user()->id)->whereNull('deleted_at'),
+            ],
             'avatar' => [
                 'nullable',
                 'image',
@@ -53,6 +59,10 @@ class UpdateRequest extends FormRequest
             'password.required' => 'Password tidak boleh kosong',
             'password.min' => 'Password minimal 8 karakter',
             'password.confirmed' => 'Password tidak sama',
+            'phone.required' => 'Phone tidak boleh kosong',
+            'phone.numeric' => 'Phone harus berupa angka',
+            'phone.min' => 'Phone minimal 8 angka',
+            'phone.unique' => 'Phone sudah terdaftar',
         ];
     }
 

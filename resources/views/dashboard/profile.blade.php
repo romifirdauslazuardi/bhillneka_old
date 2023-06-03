@@ -35,6 +35,12 @@
                             </div>
                         </div>
                         <div class="form-group row mb-3">
+                            <label class="col-md-3 col-form-label">Phone <span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="phone" placeholder="Phone" value="{{old('phone',$result->phone)}}">
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Email <span class="text-danger">*</span></label>
                             <div class="col-md-9">
                                 <input type="email" class="form-control" name="email" placeholder="Email" value="{{old('email',$result->email)}}">
@@ -73,9 +79,10 @@
         </div>
     </div>
 </div>
-@endsection
 
 @include("dashboard.components.loader")
+
+@endsection
 
 @section("script")
 <script src="{{URL::to('/')}}/templates/dashboard/assets/libs/moment/moment.min.js"></script>
@@ -107,7 +114,7 @@
                         return openLoader();
                     },
                     success : function(resp){
-                        if(resp.status == "failed"){
+                        if(resp.success == false){
                             responseFailed(resp.message);                   
                         }
                         else{

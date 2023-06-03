@@ -27,7 +27,7 @@ class NotificationController extends Controller
         }
         $notification->markAsRead();
 
-        return redirect($notification->data['link']);
+        return redirect($notification->data['url']);
     }
 
     public function markAsRead()

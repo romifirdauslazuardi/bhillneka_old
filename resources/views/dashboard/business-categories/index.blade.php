@@ -1,6 +1,6 @@
 @extends("dashboard.layouts.main")
 
-@section("title","Kategori Bisniss")
+@section("title","Kategori Bisnis")
 
 @section("css")
 @endsection
@@ -38,6 +38,7 @@
                                     <th>Aksi</th>
                                     <th>No</th>
                                     <th>Nama</th>
+                                    <th>Author</th>
                                     <th>Dibuat Pada</th>
                                 </thead>
                                 <tbody>
@@ -56,6 +57,7 @@
                                         </td>
                                         <td>{{$table->firstItem() + $index}}</td>
                                         <td>{{$row->name}}</td>
+                                        <td>{{$row->author->name ?? null}}</td>
                                         <td>{{date('d-m-Y H:i:s',strtotime($row->created_at))}}</td>
                                     </tr>
                                     @empty
@@ -73,7 +75,6 @@
         </div>
     </div>
 </div>
-@endsection
 
 @include("dashboard.business-categories.modal.index")
 @include("dashboard.components.loader")
@@ -83,6 +84,8 @@
     @method('DELETE')
     <input type="hidden" name="id" />
 </form>
+
+@endsection
 
 @section("script")
 <script>
