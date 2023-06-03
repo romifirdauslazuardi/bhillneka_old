@@ -39,6 +39,19 @@
         
                         <button class="btn btn-primary w-100" type="submit">Login</button>
 
+                        <div class="row">
+                            <div class="col-lg-12 mt-2 text-center">
+                                <h6>Atau login dengan</h6>
+                                <div class="row">
+                                    <div class="col-12 mt-1">
+                                        <div class="d-grid">
+                                            <a href="{{route('dashboard.auth.google.index')}}" class="btn btn-light"><i class="mdi mdi-google text-danger"></i> Google</a>
+                                        </div>
+                                    </div><!--end col-->
+                                </div>
+                            </div><!--end col-->
+                        </div>
+
                         <div class="col-12 text-center mt-3">
                             <p class="mb-0 mt-3"><small class="text-dark me-2">Belum punya akun ?</small> <a href="{{route('dashboard.auth.register.index')}}" class="text-dark fw-bold">Daftar Sekarang</a></p>
                         </div><!--end col-->

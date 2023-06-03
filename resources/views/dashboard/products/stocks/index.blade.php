@@ -20,7 +20,7 @@
                                     <th>Dibuat Pada</th>
                                 </thead>
                                 <tbody>
-                                    @forelse ($result->stocks as $index => $row)
+                                    @foreach ($result->stocks as $index => $row)
                                     <tr>
                                         <td>
                                             <div class="dropdown-primary me-2 mt-2">
@@ -39,11 +39,7 @@
                                         <td>{{$row->author->name ?? null}}</td>
                                         <td>{{date('d-m-Y H:i:s',strtotime($row->created_at))}}</td>
                                     </tr>
-                                    @empty
-                                    <tr>
-                                        <td colspan="6" class="text-center">Data tidak ditemukan</td>
-                                    </tr>
-                                    @endforelse
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>

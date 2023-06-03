@@ -17,7 +17,7 @@ final class RoleEnum extends Enum
     const OWNER = "Owner";
     const AGEN = "Agen";
     const USER = "User";
-    const ADMIN_AGEN = "ADMIN AGEN";
+    const ADMIN_AGEN = "Admin Agen";
 
     public static function roles()
     {

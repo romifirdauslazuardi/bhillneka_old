@@ -85,8 +85,15 @@
 
                 <div class="mt-3">
                     <p class="font-size-12 text-muted mb-1">Author</p>
-                    <h6 class="">{{ $result->author->name ?? null }}</h6>
+                    <h6 class="">{{ $result->author->name ?? "-" }}</h6>
                 </div>
+
+                @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
+                <div class="mt-3">
+                    <p class="font-size-12 text-muted mb-1">Tipe Registrasi</p>
+                    <h6 class="">{{ $result->provider() ?? null }}</h6>
+                </div>
+                @endif
 
                 <div class="mt-3">
                     <p class="font-size-12 text-muted mb-1">Tanggal Dibuat</p>

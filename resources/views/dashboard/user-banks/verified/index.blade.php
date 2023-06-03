@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-12 mt-4">
         <div class="card border-0 rounded shadow p-4">
-            <h5 class="card-title mb-3">Informasi Data Rekening Lainnya</h5>
+            <h5 class="card-title mb-3">Informasi Data Rekening Lainnya (Approved)</h5>
             <div class="row mb-3">
                 <div class="col-lg-12">
                 <div class="table-responsive">
@@ -16,7 +16,7 @@
                                     <th>Dibuat Pada</th>
                                 </thead>
                                 <tbody>
-                                    @forelse ($result->related as $index => $row)
+                                    @forelse ($result->verified as $index => $row)
                                     <tr>
                                         <td>{{$index + 1}}</td>
                                         <td>{{$row->user->name ?? null}}</td>

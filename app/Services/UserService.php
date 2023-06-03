@@ -8,6 +8,7 @@ use App\Http\Requests\User\StoreRequest;
 use App\Http\Requests\User\UpdateRequest;
 use App\Helpers\UploadHelper;
 use App\Enums\UserEnum;
+use App\Helpers\CodeHelper;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Auth;
@@ -134,6 +135,7 @@ class UserService extends BaseService
             }
 
             $create = $this->user->create([
+                'code' => CodeHelper::generateUserCode(),
                 'name' => $name,
                 'phone' => $phone,
                 'email' => $email,

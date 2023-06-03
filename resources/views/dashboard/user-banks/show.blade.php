@@ -114,7 +114,7 @@
     </div>
 </div>
 
-@include("dashboard.user-banks.related.index")
+@include("dashboard.user-banks.verified.index")
 
 <form id="frmDelete" method="POST">
     @csrf

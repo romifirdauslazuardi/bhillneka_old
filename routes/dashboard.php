@@ -43,6 +43,11 @@ Route::group(["as" => "auth.", "prefix" => "auth", "namespace" => "Auth"], funct
 		Route::get('verify/{id}/{hash}', 'VerificationController@verifyUser')->name("verify")->middleware(['signed']);
 		Route::post('verification-notification', 'VerificationController@verificationResend')->name("send")->middleware(['auth', 'throttle:6,1']);
 	});
+
+	Route::group(["as" => "google.", "prefix" => "google"], function () {
+		Route::get('/', 'GoogleController@index')->name('index');
+		Route::get('/callback', 'GoogleController@callback')->name('callback');
+	});
 });
 
 Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.auth.verification.notice']], function () {

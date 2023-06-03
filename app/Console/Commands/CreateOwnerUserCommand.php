@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Enums\RoleEnum;
+use App\Enums\UserEnum;
+use App\Helpers\CodeHelper;
 use App\Models\User;
 use Exception;
 use Illuminate\Console\Command;
@@ -75,11 +77,13 @@ class CreateOwnerUserCommand extends Command
             if ($this->confirm('Do you wish to create the user?')) {
                 $this->info('Creating the user...');
                 $user = User::create([
+                    'code' => CodeHelper::generateUserCode(),
                     'name' => $name,
                     'email' => $email,
                     'phone' => $phone,
                     'password' => Hash::make($password),
                     'email_verified_at' => now(),
+                    'provider' => UserEnum::PROVIDER_MANUAL,
                 ]);
                 $user->assignRole(RoleEnum::OWNER);
                 DB::commit();

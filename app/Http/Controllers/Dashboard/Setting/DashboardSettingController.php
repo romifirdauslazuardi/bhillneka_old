@@ -35,6 +35,7 @@ class DashboardSettingController extends Controller
     {
         try {
             $title = $request->title;
+            $footer = $request->footer;
             $logo = $request->file("logo");
             $logo_dark = $request->file("logo_dark");
             $logo_icon = $request->file("logo_icon");
@@ -80,6 +81,7 @@ class DashboardSettingController extends Controller
                 $dashboardSetting->logo_icon = $logo_icon;
             }
             $dashboardSetting->title = $title;
+            $dashboardSetting->footer = $footer;
             $dashboardSetting->save();
 
             return ResponseHelper::apiResponse(true, "Pengaturan dashboard berhasil diubah" , $dashboardSetting , null, 200);

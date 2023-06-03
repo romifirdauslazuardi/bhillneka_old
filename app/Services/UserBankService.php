@@ -83,13 +83,14 @@ class UserBankService extends BaseService
                 return $this->response(false, "Data tidak ditemukan");
             }
 
-            $related = $this->userBank;
-            $related = $related->where("user_id",$result->user_id);
-            $related = $related->where("id","!=",$result->id);
-            $related = $related->orderBy("created_at","DESC");
-            $related = $related->get();
+            $verified = $this->userBank;
+            $verified = $verified->where("user_id",$result->user_id);
+            $verified = $verified->where("id","!=",$result->id);
+            $verified = $verified->orderBy("created_at","DESC");
+            $verified = $verified->where("status",UserBankEnum::STATUS_APPROVED);
+            $verified = $verified->get();
 
-            $result->related = $related;
+            $result->verified = $verified;
 
             return $this->response(true, 'Berhasil mendapatkan data', $result);
         } catch (Throwable $th) {

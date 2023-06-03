@@ -39,7 +39,7 @@
                                     <th>No</th>
                                     <th>Nama Produk</th>
                                     <th>Harga Produk</th>
-                                    <th>Apakah Item Stock ? </th
+                                    <th>Apakah Item Stock</th>
                                     @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
                                     <th>Pengguna</th>
                                     @endif
@@ -64,12 +64,12 @@
                                         <td>{{$table->firstItem() + $index}}</td>
                                         <td>{{$row->name}}</td>
                                         <td>{{number_format($row->price,0,',','.')}}</td>
-                                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-                                        <td>{{$row->user->name ?? null}}</td>
-                                        @endif
                                         <td>
                                             <span class="badge bg-{{$row->is_using_stock()->class ?? null}}">{{$row->is_using_stock()->msg ?? null}}</span>
                                         </td>
+                                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
+                                        <td>{{$row->user->name ?? null}}</td>
+                                        @endif
                                         <td>
                                             <span class="badge bg-{{$row->status()->class ?? null}}">{{$row->status()->msg ?? null}}</span>
                                         </td>

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\UserEnum;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -22,6 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $fillable = [
+        'code',
         'name',
         'email',
         'password',
@@ -30,6 +32,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'user_id',
         'email_verified_at',
         'author_id',
+        'provider',
     ];
 
     /**
@@ -60,5 +63,19 @@ class User extends Authenticatable implements MustVerifyEmail
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id', 'id');
+    }
+
+    public function provider()
+    {
+        $return = null;
+
+        if($this->provider == UserEnum::PROVIDER_MANUAL){
+            $return = "Manual";
+        }
+        else{
+            $return = "Google";
+        }
+
+        return $return;
     }
 }
