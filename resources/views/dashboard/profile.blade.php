@@ -72,7 +72,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <a href="{{route('dashboard.index')}}" class="btn btn-warning btn-sm"><i class="fa fa-arrow-left"></i> Kembali</a>
-                        <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-save"></i> Simpan</button>
+                        <button type="submit" class="btn btn-primary btn-sm" disabled><i class="fa fa-save"></i> Simpan</button>
                     </div>
                 </div>
             </form>
@@ -98,6 +98,8 @@
               formatTime:'HH:mm:ss',
               formatDate:'YYYY-MM-DD'
         });
+
+        $('button[type="submit"]').attr("disabled",false);
 
         $(document).on('submit','#frmUpdate',function(e){
             e.preventDefault();

@@ -43,7 +43,7 @@
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Nama Bisnis <span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" name="name" placeholder="Nama Lengkap" value="{{old('name',$result->name)}}" >
+                                <input type="text" class="form-control" name="name" placeholder="Nama Bisnis" value="{{old('name',$result->name)}}" >
                             </div>
                         </div>
                         <div class="form-group row mb-3">
@@ -106,7 +106,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <a href="{{route('dashboard.business.index')}}" class="btn btn-warning btn-sm"><i class="fa fa-arrow-left"></i> Kembali</a>
-                        <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-save"></i> Simpan</button>
+                        <button type="submit" class="btn btn-primary btn-sm" disabled><i class="fa fa-save"></i> Simpan</button>
                     </div>
                 </div>
             </form>
@@ -120,6 +120,9 @@
 @section("script")
 <script>
     $(function(){
+
+        $('button[type="submit"]').attr("disabled",false);
+        
         @if(!empty($result->village_code))
             getProvince('.select-province','{{$result->village->district->city->province->code ?? null}}');
             getCity('.select-city','{{$result->village->district->city->province->code ?? null}}','{{$result->village->district->city->code ?? null}}');

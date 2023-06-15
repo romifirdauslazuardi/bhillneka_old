@@ -26,7 +26,7 @@
                 <div class="col-lg-12">
                     <a href="#" class="btn btn-primary btn-sm btn-add"><i class="fa fa-plus"></i> Tambah</a>
                     <a href="#" class="btn btn-success btn-sm btn-filter"><i class="fa fa-filter"></i> Filter</a>
-                    <a href="{{route('dashboard.product-categories.index')}}" class="btn btn-warning btn-sm"><i class="fa fa-refresh"></i> Refresh</a>
+                    <a href="{{route('dashboard.product-categories.index')}}" class="btn @if(!empty(request()->all())) btn-warning @else btn-secondary @endif btn-sm"><i class="fa fa-refresh"></i> Refresh</a>
                 </div>
             </div>
             <div class="row">
@@ -96,6 +96,9 @@
 @section("script")
 <script>
     $(function() {
+
+        $('button[type="submit"]').attr("disabled",false);
+        
         $(document).on("click", ".btn-filter", function(e) {
             e.preventDefault();
 
@@ -142,9 +145,7 @@
                     processData:false,
                     dataType : "JSON",
                     beforeSend : function(){
-                        $('.preloader').removeClass('d-none');
-                        $('.preloader').css('display','block');
-                        $('.preloader').find('#status').css('display','block');
+                        return openLoader();
                     },
                     success : function(resp){
                         if(resp.success == false){
@@ -163,9 +164,7 @@
                         }
                     },
                     complete :function(){
-                        $('.preloader').removeClass('d-none').addClass('d-none');
-                        $('.preloader').css('display','none');
-                        $('.preloader').find('#status').css('display','none');
+                        return closeLoader();
                     }
                 })
             }
@@ -183,9 +182,7 @@
                     processData:false,
                     dataType : "JSON",
                     beforeSend : function(){
-                        $('.preloader').removeClass('d-none');
-                        $('.preloader').css('display','block');
-                        $('.preloader').find('#status').css('display','block');
+                        return openLoader();
                     },
                     success : function(resp){
                         if(resp.success == false){
@@ -204,9 +201,7 @@
                         }
                     },
                     complete :function(){
-                        $('.preloader').removeClass('d-none').addClass('d-none');
-                        $('.preloader').css('display','none');
-                        $('.preloader').find('#status').css('display','none');
+                        return closeLoader();
                     }
                 })
             }

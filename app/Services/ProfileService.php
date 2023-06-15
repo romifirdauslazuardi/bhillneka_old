@@ -27,10 +27,10 @@ class ProfileService extends BaseService
         try {
             $result = Auth::user();
 
-            $name = $request->name;
-            $phone = $request->phone;
-            $email = $request->email;
-            $password = $request->password;
+            $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
+            $phone = (empty($request->phone)) ? null : trim(strip_tags($request->phone));
+            $email = (empty($request->email)) ? null : trim(strip_tags($request->email));
+            $password = (empty($request->password)) ? null : trim(strip_tags($request->password));
             $avatar = $request->file("avatar");
 
             if ($avatar) {

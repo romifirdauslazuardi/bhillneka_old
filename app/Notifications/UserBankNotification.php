@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Broadcasting\WhatsappChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
@@ -36,12 +37,23 @@ class UserBankNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        $channels = ['database'];
+        $channels = [];
+        $channels[] = "database";
+        $channels[] = WhatsappChannel::class;
 
         return $channels;
     }
 
     public function toArray(): array
+    {
+        return [
+            'url' => $this->url,
+            'title' => $this->title,
+            'message' => $this->message,
+        ];
+    }
+
+    public function toWhatsapp(): array
     {
         return [
             'url' => $this->url,

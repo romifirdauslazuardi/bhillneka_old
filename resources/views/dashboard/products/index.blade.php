@@ -26,7 +26,7 @@
                 <div class="col-lg-12">
                     <a href="{{route('dashboard.products.create')}}" class="btn btn-primary btn-sm btn-add"><i class="fa fa-plus"></i> Tambah</a>
                     <a href="#" class="btn btn-success btn-sm btn-filter"><i class="fa fa-filter"></i> Filter</a>
-                    <a href="{{route('dashboard.products.index')}}" class="btn btn-warning btn-sm"><i class="fa fa-refresh"></i> Refresh</a>
+                    <a href="{{route('dashboard.products.index')}}" class="btn @if(!empty(request()->all())) btn-warning @else btn-secondary @endif btn-sm"><i class="fa fa-refresh"></i> Refresh</a>
                 </div>
             </div>
             <div class="row">

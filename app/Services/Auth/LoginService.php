@@ -17,9 +17,9 @@ class LoginService extends BaseService
     public function login(LoginRequest $request)
     {
         try {
-            $email = (empty($request->input("email"))) ? null : trim(htmlentities($request->input("email")));
-            $password = (empty($request->input("password"))) ? null : trim(htmlentities($request->input("password")));
-            $rememberme = (empty($request->input("rememberme"))) ? null : trim(htmlentities($request->input("rememberme")));
+            $email = (empty($request->email)) ? null : trim(strip_tags($request->email));
+            $password = (empty($request->password)) ? null : trim(strip_tags($request->password));
+            $rememberme = (empty($request->rememberme)) ? null : trim(strip_tags($request->rememberme));
 
             $field = [
                 'email' => $email,

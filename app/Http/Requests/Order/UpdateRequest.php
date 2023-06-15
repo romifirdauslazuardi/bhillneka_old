@@ -43,6 +43,8 @@ class UpdateRequest extends FormRequest
             'provider_id.exists' => 'Provider tidak ditemukan',
             'repeater.required' => 'Produk belum dipilih',
             'repeater.array' => 'Produk tidak valid',
+            'status.required' => 'Status order harus diisi',
+            'status.in' => 'Status order tidak valid',
         ];
     }
 

@@ -27,9 +27,9 @@ class UserService extends BaseService
 
     public function index(Request $request, bool $paginate = true)
     {
-        $search = $request->search;
-        $role = $request->role;
-        $user_id = $request->user_id;
+        $search = (empty($request->search)) ? null : trim(strip_tags($request->search));
+        $role = (empty($request->role)) ? null : trim(strip_tags($request->role));
+        $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
 
         if(Auth::user()->hasRole([RoleEnum::AGEN])){
             $user_id = Auth::user()->id;
@@ -115,14 +115,14 @@ class UserService extends BaseService
     {
         DB::beginTransaction();
         try {
-            $name = $request->name;
-            $phone = $request->phone;
-            $email = $request->email;
-            $email_verified_at = $request->email_verified_at;
-            $password = $request->password;
-            $roles = $request->roles;
+            $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
+            $phone = (empty($request->phone)) ? null : trim(strip_tags($request->phone));
+            $email = (empty($request->email)) ? null : trim(strip_tags($request->email));
+            $email_verified_at = (empty($request->email_verified_at)) ? null : trim(strip_tags($request->email_verified_at));
+            $password = (empty($request->password)) ? null : trim(strip_tags($request->password));
+            $roles = (empty($request->roles)) ? null : trim(strip_tags($request->roles));
             $avatar = $request->file("avatar");
-            $user_id = $request->user_id;
+            $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
 
             if ($avatar) {
                 $upload = UploadHelper::upload_file($avatar, 'user-avatar', UserEnum::AVATAR_EXT);
@@ -163,14 +163,14 @@ class UserService extends BaseService
     {
         DB::beginTransaction();
         try {
-            $name = $request->name;
-            $phone = $request->phone;
-            $email = $request->email;
-            $email_verified_at = $request->email_verified_at;
-            $password = $request->password;
-            $roles = $request->roles;
+            $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
+            $phone = (empty($request->phone)) ? null : trim(strip_tags($request->phone));
+            $email = (empty($request->email)) ? null : trim(strip_tags($request->email));
+            $email_verified_at = (empty($request->email_verified_at)) ? null : trim(strip_tags($request->email_verified_at));
+            $password = (empty($request->password)) ? null : trim(strip_tags($request->password));
+            $roles = (empty($request->roles)) ? null : trim(strip_tags($request->roles));
             $avatar = $request->file("avatar");
-            $user_id = $request->user_id;
+            $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
 
             $result = $this->user;
             if (Auth::user()->hasRole([

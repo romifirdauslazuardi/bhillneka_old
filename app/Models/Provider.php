@@ -31,10 +31,10 @@ class Provider extends Model
     {
         $return = null;
 
-        if($this->status == ProviderEnum::TYPE_MANUAL_TRANSFER){
+        if($this->type == ProviderEnum::TYPE_MANUAL_TRANSFER){
             $return = "Manual Transfer";
         }
-        else if($this->status == ProviderEnum::TYPE_DOKU){
+        else if($this->type == ProviderEnum::TYPE_DOKU){
             $return = "Doku";
         }
 

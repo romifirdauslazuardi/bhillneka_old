@@ -13,5 +13,11 @@ class BusinessCategory extends Model
     protected $table = "business_categories";
     protected $fillable = [
         'name',
+        'author_id',
     ];
+
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'author_id', 'id');
+    }
 }

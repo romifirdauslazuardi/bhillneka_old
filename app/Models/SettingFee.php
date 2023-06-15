@@ -19,11 +19,11 @@ class SettingFee extends Model
 
     public function getOwnerFeeAttribute($value)
     {
-        return floatval($value);
+        return (int)$value;
     }
 
     public function getAgenFeeAttribute($value)
     {
-        return floatval($value);
+        return (int)$value;
     }
 }

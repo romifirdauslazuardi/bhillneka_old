@@ -27,9 +27,9 @@ class ProductStockService extends BaseService
     public function store(StoreRequest $request)
     {
         try {
-            $product_id = $request->product_id;
-            $qty = $request->qty;
-            $note = $request->note;
+            $product_id = (empty($request->product_id)) ? null : trim(strip_tags($request->product_id));
+            $qty = (empty($request->qty)) ? 0 : trim(strip_tags($request->qty));
+            $note = (empty($request->note)) ? null : trim(strip_tags($request->note));
 
             $create = $this->productStock->create([
                 'product_id' => $product_id,
@@ -49,8 +49,8 @@ class ProductStockService extends BaseService
     public function update(UpdateRequest $request, $id)
     {
         try {
-            $qty = $request->qty;
-            $note = $request->note;
+            $qty = (empty($request->qty)) ? 0 : trim(strip_tags($request->qty));
+            $note = (empty($request->note)) ? null : trim(strip_tags($request->note));
 
             $result = $this->productStock->findOrFail($id);
 

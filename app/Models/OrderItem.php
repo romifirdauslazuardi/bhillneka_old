@@ -40,33 +40,33 @@ class OrderItem extends Model
 
     public function getProductPriceAttribute($value)
     {
-        return floatval($value);
+        return (int)$value;
     }
 
     public function getQtyAttribute($value)
     {
-        return floatval($value);
+        return (int)$value;
     }
 
     public function getDiscountAttribute($value)
     {
-        return floatval($value);
+        return (int)$value;
     }
 
     public function getTotalAttribute($value)
     {
-        return floatval($value);
+        return (int)$value;
     }
 
     public function totalBruto(){
         $total = $this->qty * $this->product_price;
 
-        return $total;
+        return (int)$total;
     }
 
     public function totalNeto(){
         $total = ($this->qty * $this->product_price) - $this->discount;
 
-        return $total;
+        return (int)$total;
     }
 }

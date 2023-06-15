@@ -39,8 +39,8 @@ class SettingFeeService extends BaseService
     public function update(SettingFeeRequest $request)
     {
         try {
-            $owner_fee = $request->owner_fee;
-            $agen_fee = $request->agen_fee;
+            $owner_fee = (empty($request->owner_fee)) ? 0 : trim(strip_tags($request->owner_fee));
+            $agen_fee = (empty($request->agen_fee)) ? 0 : trim(strip_tags($request->agen_fee));
 
             $result = $this->settingFee;
             $result = $result->orderBy("created_at","DESC");

@@ -61,6 +61,15 @@
 
                         <div class="row mb-2">
                             <div class="col-md-3">
+                                Slug
+                            </div>
+                            <div class="col-md-8">
+                                : {{$result->slug}}
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-3">
                                 Deskripsi
                             </div>
                             <div class="col-md-8">
@@ -83,6 +92,17 @@
                             </div>
                             <div class="col-md-8">
                                 : <span class="badge bg-{{$result->status()->class ?? null}}">{{$result->status()->msg ?? null}}</span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-3">
+                                QRcode
+                            </div>
+                            <div class="col-md-8">
+                                : <a href="{{route('dashboard.products.qrcode',$result->id)}}">
+                                    {{\QrCode::size(100)->generate(route('landing-page.buy-products.index',$result->slug))}}
+                                </a>
                             </div>
                         </div>
 

@@ -80,7 +80,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <a href="{{route('dashboard.providers.index')}}" class="btn btn-warning btn-sm"><i class="fa fa-arrow-left"></i> Kembali</a>
-                        <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-save"></i> Simpan</button>
+                        <button type="submit" class="btn btn-primary btn-sm" disabled><i class="fa fa-save"></i> Simpan</button>
                     </div>
                 </div>
             </form>
@@ -95,6 +95,8 @@
 @section("script")
 <script>
     $(function(){
+
+        $('button[type="submit"]').attr("disabled",false);
 
         $(document).on('submit','#frmUpdate',function(e){
             e.preventDefault();

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\ProductEnum;
 use App\Services\BaseService;
 use App\Http\Requests\Product\StoreRequest;
 use App\Http\Requests\Product\UpdateRequest;
@@ -25,11 +26,11 @@ class ProductService extends BaseService
 
     public function index(Request $request, bool $paginate = true)
     {
-        $search = $request->search;
-        $user_id = $request->user_id;
-        $category_id = $request->category_id;
-        $unit_id = $request->unit_id;
-        $status = $request->status;
+        $search = (empty($request->search)) ? null : trim(strip_tags($request->search));
+        $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
+        $category_id = (empty($request->category_id)) ? null : trim(strip_tags($request->category_id));
+        $unit_id = (empty($request->unit_id)) ? null : trim(strip_tags($request->unit_id));
+        $status = (!isset($request->status)) ? null : trim(strip_tags($request->status));
 
         if(Auth::user()->hasRole([RoleEnum::AGEN])){
             $user_id = Auth::user()->id;
@@ -95,21 +96,55 @@ class ProductService extends BaseService
         }
     }
 
-    public function showByCode($code)
+    public function showActiveBySlug($slug)
     {
         try {
             $result = $this->product;
-            if(Auth::user()->hasRole([RoleEnum::AGEN])){
-                $result = $result->where("user_id",Auth::user()->id);
-            }
-            $result = $result->where("code",$code);
+            $result = $result->where('slug',$slug);
+            $result = $result->where("status",ProductEnum::STATUS_TRUE);
             $result = $result->first();
 
             if(!$result){
                 return $this->response(false, "Data tidak ditemukan");
             }
 
-            $result->stock = $result->stocks()->sum("qty");
+            return $this->response(true, 'Berhasil mendapatkan data', $result);
+        } catch (Throwable $th) {
+            Log::emergency($th->getMessage());
+
+            return $this->response(false, "Terjadi kesalahan saat memproses data");
+        }
+    }
+
+    public function showByCode(Request $request)
+    {
+        try {
+            $code = (empty($request->code)) ? null : trim(strip_tags($request->code));
+            $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
+
+            if(Auth::user()->hasRole([RoleEnum::AGEN])){
+                $user_id = Auth::user()->id;
+            }
+            if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
+                $user_id = Auth::user()->user_id;
+            }
+
+            if(!$code){
+                return $this->response(false, "Kode Transaksi harus diisi");
+            }
+
+            if(!$user_id){
+                return $this->response(false, "Pelanggan harus diisi");
+            }
+
+            $result = $this->product;
+            $result = $result->where('code',$code);
+            $result = $result->where('user_id',$user_id);
+            $result = $result->first();
+
+            if(!$result){
+                return $this->response(false, "Data tidak ditemukan");
+            }
 
             return $this->response(true, 'Berhasil mendapatkan data', $result);
         } catch (Throwable $th) {
@@ -122,17 +157,19 @@ class ProductService extends BaseService
     public function store(StoreRequest $request)
     {
         try {
-            $code = $request->code;
-            $name = $request->name;
-            $price = $request->price;
-            $description = $request->description;
-            $user_id = $request->user_id;
-            $category_id = $request->category_id;
-            $unit_id = $request->unit_id;
-            $status = $request->status;
-            $is_using_stock = $request->is_using_stock;
+            $code = (empty($request->code)) ? null : trim(strip_tags($request->code));
+            $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
+            $price = (empty($request->price)) ? 0 : trim(strip_tags($request->price));
+            $description = (empty($request->description)) ? null : trim(strip_tags($request->description));;
+            $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
+            $category_id = (empty($request->category_id)) ? null : trim(strip_tags($request->category_id));
+            $unit_id = (empty($request->unit_id)) ? null : trim(strip_tags($request->unit_id));
+            $status = (empty($request->status)) ? ProductEnum::STATUS_FALSE : trim(strip_tags($request->status));
+            $is_using_stock = (empty($request->is_using_stock)) ? ProductEnum::IS_USING_STOCK_FALSE : trim(strip_tags($request->is_using_stock));
 
             $slug = SlugHelper::generate(Product::class,$name,"slug");
+
+            $code = str_replace(" ","-",$code);
 
             $create = $this->product->create([
                 'slug' => $slug,
@@ -159,15 +196,15 @@ class ProductService extends BaseService
     public function update(UpdateRequest $request, $id)
     {
         try {
-            $name = $request->name;
-            $code = $request->code;
-            $price = $request->price;
-            $description = $request->description;
-            $user_id = $request->user_id;
-            $category_id = $request->category_id;
-            $unit_id = $request->unit_id;
-            $status = $request->status;
-            $is_using_stock = $request->is_using_stock;
+            $code = (empty($request->code)) ? null : trim(strip_tags($request->code));
+            $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
+            $price = (empty($request->price)) ? 0 : trim(strip_tags($request->price));
+            $description = (empty($request->description)) ? null : trim(strip_tags($request->description));;
+            $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
+            $category_id = (empty($request->category_id)) ? null : trim(strip_tags($request->category_id));
+            $unit_id = (empty($request->unit_id)) ? null : trim(strip_tags($request->unit_id));
+            $status = (empty($request->status)) ? ProductEnum::STATUS_FALSE : trim(strip_tags($request->status));
+            $is_using_stock = (empty($request->is_using_stock)) ? ProductEnum::IS_USING_STOCK_FALSE : trim(strip_tags($request->is_using_stock));
 
             $result = $this->product->findOrFail($id);
 
@@ -177,6 +214,8 @@ class ProductService extends BaseService
             else{
                 $slug = $result->slug;
             }
+
+            $code = str_replace(" ","-",$code);
 
             $result->update([
                 'slug' => $slug,

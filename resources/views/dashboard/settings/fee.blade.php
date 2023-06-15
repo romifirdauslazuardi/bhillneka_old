@@ -3,7 +3,6 @@
 @section("title","Fee Transaksi")
 
 @section("css")
-<link href="{{URL::to('/')}}/templates/dashboard/assets/libs/datetimepicker/jquery.datetimepicker.css" type="text/css" rel="stylesheet" />
 @endsection
 
 @section("breadcumb")
@@ -51,7 +50,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <a href="{{route('dashboard.index')}}" class="btn btn-warning btn-sm"><i class="fa fa-arrow-left"></i> Kembali</a>
-                        <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-save"></i> Simpan</button>
+                        <button type="submit" class="btn btn-primary btn-sm" disabled><i class="fa fa-save"></i> Simpan</button>
                     </div>
                 </div>
             </form>
@@ -64,19 +63,10 @@
 @endsection
 
 @section("script")
-<script src="{{URL::to('/')}}/templates/dashboard/assets/libs/moment/moment.min.js"></script>
-<script src="{{URL::to('/')}}/templates/dashboard/assets/libs/datetimepicker/jquery.datetimepicker.min.js"></script>
-<script src="{{URL::to('/')}}/templates/dashboard/assets/libs/axios/axios.min.js"></script>
 <script>
     $(function(){
-        $.datetimepicker.setDateFormatter('moment');
-        $.datetimepicker.setLocale('id');
-        
-        $('.datetimepicker').datetimepicker({
-              format:'YYYY-MM-DD HH:mm:ss',
-              formatTime:'HH:mm:ss',
-              formatDate:'YYYY-MM-DD'
-        });
+
+        $('button[type="submit"]').attr("disabled",false);
 
         $(document).on('submit','#frmUpdate',function(e){
             e.preventDefault();

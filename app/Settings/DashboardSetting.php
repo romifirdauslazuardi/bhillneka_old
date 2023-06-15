@@ -8,8 +8,6 @@ class DashboardSetting extends Settings
 {
     public ?string $logo;
 
-    public ?string $logo_dark;
-
     public ?string $logo_icon;
 
     public ?string $title;

@@ -26,7 +26,7 @@
                 <div class="col-lg-12">
                     <a href="{{route('dashboard.user-banks.create')}}" class="btn btn-primary btn-sm btn-add"><i class="fa fa-plus"></i> Tambah</a>
                     <a href="#" class="btn btn-success btn-sm btn-filter"><i class="fa fa-filter"></i> Filter</a>
-                    <a href="{{route('dashboard.user-banks.index')}}" class="btn btn-warning btn-sm"><i class="fa fa-refresh"></i> Refresh</a>
+                    <a href="{{route('dashboard.user-banks.index')}}" class="btn @if(!empty(request()->all())) btn-warning @else btn-secondary @endif btn-sm"><i class="fa fa-refresh"></i> Refresh</a>
                 </div>
             </div>
             <div class="row">
@@ -44,6 +44,7 @@
                                     <th>Pengguna</th>
                                     @endif
                                     <th>Status</th>
+                                    <th>Default</th>
                                     <th>Dibuat Pada</th>
                                 </thead>
                                 <tbody>
@@ -70,6 +71,9 @@
                                         @endif
                                         <td>
                                             <span class="badge bg-{{$row->status()->class ?? null}}">{{$row->status()->msg ?? null}}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{{$row->default()->class ?? null}}">{{$row->default()->msg ?? null}}</span>
                                         </td>
                                         <td>{{date('d-m-Y H:i:s',strtotime($row->created_at))}}</td>
                                     </tr>

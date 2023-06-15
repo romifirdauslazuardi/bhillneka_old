@@ -15,7 +15,7 @@ use App\Services\UserService;
 use Log;
 use Auth;
 
-class UnitControLler extends Controller
+class UnitController extends Controller
 {
     protected $route;
     protected $view;

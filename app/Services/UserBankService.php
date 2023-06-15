@@ -30,9 +30,9 @@ class UserBankService extends BaseService
 
     public function index(Request $request, bool $paginate = true)
     {
-        $search = $request->search;
-        $user_id = $request->user_id;
-        $status = $request->status;
+        $search = (empty($request->search)) ? null : trim(strip_tags($request->search));
+        $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
+        $status = (empty($request->status)) ? null : trim(strip_tags($request->status));
 
         if(Auth::user()->hasRole([RoleEnum::AGEN])){
             $user_id = Auth::user()->id;
@@ -104,11 +104,13 @@ class UserBankService extends BaseService
     {
         DB::beginTransaction();
         try {
-            $name = $request->name;
-            $number = $request->number;
-            $bank_id = $request->bank_id;
-            $user_id = $request->user_id;
-            $status = $request->status;
+            $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
+            $number = (empty($request->number)) ? null : trim(strip_tags($request->number));
+            $bank_id = (empty($request->bank_id)) ? null : trim(strip_tags($request->bank_id));
+            $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
+            $status = (empty($request->status)) ? null : trim(strip_tags($request->status));
+            $default = (empty($request->default)) ? UserBankEnum::DEFAULT_FALSE : trim(strip_tags($request->default));
+            $bank_settlement_id = (empty($request->bank_settlement_id)) ? null : trim(strip_tags($request->bank_settlement_id));
 
             $create = $this->userBank->create([
                 'name' => $name,
@@ -116,6 +118,8 @@ class UserBankService extends BaseService
                 'bank_id' => $bank_id,
                 'user_id' => $user_id,
                 'status' => $status,
+                'default' => $default,
+                'bank_settlement_id' => $bank_settlement_id,
                 'author_id' => Auth::user()->id,
             ]);
 
@@ -125,6 +129,19 @@ class UserBankService extends BaseService
                 $owners = $owners->get();
 
                 Notification::send($owners,new UserBankNotification(route('dashboard.user-banks.show',$create->id),"Pengajuan Rekening Baru","Terdapat pengajuan rekening baru dari ".Auth::user()->name.". Silahkan approve / reject pengajuan ini"));
+            }
+
+            if($create->default == UserBankEnum::DEFAULT_TRUE){
+                $disabledOtherBank = $this->userBank;
+                $disabledOtherBank = $disabledOtherBank->where("id","!=",$create->id);
+                $disabledOtherBank = $disabledOtherBank->where("user_id",$create->user_id);
+                $disabledOtherBank = $disabledOtherBank->get();
+
+                foreach($disabledOtherBank as $index => $row){
+                    $row->update([
+                        'default' => UserBankEnum::DEFAULT_FALSE
+                    ]);
+                }
             }
 
             DB::commit();
@@ -142,11 +159,13 @@ class UserBankService extends BaseService
     {
         DB::beginTransaction();
         try {
-            $name = $request->name;
-            $number = $request->number;
-            $bank_id = $request->bank_id;
-            $user_id = $request->user_id;
-            $status = $request->status;
+            $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
+            $number = (empty($request->number)) ? null : trim(strip_tags($request->number));
+            $bank_id = (empty($request->bank_id)) ? null : trim(strip_tags($request->bank_id));
+            $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
+            $status = (empty($request->status)) ? null : trim(strip_tags($request->status));
+            $default = (empty($request->default)) ? UserBankEnum::DEFAULT_FALSE : trim(strip_tags($request->default));
+            $bank_settlement_id = (empty($request->bank_settlement_id)) ? null : trim(strip_tags($request->bank_settlement_id));
 
             $result = $this->userBank->findOrFail($id);
 
@@ -166,7 +185,22 @@ class UserBankService extends BaseService
                 'bank_id' => $bank_id,
                 'user_id' => $user_id,
                 'status' => $status,
+                'default' => $default,
+                'bank_settlement_id' => $bank_settlement_id,
             ]);
+
+            if($result->default == UserBankEnum::DEFAULT_TRUE){
+                $disabledOtherBank = $this->userBank;
+                $disabledOtherBank = $disabledOtherBank->where("id","!=",$result->id);
+                $disabledOtherBank = $disabledOtherBank->where("user_id",$result->user_id);
+                $disabledOtherBank = $disabledOtherBank->get();
+
+                foreach($disabledOtherBank as $index => $row){
+                    $row->update([
+                        'default' => UserBankEnum::DEFAULT_FALSE
+                    ]);
+                }
+            }
 
             DB::commit();
 

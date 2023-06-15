@@ -61,11 +61,13 @@ class UserBankController extends Controller
         $banks = $banks->data;
 
         $status = UserBankEnum::status();
+        $default = UserBankEnum::default();
 
         $data = [
             'users' => $users,
             'banks' => $banks,
             'status' => $status,
+            'default' => $default,
         ];
 
         return view($this->view . "create", $data);
@@ -103,11 +105,13 @@ class UserBankController extends Controller
         $banks = $banks->data;
 
         $status = UserBankEnum::status();
+        $default = UserBankEnum::default();
 
         $data = [
             'users' => $users,
             'banks' => $banks,
             'status' => $status,
+            'default' => $default,
             'result' => $result
         ];
 

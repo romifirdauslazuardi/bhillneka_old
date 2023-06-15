@@ -23,7 +23,7 @@ class BankService extends BaseService
 
     public function index(Request $request, bool $paginate = true)
     {
-        $search = $request->search;
+        $search = (empty($request->search)) ? null : trim(strip_tags($request->search));
 
         $table = $this->bank;
         if (!empty($search)) {
@@ -46,8 +46,11 @@ class BankService extends BaseService
     public function store(StoreRequest $request)
     {
         try {
+            $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
+
             $create = $this->bank->create([
-                'name' => $request->name,
+                'name' => $name,
+                'author_id' => Auth::user()->id
             ]);
 
             return $this->response(true, 'Berhasil menambahkan data',$create);
@@ -61,10 +64,12 @@ class BankService extends BaseService
     public function update(UpdateRequest $request, $id)
     {
         try {
+            $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
+
             $result = $this->bank->findOrFail($id);
 
             $result->update([
-                'name' => $request->name,
+                'name' => $name,
             ]);
 
             return $this->response(true, 'Berhasil mengubah data',$result);

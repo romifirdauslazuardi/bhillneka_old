@@ -14,7 +14,7 @@ use App\Services\UserService;
 use Log;
 use Auth;
 
-class ProductCategoryControLler extends Controller
+class ProductCategoryController extends Controller
 {
     protected $route;
     protected $view;

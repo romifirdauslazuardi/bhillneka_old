@@ -29,6 +29,36 @@
             <form action="{{route('dashboard.orders.update',$result->id)}}" id="frmUpdate" autocomplete="off">
                 @csrf
                 @method("PUT")
+                <div class="row mb-3">
+                    <div class="col-md-12 mb-3">
+                        <div class="card border-0 rounded shadow p-4">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label">Fee Owner</label>
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="Fee Owner" value="{{$result->owner_fee}} (Include Biaya Penanganan)" readonly disabled>
+                                                <button class="input-group-text btn btn-secondary" type="button" disabled>%</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label">Fee Agen</label>
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="Fee Owner" value="{{$result->agen_fee}}" readonly disabled>
+                                                <button class="input-group-text btn btn-secondary" type="button" disabled>%</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <div class="card border-0 rounded shadow p-4">
@@ -191,7 +221,7 @@
                                         </select>
                                     </div>
                                     <a href="{{route('dashboard.orders.index')}}" class="btn btn-warning btn-sm mb-2"><i class="fa fa-arrow-left"></i> Kembali</a>
-                                    <button type="submit" class="btn btn-success btn-sm mb-2"><i class="fa fa-edit"></i> Ubah</button>
+                                    <button type="submit" class="btn btn-success btn-sm mb-2" disabled><i class="fa fa-edit"></i> Ubah</button>
                                 </div>
                             </div>
                         </div>
@@ -218,6 +248,8 @@
 <script>
     $(function(){
         $(".page-wrapper").removeClass("toggled");
+
+        $('button[type="submit"]').attr("disabled",false);
 
         getProduct('{{$result->user_id}}');
         getCustomer(".select-customer",'{{$result->user_id}}','{{$result->customer_id}}');
@@ -390,10 +422,19 @@
     }
 
     function getProductShow(code,inputQty=1){
+        let data = {};
+
+        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
+            data.user_id = '{{$result->user_id}}';
+        @endif
+
+        data.code = code;
+
         $.ajax({
-            url : '{{route("base.products.showByCode","_code_")}}'.replace("_code_", code),
+            url : '{{route("base.products.showByCode")}}',
             method : "GET",
             dataType : "JSON",
+            data : data,
             beforeSend : function(){
                 return openLoader();
             },
@@ -497,14 +538,15 @@
         let subtotal = 0;
         let total = 0;
         let discount = $('.input-discount').val();
+        let total_discount = 0;
         
         discount = discount.split(".").join("");
 
+        discount = parseInt(discount);
+        
         if(isNaN(discount)){
             discount = 0;
         }
-
-        discount = parseInt(discount);
 
         $('.repeater-product').each(function(index,element){
             let price = $('.repeater-product').eq(index).find(".tbody-product-price").html();
@@ -530,17 +572,18 @@
                 disc = 0;
             }
 
-            subtotal += (price * qty);
-            total += (price * qty) - disc;
+            subtotal += (price * qty) - disc;
+            total_discount += disc;
         });
 
-        if(discount >= total){
-            total = 0;
-        }
-        else{
-            total = total - discount;
-        }
+        total_discount += discount;
+        total = subtotal - discount;
 
+        if(total <= 0 || total_discount >= subtotal){
+            subtotal = 0;
+            total = subtotal;
+        }
+        
         $('.input-subtotal').val(formatRupiah(subtotal,undefined));
         $('.input-total').val(formatRupiah(total,undefined));
         $('.text-total').html(formatRupiah(total,undefined));

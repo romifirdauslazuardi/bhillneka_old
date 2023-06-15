@@ -19,7 +19,7 @@ class ForgotPasswordService extends BaseService
     {
         try {
 
-            $email = (empty($request->input("email"))) ? null : trim(htmlentities($request->input("email")));
+            $email = (empty($request->email)) ? null : trim(strip_tags($request->email));
 
             $status = Password::sendResetLink(
                 [

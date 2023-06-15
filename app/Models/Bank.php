@@ -13,5 +13,11 @@ class Bank extends Model
     protected $table = "banks";
     protected $fillable = [
         'name',
+        'author_id',
     ];
+
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'author_id', 'id');
+    }
 }

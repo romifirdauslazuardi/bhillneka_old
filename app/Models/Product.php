@@ -53,7 +53,7 @@ class Product extends Model
 
     public function getPriceAttribute($value)
     {
-        return floatval($value);
+        return (int)$value;
     }
 
     public function status()

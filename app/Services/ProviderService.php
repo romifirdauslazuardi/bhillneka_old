@@ -25,8 +25,8 @@ class ProviderService extends BaseService
 
     public function index(Request $request, bool $paginate = true)
     {
-        $search = $request->search;
-        $status = $request->status;
+        $search = (empty($request->search)) ? null : trim(strip_tags($request->search));
+        $status = (!isset($request->status)) ? null : trim(strip_tags($request->status));
 
         $table = $this->provider;
         if (!empty($search)) {
@@ -71,12 +71,12 @@ class ProviderService extends BaseService
     public function store(StoreRequest $request)
     {
         try {
-            $name = $request->name;
-            $client_id = $request->client_id;
-            $secret_key = $request->secret_key;
-            $type = $request->type;
-            $status = $request->status;
-            $note = $request->note;
+            $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
+            $client_id = (empty($request->client_id)) ? null : trim(strip_tags($request->client_id));
+            $secret_key = (empty($request->secret_key)) ? null : trim(strip_tags($request->secret_key));
+            $type = (empty($request->type)) ? null : trim(strip_tags($request->type));
+            $status = (empty($request->status)) ? ProviderEnum::STATUS_FALSE : trim(strip_tags($request->status));
+            $note = (empty($request->note)) ? null : trim(strip_tags($request->note));
 
             if($type == ProviderEnum::TYPE_DOKU){
                 $checkExistDoku = $this->provider;
@@ -109,12 +109,12 @@ class ProviderService extends BaseService
     public function update(UpdateRequest $request, $id)
     {
         try {
-            $name = $request->name;
-            $client_id = $request->client_id;
-            $secret_key = $request->secret_key;
-            $type = $request->type;
-            $status = $request->status;
-            $note = $request->note;
+            $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
+            $client_id = (empty($request->client_id)) ? null : trim(strip_tags($request->client_id));
+            $secret_key = (empty($request->secret_key)) ? null : trim(strip_tags($request->secret_key));
+            $type = (empty($request->type)) ? null : trim(strip_tags($request->type));
+            $status = (empty($request->status)) ? ProviderEnum::STATUS_FALSE : trim(strip_tags($request->status));
+            $note = (empty($request->note)) ? null : trim(strip_tags($request->note));
 
             $result = $this->provider->findOrFail($id);
 

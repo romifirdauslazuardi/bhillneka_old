@@ -18,9 +18,8 @@ class NotificationController extends Controller
         ]);
     }
 
-    public function notificationRead()
+    public function notificationRead($id)
     {
-        $id = request()->get('go');
         $notification = Auth::user()->notifications()->where('id', $id)->first();
         if (empty($id) || empty($notification)) {
             return redirect()->route('dashboard.index')->withError('Notifikasi tidak ditemukan');

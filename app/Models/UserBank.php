@@ -18,6 +18,8 @@ class UserBank extends Model
         'user_id',
         'bank_id',
         'status',
+        'bank_settlement_id',
+        'default',
         'author_id',
     ];
 
@@ -56,6 +58,26 @@ class UserBank extends Model
             $return = (object) [
                 'class' => 'danger',
                 'msg' => 'Ditolak',
+            ];
+        }
+
+        return $return;
+    }
+
+    public function default()
+    {
+        $return = null;
+
+        if($this->default == UserBankEnum::DEFAULT_TRUE){
+            $return = (object) [
+                'class' => 'success',
+                'msg' => 'Ya',
+            ];
+        }
+        else{
+            $return = (object) [
+                'class' => 'secondary',
+                'msg' => 'Tidak',
             ];
         }
 

@@ -75,7 +75,7 @@
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Roles<span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <select class="form-control select2 select-role" multiple name="roles[]" >
+                                <select class="form-control select2 select-role" name="roles" >
                                     @foreach ($roles as $index => $row)
                                     <option value="{{$row}}" @if($row == old('roles')) selected @endif>{{$row}}</option>
                                     @endforeach
@@ -101,7 +101,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <a href="{{route('dashboard.users.index')}}" class="btn btn-warning btn-sm"><i class="fa fa-arrow-left"></i> Kembali</a>
-                        <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-save"></i> Simpan</button>
+                        <button type="submit" class="btn btn-primary btn-sm" disabled><i class="fa fa-save"></i> Simpan</button>
                     </div>
                 </div>
             </form>
@@ -128,15 +128,16 @@
               formatDate:'YYYY-MM-DD'
         });
 
+        $('button[type="submit"]').attr("disabled",false);
+
         $(document).on('change','.select-role',function(e){
             e.preventDefault();
             let val = $(this).val();
             let agen = false;
-            $.each(val,function(index,element){
-                if(element == '{{\App\Enums\RoleEnum::USER}}' || element == '{{\App\Enums\RoleEnum::ADMIN_AGEN}}'){
-                    agen = true;
-                }
-            });
+            
+            if(val == '{{\App\Enums\RoleEnum::USER}}' || val == '{{\App\Enums\RoleEnum::ADMIN_AGEN}}'){
+                agen = true;
+            }
 
             if(agen == true){
                 $(".display-agen").removeClass("d-none");

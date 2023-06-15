@@ -13,3 +13,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+Route::group(["as" => "payments.", "prefix" => "payments"], function () {
+    Route::post('/notifications', 'PaymentNotificationController@notifications')->name('notifications');
+});

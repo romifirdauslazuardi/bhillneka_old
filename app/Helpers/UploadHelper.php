@@ -3,6 +3,7 @@
 namespace App\Helpers;
 use Illuminate\Support\Str;
 use Storage;
+use Log;
 
 class UploadHelper{
 
@@ -37,9 +38,10 @@ class UploadHelper{
           $return["Path"] = "storage/".$last_folder."/".$name; 
           goto ResultData;
   
-        }catch(\Throwable $e){
+        }catch(\Throwable $th){
+          Log::emergency($th->getMessage());
           $return["IsError"] = TRUE;
-          $return["Message"] = $e->getMessage();
+          $return["Message"] = $th->getMessage();
           goto ResultData;
         }
         

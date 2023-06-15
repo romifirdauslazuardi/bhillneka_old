@@ -37,10 +37,10 @@ class ProductController extends Controller
         }
     }
 
-    public function showByCode($code)
+    public function showByCode(Request $request)
     {
         try {
-            $response = $this->productService->showByCode($code);
+            $response = $this->productService->showByCode($request);
             if (!$response->success) {
                 return ResponseHelper::apiResponse(false, $response->message , null, null, $response->code);
             }

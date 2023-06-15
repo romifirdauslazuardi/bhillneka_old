@@ -21,9 +21,37 @@
 @section("content")
 <div class="row">
     <div class="col-12 mt-4">
-            <form action="{{route('dashboard.orders.update',$result->id)}}" id="frmUpdate" autocomplete="off">
-                @csrf
-                @method("PUT")
+            <form action="#" id="frmUpdate" autocomplete="off">
+                <div class="row mb-3">
+                    <div class="col-md-12 mb-3">
+                        <div class="card border-0 rounded shadow p-4">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label">Fee Owner</label>
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="Fee Owner" value="{{$result->owner_fee}}" readonly disabled>
+                                                <button class="input-group-text btn btn-secondary" type="button" disabled>%</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label">Fee Agen</label>
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="Fee Owner" value="{{$result->agen_fee}}" readonly disabled>
+                                                <button class="input-group-text btn btn-secondary" type="button" disabled>%</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <div class="card border-0 rounded shadow p-4">
@@ -170,6 +198,13 @@
     </div>
 </div>
 
+@if($result->provider->type == \App\Enums\ProviderEnum::TYPE_DOKU)
+    @include("dashboard.orders.doku.index")
+@elseif($result->provider->type == \App\Enums\ProviderEnum::TYPE_MANUAL_TRANSFER)
+    @include("dashboard.orders.manual.index")
+    @include("dashboard.orders.manual.modal")
+@endif
+
 <form id="frmDelete" method="POST">
     @csrf
     @method('DELETE')
@@ -191,6 +226,51 @@
                 $("#frmDelete").attr("action", "{{ route('dashboard.orders.destroy', '_id_') }}".replace("_id_", id));
                 $("#frmDelete").find('input[name="id"]').val(id);
                 $("#frmDelete").submit();
+            }
+        })
+
+        $(document).on("click", ".btn-proof-order", function(e) {
+            e.preventDefault();
+            let id = $(this).data("id");
+            
+            $("#frmUploadProofOrder").attr("action", "{{ route('dashboard.orders.proofOrder', '_id_') }}".replace("_id_", id));
+            $("#modalUploadProofOrder").modal("show");
+        })
+
+        $(document).on('submit','#frmUploadProofOrder',function(e){
+            e.preventDefault();
+            if(confirm("Apakah anda yakin ingin menyimpan data ini ?")){
+                $.ajax({
+                    url : $("#frmUploadProofOrder").attr("action"),
+                    method : "POST",
+                    data : new FormData($('#frmUploadProofOrder')[0]),
+                    contentType:false,
+                    cache:false,
+                    processData:false,
+                    dataType : "JSON",
+                    beforeSend : function(){
+                        return openLoader();
+                    },
+                    success : function(resp){
+                        if(resp.success == false){
+                            responseFailed(resp.message);                   
+                        }
+                        else{
+                            responseSuccess(resp.message,"{{route('dashboard.orders.show',$result->id)}}");
+                        }
+                    },
+                    error: function (request, status, error) {
+                        if(request.status == 422){
+                            responseFailed(request.responseJSON.message);
+                        }
+                        else{
+                            responseInternalServerError();
+                        }
+                    },
+                    complete :function(){
+                        return closeLoader();
+                    }
+                })
             }
         })
     });

@@ -34,7 +34,7 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
     
     Route::group(["as" => "products.", "prefix" => "products"], function () {
         Route::get('/', 'ProductController@index')->name('index');
-        Route::get('/{code}', 'ProductController@showByCode')->name('showByCode');
+        Route::get('/search', 'ProductController@showByCode')->name('showByCode');
     });
     
     Route::group(["as" => "customers.", "prefix" => "customers"], function () {

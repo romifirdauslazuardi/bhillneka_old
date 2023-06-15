@@ -37,7 +37,6 @@ class DashboardSettingController extends Controller
             $title = $request->title;
             $footer = $request->footer;
             $logo = $request->file("logo");
-            $logo_dark = $request->file("logo_dark");
             $logo_icon = $request->file("logo_icon");
 
             if ($logo) {
@@ -48,16 +47,6 @@ class DashboardSettingController extends Controller
                 }
 
                 $logo = $upload["Path"];
-            }
-
-            if ($logo_dark) {
-                $upload = UploadHelper::upload_file($logo_dark, 'settings/dashboard', DashboardSettingEnum::LOGO_EXT);
-
-                if ($upload["IsError"] == TRUE) {
-                    return ResponseHelper::apiResponse(false, $upload["Message"] , null, null, 422);
-                }
-
-                $logo_dark = $upload["Path"];
             }
 
             if ($logo_icon) {
@@ -73,9 +62,6 @@ class DashboardSettingController extends Controller
             $dashboardSetting = new DashboardSetting();
             if ($logo) {
                 $dashboardSetting->logo = $logo;
-            }
-            if ($logo_dark) {
-                $dashboardSetting->logo_dark = $logo_dark;
             }
             if ($logo_icon) {
                 $dashboardSetting->logo_icon = $logo_icon;

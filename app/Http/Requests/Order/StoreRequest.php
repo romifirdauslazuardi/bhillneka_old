@@ -14,11 +14,13 @@ class StoreRequest extends FormRequest
     public function prepareForValidation()
     {
         $merge = [];
-        if(Auth::user()->hasRole([RoleEnum::AGEN])){
-            $merge["user_id"] = Auth::user()->id;
-        }
-        if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
-            $merge["user_id"] = Auth::user()->user_id;
+        if(!request()->routeIs("landing-page.buy-products.store")){
+            if(Auth::user()->hasRole([RoleEnum::AGEN])){
+                $merge["user_id"] = Auth::user()->id;
+            }
+            if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
+                $merge["user_id"] = Auth::user()->user_id;
+            }
         }
         $this->merge($merge);
     }
@@ -65,6 +67,13 @@ class StoreRequest extends FormRequest
 
     public function failedValidation(Validator $validator)
     {
-        throw new CustomValidationException($validator);
+        if (! $this->wantsJson()) {
+            $errors = implode('<br>', $validator->errors()->all());
+            alert()->html('Gagal',$errors,'error');
+            parent::failedValidation($validator);
+        }
+        else{
+            throw new CustomValidationException($validator);
+        }
     }
 }

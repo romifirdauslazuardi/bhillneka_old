@@ -17,10 +17,24 @@ class Order extends Model
         'user_id',
         'customer_id',
         'discount',
-        'fee',
+        'owner_fee',
+        'agen_fee',
+        'doku_fee',
         'provider_id',
         'note',
+        'doku_service_id',
+        'doku_acquirer_id',
+        'doku_channel_id',
+        'doku_token_id',
+        'payment_due_date',
+        'expired_date',
+        'paid_date',
+        'payment_url',
+        'proof_order',
+        'payment_note',
         'status',
+        'owner_bank_settlement_id',
+        'agen_bank_settlement_id',
         'author_id',
     ];
 
@@ -42,6 +56,11 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class, 'order_id');
+    }
+
+    public function doku()
+    {
+        return $this->hasMany(OrderDoku::class, 'order_id')->orderBy("created_at","DESC");
     }
 
     public function author()
@@ -108,12 +127,22 @@ class Order extends Model
 
     public function getDiscountAttribute($value)
     {
-        return floatval($value);
+        return (int)$value;
     }
 
-    public function getFeeAttribute($value)
+    public function getOwnerFeeAttribute($value)
     {
-        return floatval($value);
+        return (int)($value);
+    }
+
+    public function getAgenFeeAttribute($value)
+    {
+        return (int)$value;
+    }
+
+    public function getDokuFeeAttribute($value)
+    {
+        return (int)$value;
     }
 
     public function totalBruto(){
@@ -123,7 +152,7 @@ class Order extends Model
             $total += $row->qty * $row->product_price;
         }
 
-        return $total;
+        return (int)$total;
     }
 
     public function totalNeto(){
@@ -134,10 +163,21 @@ class Order extends Model
 
         $total = $total - $this->discount;
 
-        return $total;
+        return (int)$total;
     }
 
-    public function income(){
-        return $this->totalNeto() - $this->fee;
+    public function incomeAgen(){
+        $total = ceil(($this->agen_fee / 100) * $this->totalNeto());
+        return (int)$total;
+    }
+
+    public function incomeOwnerBruto(){
+        $total = floor(($this->owner_fee / 100) * $this->totalNeto());
+        return (int)$total;
+    }
+
+    public function incomeOwnerNeto(){
+        $total = $this->incomeOwnerBruto() - $this->doku_fee;
+        return (int)$total;
     }
 }

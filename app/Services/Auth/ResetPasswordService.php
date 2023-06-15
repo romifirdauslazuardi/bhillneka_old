@@ -22,10 +22,10 @@ class ResetPasswordService extends BaseService
         DB::beginTransaction();
         try {
 
-            $email = (empty($request->input("email"))) ? null : trim(htmlentities($request->input("email")));
-            $password = (empty($request->input("password"))) ? null : trim(htmlentities($request->input("password")));
-            $password_confirmation = (empty($request->input("password_confirmation"))) ? null : trim(htmlentities($request->input("password_confirmation")));
-            $token = (empty($request->input("token"))) ? null : trim(htmlentities($request->input("token")));
+            $email = (empty($request->email)) ? null : trim(strip_tags($request->email));
+            $password = (empty($request->password)) ? null : trim(strip_tags($request->password));
+            $password_confirmation = (empty($request->password_confirmation)) ? null : trim(strip_tags($request->password_confirmation));
+            $token = (empty($request->token)) ? null : trim(strip_tags($request->token));
 
             $status = Password::reset(
                 [

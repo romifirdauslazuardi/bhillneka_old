@@ -13,6 +13,7 @@
                                     <th>Atas Nama</th>
                                     <th>Nomor Rekening</th>
                                     <th>Bank</th>
+                                    <th>Default</th>
                                     <th>Dibuat Pada</th>
                                 </thead>
                                 <tbody>
@@ -23,6 +24,9 @@
                                         <td>{{$row->name}}</td>
                                         <td>{{$row->number}}</td>
                                         <td>{{$row->bank->name ?? null}}</td>
+                                        <td>
+                                            <span class="badge bg-{{$row->default()->class ?? null}}">{{$row->default()->msg ?? null}}</span>
+                                        </td>
                                         <td>{{date('d-m-Y H:i:s',strtotime($row->created_at))}}</td>
                                     </tr>
                                     @empty

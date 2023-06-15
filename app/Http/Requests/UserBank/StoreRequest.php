@@ -49,6 +49,13 @@ class StoreRequest extends FormRequest
                 'required',
                 'in:'.implode(",",[UserBankEnum::STATUS_WAITING_APPROVE,UserBankEnum::STATUS_APPROVED,UserBankEnum::STATUS_REJECTED])
             ],
+            'default' => [
+                'required',
+                'in:'.implode(",",[UserBankEnum::DEFAULT_TRUE,UserBankEnum::DEFAULT_FALSE])
+            ],
+            'bank_settlement_id' => [
+                (request()->get("status") == UserBankEnum::STATUS_APPROVED) ? "required" : "nullable"
+            ],
         ];
     }
 
@@ -65,6 +72,9 @@ class StoreRequest extends FormRequest
             'number.min' => 'Nomor rekening minimal 1 angka',
             'status.required' => 'Status harus diisi',
             'status.in' => 'Status tidak valid',
+            'bank_settlement_id.required' => 'Bank Settlement ID harus diisi',
+            'default.required' => 'Default harus diisi',
+            'default.in' => 'Default tidak valid',
         ];
     }
 

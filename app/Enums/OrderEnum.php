@@ -20,6 +20,8 @@ final class OrderEnum extends Enum
     const STATUS_REDIRECT = "REDIRECT";
     const STATUS_TIMEOUT = "TIMEOUT";
 
+    const PROOF_ORDER_EXT = ['jpeg','jpg','png'];
+
     public static function status()
     {
         $data = [

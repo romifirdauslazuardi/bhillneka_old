@@ -23,12 +23,20 @@
     <div class="col-12 mt-4">
         <div class="card border-0 rounded shadow p-4">
             <div class="row mb-3">
-                <div class="col-lg-12">
+                <div class="col-lg-12 d-flex">
                     @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
-                    <a href="{{route('dashboard.orders.create')}}" class="btn btn-primary btn-sm btn-add"><i class="fa fa-plus"></i> Tambah</a>
+                    <a href="{{route('dashboard.orders.create')}}" class="btn btn-primary btn-sm btn-add" style="margin-right: 5px;"><i class="fa fa-plus"></i> Tambah</a>
                     @endif
-                    <a href="#" class="btn btn-success btn-sm btn-filter"><i class="fa fa-filter"></i> Filter</a>
-                    <a href="{{route('dashboard.orders.index')}}" class="btn btn-warning btn-sm"><i class="fa fa-refresh"></i> Refresh</a>
+                    <a href="#" class="btn btn-success btn-sm btn-filter" style="margin-right: 5px;"><i class="fa fa-filter"></i> Filter</a>
+                    <div class="dropdown-primary" style="margin-right: 5px;">
+                        <button type="button" class="btn btn-info btn-sm" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Export <i class="fa fa-file"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item btn-export-excel">Export Excel</a>
+                        </div>
+                    </div>
+                    <a href="{{route('dashboard.orders.index')}}" class="btn @if(!empty(request()->all())) btn-warning @else btn-secondary @endif btn-sm"><i class="fa fa-refresh"></i> Refresh</a>
                 </div>
             </div>
             <div class="row">
@@ -129,6 +137,14 @@
                 $("#frmDelete").submit();
             }
         })
+
+        $(document).on("click", ".btn-export-excel", function(e) {
+            e.preventDefault();
+
+            $('#modalExport').find('.export-title').html("Excel");
+            $("#frmExport").attr("action", "{{ route('dashboard.orders.exportExcel') }}");
+            $("#modalExport").modal("show");
+        });
     })
 </script>
 @endsection

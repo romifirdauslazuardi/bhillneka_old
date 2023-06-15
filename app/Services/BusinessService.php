@@ -24,8 +24,8 @@ class BusinessService extends BaseService
 
     public function index(Request $request, bool $paginate = true)
     {
-        $search = $request->search;
-        $user_id = $request->user_id;
+        $search = (empty($request->search)) ? null : trim(strip_tags($request->search));
+        $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
 
         if(Auth::user()->hasRole([RoleEnum::AGEN])){
             $user_id = Auth::user()->id;
@@ -82,12 +82,12 @@ class BusinessService extends BaseService
     public function store(StoreRequest $request)
     {
         try {
-            $name = $request->name;
-            $location = $request->location;
-            $description = $request->description;
-            $category_id = $request->category_id;
-            $user_id = $request->user_id;
-            $village_code = $request->village_code;
+            $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
+            $location = (empty($request->location)) ? null : trim(strip_tags($request->location));
+            $description = (empty($request->description)) ? null : trim(strip_tags($request->description));
+            $category_id = (empty($request->category_id)) ? null : trim(strip_tags($request->category_id));
+            $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
+            $village_code = (empty($request->village_code)) ? null : trim(strip_tags($request->village_code));
 
             $create = $this->business->create([
                 'name' => $name,
@@ -110,12 +110,12 @@ class BusinessService extends BaseService
     public function update(UpdateRequest $request, $id)
     {
         try {
-            $name = $request->name;
-            $location = $request->location;
-            $description = $request->description;
-            $category_id = $request->category_id;
-            $user_id = $request->user_id;
-            $village_code = $request->village_code;
+            $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
+            $location = (empty($request->location)) ? null : trim(strip_tags($request->location));
+            $description = (empty($request->description)) ? null : trim(strip_tags($request->description));
+            $category_id = (empty($request->category_id)) ? null : trim(strip_tags($request->category_id));
+            $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
+            $village_code = (empty($request->village_code)) ? null : trim(strip_tags($request->village_code));
 
             $result = $this->business->findOrFail($id);
 

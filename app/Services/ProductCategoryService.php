@@ -24,8 +24,8 @@ class ProductCategoryService extends BaseService
 
     public function index(Request $request, bool $paginate = true)
     {
-        $search = $request->search;
-        $user_id = $request->user_id;
+        $search = (empty($request->search)) ? null : trim(strip_tags($request->search));
+        $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
 
         if(Auth::user()->hasRole([RoleEnum::AGEN])){
             $user_id = Auth::user()->id;
@@ -83,8 +83,8 @@ class ProductCategoryService extends BaseService
     public function store(StoreRequest $request)
     {
         try {
-            $name = $request->name;
-            $user_id = $request->user_id;
+            $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
+            $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
 
             $create = $this->productCategory->create([
                 'name' => $name,
@@ -103,8 +103,8 @@ class ProductCategoryService extends BaseService
     public function update(UpdateRequest $request, $id)
     {
         try {
-            $name = $request->name;
-            $user_id = $request->user_id;
+            $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
+            $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
 
             $result = $this->productCategory->findOrFail($id);
 

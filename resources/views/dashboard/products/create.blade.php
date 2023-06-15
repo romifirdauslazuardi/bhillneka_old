@@ -72,10 +72,10 @@
                             </div>
                         </div>
                         <div class="form-group row mb-3">
-                            <label class="col-md-3 col-form-label">Unit<span class="text-danger">*</span></label>
+                            <label class="col-md-3 col-form-label">Satuan<span class="text-danger">*</span></label>
                             <div class="col-md-9">
                                 <select class="form-control select2 select-unit" name="unit_id" >
-                                    <option value="">==Pilih Unit==</option>
+                                    <option value="">==Pilih Satuan==</option>
                                 </select>
                             </div>
                         </div>
@@ -106,7 +106,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <a href="{{route('dashboard.products.index')}}" class="btn btn-warning btn-sm"><i class="fa fa-arrow-left"></i> Kembali</a>
-                        <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-save"></i> Simpan</button>
+                        <button type="submit" class="btn btn-primary btn-sm" disabled><i class="fa fa-save"></i> Simpan</button>
                     </div>
                 </div>
             </form>
@@ -121,6 +121,8 @@
 @section("script")
 <script>
     $(function(){
+
+        $('button[type="submit"]').attr("disabled",false);
 
         @if(Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN]))
             getProductCategory('.select-category','{{Auth::user()->id}}',null);

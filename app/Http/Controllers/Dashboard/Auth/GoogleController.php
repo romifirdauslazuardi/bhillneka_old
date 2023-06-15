@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use App\Enums\UserEnum;
+use App\Helpers\SettingHelper;
+use App\Mail\RegisterMail;
+use Mail;
 use Auth;
 use Log;
 
@@ -57,6 +60,8 @@ class GoogleController extends Controller
             ]);
 
             $create->assignRole([RoleEnum::AGEN]);
+
+            Mail::to($create->email)->send(new RegisterMail(SettingHelper::settingFee()));
 
             Auth::login($create,true);
 

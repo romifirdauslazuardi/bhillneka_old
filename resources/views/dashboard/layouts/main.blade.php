@@ -5,7 +5,7 @@
         @include("dashboard.layouts.head")
     </head>
 
-    <body>
+    <body oncontextmenu="return false;">
 
         @include('sweetalert::alert')
 
