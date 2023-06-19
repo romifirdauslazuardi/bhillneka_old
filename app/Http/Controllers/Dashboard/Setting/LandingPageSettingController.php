@@ -31,7 +31,7 @@ class LandingPageSettingController extends Controller
         return view($this->view, $data);
     }
 
-    public function update(LandingpageSettingRequest $request)
+    public function update(LandingPageSettingRequest $request)
     {
         try {
             $title = $request->title;
