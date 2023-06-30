@@ -120,6 +120,13 @@
                                             </tr>
                                             @endif
                                             <tr>
+                                                <td style="width:25%;">Progress</td>
+                                                <td class="text-center">:</td>
+                                                <td>
+                                                    <span class="badge bg-{{$result->progress()->class ?? null}}">{{$result->progress()->msg ?? null}}</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
                                                 <td style="width:25%;">Status</td>
                                                 <td class="text-center">:</td>
                                                 <td>
