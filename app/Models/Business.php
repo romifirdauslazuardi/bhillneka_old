@@ -40,4 +40,9 @@ class Business extends Model
     {
         return $this->belongsTo(User::class, 'author_id', 'id');
     }
+
+    public function tables()
+    {
+        return $this->hasMany(Table::class, 'business_id');
+    }
 }

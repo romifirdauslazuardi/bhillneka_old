@@ -9,16 +9,24 @@
                 <div class="modal-body">
                     <div class="form-group mb-3">
                         <label>Search</label>
-                        <input type="text" class="form-control" placeholder="Search (Atas Nama , Nomor Rekening)" value="{{request()->get('search')}}" name="search">
+                        <input type="text" class="form-control" placeholder="Search (Atas Nama , Nomor Rekening, Cabang)" value="{{request()->get('search')}}" name="search">
                     </div>
                     @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
+                        @if(empty(Auth::user()->business_id))
+                        <div class="form-group mb-3">
+                            <label>Pengguna</label>
+                            <select class="form-control select2 select-user" name="user_id" style="width:100%;">
+                                <option value="">==Semua Pengguna==</option>
+                                @foreach($users as $index => $row)
+                                <option value="{{$row->id}}">{{$row->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
                     <div class="form-group mb-3">
-                        <label>Pengguna</label>
-                        <select class="form-control select2" name="user_id" style="width:100%;">
-                            <option value="">==Semua Pengguna==</option>
-                            @foreach($users as $index => $row)
-                            <option value="{{$row->id}}">{{$row->name}}</option>
-                            @endforeach
+                        <label>Bisniss</label>
+                        <select class="form-control select2 select-business" name="business_id" style="width:100%;">
+                            <option value="">==Semua Bisniss==</option>
                         </select>
                     </div>
                     <div class="form-group mb-3">

@@ -5,7 +5,7 @@
         @include("landing-page.layouts.head")
     </head>
 
-    <body oncontextmenu="return false;">
+    <body oncontextmenu="return true;">
         @include('sweetalert::alert')
         
         @include("landing-page.layouts.topbar")

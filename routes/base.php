@@ -23,6 +23,10 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
         Route::get('/village', 'IndonesiaController@village')->name('village');
     
     });
+
+    Route::group(["as" => "business.", "prefix" => "business"], function () {
+        Route::get('/', 'BusinessController@index')->name('index');
+    });
     
     Route::group(["as" => "product-categories.", "prefix" => "product-categories"], function () {
         Route::get('/', 'ProductCategoryController@index')->name('index');
@@ -43,5 +47,15 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
 
     Route::group(["as" => "orders.", "prefix" => "orders"], function () {
         Route::get('/', 'OrderController@index')->name('index');
+    });
+
+    Route::group(["as" => "mikrotik-configs.", "prefix" => "mikrotik-configs"], function () {
+        Route::get('/profile/pppoe', 'MikrotikConfigController@profilePppoe')->name('profilePppoe');
+        Route::get('/profile/hotspot', 'MikrotikConfigController@profileHotspot')->name('profileHotspot');
+        Route::get('/server/hotspot', 'MikrotikConfigController@serverHotspot')->name('serverHotspot');
+    });
+
+    Route::group(["as" => "tables.", "prefix" => "tables"], function () {
+        Route::get('/', 'TableController@index')->name('index');
     });
 });

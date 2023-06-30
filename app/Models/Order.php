@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\OrderEnum;
+use App\Helpers\DateHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Haruncpi\LaravelUserActivity\Traits\Loggable;
@@ -16,6 +17,8 @@ class Order extends Model
         'code',
         'user_id',
         'customer_id',
+        'customer_name',
+        'customer_phone',
         'discount',
         'owner_fee',
         'agen_fee',
@@ -33,8 +36,17 @@ class Order extends Model
         'proof_order',
         'payment_note',
         'status',
+        'progress',
         'owner_bank_settlement_id',
         'agen_bank_settlement_id',
+        'business_id',
+        'type',
+        'fnb_type',
+        'due_date',
+        'table_id',
+        'repeat_order_at',
+        'repeat_order_status',
+        'order_id',
         'author_id',
     ];
 
@@ -68,6 +80,21 @@ class Order extends Model
         return $this->belongsTo(User::class, 'author_id', 'id');
     }
 
+    public function business()
+    {
+        return $this->belongsTo(Business::class, 'business_id', 'id');
+    }
+
+    public function table()
+    {
+        return $this->belongsTo(Table::class, 'table_id', 'id');
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id', 'id');
+    }
+
     public function status()
     {
         $return = null;
@@ -75,52 +102,136 @@ class Order extends Model
         if($this->status == OrderEnum::STATUS_PENDING){
             $return = (object) [
                 'class' => 'info',
-                'msg' => 'PENDING',
+                'msg' => 'Pending',
             ];
         }
         else if($this->status == OrderEnum::STATUS_WAITING_PAYMENT){
             $return = (object) [
                 'class' => 'secondary',
-                'msg' => 'WAITING PAYMENT',
+                'msg' => 'Waiting Payment',
             ];
         }
         else if($this->status == OrderEnum::STATUS_SUCCESS){
             $return = (object) [
                 'class' => 'success',
-                'msg' => 'SUCCESS',
+                'msg' => 'Success',
             ];
         }
         else if($this->status == OrderEnum::STATUS_FAILED){
             $return = (object) [
                 'class' => 'danger',
-                'msg' => 'FAILED',
+                'msg' => 'Failed',
             ];
         }
         else if($this->status == OrderEnum::STATUS_EXPIRED){
             $return = (object) [
                 'class' => 'danger',
-                'msg' => 'EXPIRED',
+                'msg' => 'Expired',
             ];
         }
         else if($this->status == OrderEnum::STATUS_REFUNDED){
             $return = (object) [
                 'class' => 'warning',
-                'msg' => 'REFUNDED',
+                'msg' => 'Refunded',
             ];
         }
         else if($this->status == OrderEnum::STATUS_TIMEOUT){
             $return = (object) [
                 'class' => 'danger',
-                'msg' => 'TIMEOUT',
+                'msg' => 'Timeout',
             ];
         }
         else if($this->status == OrderEnum::STATUS_REDIRECT){
             $return = (object) [
                 'class' => 'info',
-                'msg' => 'REDIRECT',
+                'msg' => 'Redirect',
             ];
         }
 
+
+        return $return;
+    }
+
+    public function progress()
+    {
+        $return = null;
+
+        if($this->progress == OrderEnum::PROGRESS_BATAL){
+            $return = (object) [
+                'class' => 'danger',
+                'msg' => 'Batal',
+            ];
+        }
+        else if($this->progress == OrderEnum::PROGRESS_DRAFT){
+            $return = (object) [
+                'class' => 'secondary',
+                'msg' => 'Draft',
+            ];
+        }
+        else if($this->progress == OrderEnum::PROGRESS_PENDING){
+            $return = (object) [
+                'class' => 'warning',
+                'msg' => 'Pending',
+            ];
+        }
+        else if($this->progress == OrderEnum::PROGRESS_DIKONFIRMASI){
+            $return = (object) [
+                'class' => 'info',
+                'msg' => 'Dikonfirmasi',
+            ];
+        }
+        else if($this->progress == OrderEnum::PROGRESS_DIKIRIM){
+            $return = (object) [
+                'class' => 'success',
+                'msg' => 'Dikirim',
+            ];
+        }
+        else if($this->progress == OrderEnum::PROGRESS_TERIKIRIM){
+            $return = (object) [
+                'class' => 'success',
+                'msg' => 'Terkirim',
+            ];
+        }
+        else if($this->progress == OrderEnum::PROGRESS_SELESAI){
+            $return = (object) [
+                'class' => 'success',
+                'msg' => 'Selesai',
+            ];
+        }
+        else if($this->progress == OrderEnum::PROGRESS_EXPIRED){
+            $return = (object) [
+                'class' => 'danger',
+                'msg' => 'Expired',
+            ];
+        }
+
+        return $return;
+    }
+
+    public function type()
+    {
+        $return = null;
+
+        if($this->type == OrderEnum::TYPE_DUE_DATE){
+            $return = "Jatuh Tempo";
+        }
+        else{
+            $return = "Sekali Bayar";
+        }
+
+        return $return;
+    }
+
+    public function fnb_type()
+    {
+        $return = null;
+
+        if($this->fnb_type == OrderEnum::FNB_DINE_IN){
+            $return = "Dine In";
+        }
+        else if($this->fnb_type == OrderEnum::FNB_TAKEAWAY){
+            $return = "Take Away";
+        }
 
         return $return;
     }
@@ -150,6 +261,12 @@ class Order extends Model
 
         foreach($this->items()->get() as $index => $row){
             $total += $row->qty * $row->product_price;
+        }
+
+        if($this->type == OrderEnum::TYPE_DUE_DATE){
+            $hari = DateHelper::differentDay($this->created_at,$this->expired_date);
+
+            $total = $total * $hari;
         }
 
         return (int)$total;

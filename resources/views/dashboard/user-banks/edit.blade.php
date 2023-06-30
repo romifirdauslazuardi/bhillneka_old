@@ -31,11 +31,19 @@
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Pengguna<span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <select class="form-control select2" name="user_id" >
+                                <select class="form-control select2 select-user" name="user_id" >
                                     <option value="">==Pilih Pengguna==</option>
                                     @foreach ($users as $index => $row)
                                     <option value="{{$row->id}}" @if($row->id == old('user_id',$result->user_id)) selected @endif>{{$row->name}} - {{$row->phone}}</option>
                                     @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
+                            <label class="col-md-3 col-form-label">Bisnis<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <select class="form-control select2 select-business" name="business_id" >
+                                    <option value="">==Pilih Bisnis==</option>
                                 </select>
                             </div>
                         </div>
@@ -49,6 +57,12 @@
                                     <option value="{{$row->id}}" @if($row->id == old('bank_id',$result->bank_id)) selected @endif>{{$row->name}}</option>
                                     @endforeach
                                 </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
+                            <label class="col-md-3 col-form-label">Cabang <span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="branch" placeholder="Cabang" value="{{old('branch',$result->branch)}}" >
                             </div>
                         </div>
                         <div class="form-group row mb-3">
@@ -116,6 +130,23 @@
     $(function(){
 
         $('button[type="submit"]').attr("disabled",false);
+
+        @if(!empty($result->business_id))
+            getBusiness('.select-business','{{$result->business->user_id ?? null}}','{{$result->business_id}}');
+        @else
+            getBusiness('.select-business','{{$result->user_id}}',null);
+        @endif
+
+        $(document).on('change','.select-user',function(e){
+            e.preventDefault();
+            let val = $(this).val();
+
+            $('.select-business').html('<option value="">==Pilih Bisnis==</option>');
+
+            if(val != null && val != "" && val != undefined){
+                getBusiness('.select-business',val,null);
+            }
+        });
 
         $(document).on('change','.select-status',function(e){
             e.preventDefault();

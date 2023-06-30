@@ -25,11 +25,7 @@ class ProductCategoryService extends BaseService
     public function index(Request $request, bool $paginate = true)
     {
         $search = (empty($request->search)) ? null : trim(strip_tags($request->search));
-        $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
-
-        if(Auth::user()->hasRole([RoleEnum::AGEN])){
-            $user_id = Auth::user()->id;
-        }
+        $business_category_id = (empty($request->business_category_id)) ? null : trim(strip_tags($request->business_category_id));
 
         $table = $this->productCategory;
         if (!empty($search)) {
@@ -40,8 +36,8 @@ class ProductCategoryService extends BaseService
         if(!empty($user_id)){
             $table = $table->where("user_id",$user_id);
         }
-        if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
-            $table = $table->where("user_id",Auth::user()->user_id);
+        if(!empty($business_category_id)){
+            $table = $table->where("business_category_id",$business_category_id);
         }
         $table = $table->orderBy('created_at', 'DESC');
 
@@ -59,12 +55,6 @@ class ProductCategoryService extends BaseService
     {
         try {
             $result = $this->productCategory;
-            if(Auth::user()->hasRole([RoleEnum::AGEN])){
-                $result = $result->where("user_id",Auth::user()->id);
-            }
-            if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
-                $result = $result->where("user_id",Auth::user()->user_id);
-            }
             $result = $result->where('id',$id);
             $result = $result->first();
 
@@ -84,11 +74,11 @@ class ProductCategoryService extends BaseService
     {
         try {
             $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
-            $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
+            $business_category_id = (empty($request->business_category_id)) ? null : trim(strip_tags($request->business_category_id));
 
             $create = $this->productCategory->create([
                 'name' => $name,
-                'user_id' => $user_id,
+                'business_category_id' => $business_category_id,
                 'author_id' => Auth::user()->id,
             ]);
 
@@ -104,13 +94,13 @@ class ProductCategoryService extends BaseService
     {
         try {
             $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
-            $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
+            $business_category_id = (empty($request->business_category_id)) ? null : trim(strip_tags($request->business_category_id));
 
             $result = $this->productCategory->findOrFail($id);
 
             $result->update([
                 'name' => $name,
-                'user_id' => $user_id,
+                'business_category_id' => $business_category_id,
             ]);
 
             return $this->response(true, 'Berhasil mengubah data',$result);

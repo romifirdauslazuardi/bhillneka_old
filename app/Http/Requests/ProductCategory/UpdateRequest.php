@@ -11,17 +11,6 @@ use Auth;
 
 class UpdateRequest extends FormRequest
 {
-    public function prepareForValidation()
-    {
-        $merge = [];
-        if(Auth::user()->hasRole([RoleEnum::AGEN])){
-            $merge["user_id"] = Auth::user()->id;
-        }
-        if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
-            $merge["user_id"] = Auth::user()->user_id;
-        }
-        $this->merge($merge);
-    }
 
     public function rules(): array
     {
@@ -29,9 +18,9 @@ class UpdateRequest extends FormRequest
             'name' => [
                 'required',
             ],
-            'user_id' => [
+            'business_category_id' => [
                 'required',
-                Rule::exists('users', 'id'),
+                Rule::exists('business_categories', 'id'),
             ],
         ];
     }
@@ -42,6 +31,8 @@ class UpdateRequest extends FormRequest
             'name.required' => 'Nama kategori harus diisi',
             'user_id.required' => 'User harus diisi',
             'user_id.exists' => 'User tidak ditemukan',
+            'business_category_id.required' => 'Kategori bisnis harus diisi',
+            'business_category_id.exists' => 'Kategori bisnis tidak ditemukan',
         ];
     }
 

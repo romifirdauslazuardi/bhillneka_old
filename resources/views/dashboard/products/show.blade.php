@@ -32,6 +32,28 @@
                 <div class="row">
                     <div class="col-12">
 
+                        @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::FNB]))
+                        <div class="row mb-2">
+                            <div class="col-md-3">
+                                Foto Produk
+                            </div>
+                            <div class="col-md-8">
+                                : @if(!empty($result->image)) <a href="{{asset($result->image)}}"><img src="{{asset($result->image)}}" style="width:100px;height:100px;"></a> @endif
+                            </div>
+                        </div>
+                        @endif
+
+                        @if(in_array($result->mikrotik,[\App\Enums\ProductEnum::MIKROTIK_HOTSPOT,\App\Enums\ProductEnum::MIKROTIK_PPPOE]))
+                        <div class="row mb-2">
+                            <div class="col-md-3">
+                                Mikrotik
+                            </div>
+                            <div class="col-md-8">
+                                : {{$result->mikrotik() ?? null}}
+                            </div>
+                        </div>
+                        @endif
+
                         <div class="row mb-2">
                             <div class="col-md-3">
                                 Kode Produk
@@ -52,6 +74,15 @@
 
                         <div class="row mb-2">
                             <div class="col-md-3">
+                                Slug
+                            </div>
+                            <div class="col-md-8">
+                                : {{$result->slug}}
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-3">
                                 Harga Produk
                             </div>
                             <div class="col-md-8">
@@ -61,12 +92,23 @@
 
                         <div class="row mb-2">
                             <div class="col-md-3">
-                                Slug
+                                Satuan Produk
                             </div>
                             <div class="col-md-8">
-                                : {{$result->slug}}
+                                : {{$result->unit}}
                             </div>
                         </div>
+
+                        @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG]))
+                        <div class="row mb-2">
+                            <div class="col-md-3">
+                                Berat Produk
+                            </div>
+                            <div class="col-md-8">
+                                : {{$result->weight() ?? null}}
+                            </div>
+                        </div>
+                        @endif
 
                         <div class="row mb-2">
                             <div class="col-md-3">
@@ -138,8 +180,10 @@
                     <div class="col-12">
                         <div class="d-flex justify-content-start mt-3">
                             <a href="{{route('dashboard.products.index')}}" class="btn btn-warning btn-sm" style="margin-right: 10px;"><i class="fa fa-arrow-left"></i> Kembali</a>
+                            @if(!empty(Auth::user()->business_id))
                             <a href="{{route('dashboard.products.edit',$result->id)}}" class="btn btn-primary btn-sm" style="margin-right: 10px;"><i class="fa fa-edit"></i> Edit</a>
                             <a href="#" class="btn btn-danger btn-sm btn-delete" data-id="{{$result->id}}"><i class="fa fa-trash"></i> Hapus</a>
+                            @endif
                         </div>
                     </div>
                 </div>

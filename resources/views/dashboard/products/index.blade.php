@@ -12,7 +12,7 @@
     <nav aria-label="breadcrumb" class="d-inline-block mt-2 mt-sm-0">
         <ul class="breadcrumb bg-transparent rounded mb-0 p-0">
             <li class="breadcrumb-item text-capitalize"><a href="#">Produk</a></li>
-            <li class="breadcrumb-item text-capitalize active" aria-current="page">Index</li>
+            <li class="breadcrumb-item text-capitalize active" aria-current="page">Daftar Produk</li>
         </ul>
     </nav>
 </div>
@@ -24,7 +24,9 @@
         <div class="card border-0 rounded shadow p-4">
             <div class="row mb-3">
                 <div class="col-lg-12">
+                    @if(!empty(Auth::user()->business_id))
                     <a href="{{route('dashboard.products.create')}}" class="btn btn-primary btn-sm btn-add"><i class="fa fa-plus"></i> Tambah</a>
+                    @endif
                     <a href="#" class="btn btn-success btn-sm btn-filter"><i class="fa fa-filter"></i> Filter</a>
                     <a href="{{route('dashboard.products.index')}}" class="btn @if(!empty(request()->all())) btn-warning @else btn-secondary @endif btn-sm"><i class="fa fa-refresh"></i> Refresh</a>
                 </div>
@@ -39,9 +41,9 @@
                                     <th>No</th>
                                     <th>Nama Produk</th>
                                     <th>Harga Produk</th>
-                                    <th>Apakah Item Stock</th>
+                                    <th>Unit</th>
                                     @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-                                    <th>Pengguna</th>
+                                    <th>Pemilik Usaha</th>
                                     @endif
                                     <th>Status</th>
                                     <th>Dibuat Pada</th>
@@ -56,17 +58,17 @@
                                                 </button>
                                                 <div class="dropdown-menu">
                                                     <a href="{{route('dashboard.products.show',$row->id)}}" class="dropdown-item"><i class="fa fa-eye"></i> Show</a>
+                                                    @if(!empty(Auth::user()->business_id))
                                                     <a href="{{route('dashboard.products.edit',$row->id)}}" class="dropdown-item"><i class="fa fa-edit"></i> Edit</a>
                                                     <a href="#" class="dropdown-item btn-delete" data-id="{{$row->id}}"><i class="fa fa-trash"></i> Hapus</a>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </td>
                                         <td>{{$table->firstItem() + $index}}</td>
                                         <td>{{$row->name}}</td>
                                         <td>{{number_format($row->price,0,',','.')}}</td>
-                                        <td>
-                                            <span class="badge bg-{{$row->is_using_stock()->class ?? null}}">{{$row->is_using_stock()->msg ?? null}}</span>
-                                        </td>
+                                        <td>{{$row->unit}}</td>
                                         @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
                                         <td>{{$row->user->name ?? null}}</td>
                                         @endif
@@ -105,6 +107,19 @@
 @section("script")
 <script>
     $(function() {
+        @if(!empty(Auth::user()->business_id))
+            getProductCategory('.select-category','{{Auth::user()->business->category_id ?? null}}',null);
+            getBusiness('.select-business','{{Auth::user()->business->user_id ?? null}}',null);
+        @else
+            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN]))
+                getProductCategory('.select-category','{{Auth::user()->business->category_id ?? null}}',null);
+                getBusiness('.select-business','{{Auth::user()->id}}',null);
+            @elseif(Auth::user()->hasRole([\App\Enums\RoleEnum::ADMIN_AGEN]))
+                getProductCategory('.select-category','{{Auth::user()->business->category_id ?? null}}',null);
+                getBusiness('.select-business','{{Auth::user()->user_id}}',null);
+            @endif
+        @endif
+
         $(document).on("click", ".btn-filter", function(e) {
             e.preventDefault();
 
@@ -116,11 +131,10 @@
             let val = $(this).val();
 
             $('.select-category').html('<option value="">==Semua Kategori Produk==</option>');
-            $('.select-unit').html('<option value="">==Semua Unit==</option>');
+            $('.select-business').html('<option value="">==Semua Bisnis==</option>');
 
             if(val != "" && val != undefined && val != null){
-                getProductCategory('.select-category',val,null);
-                getUnit('.select-unit',val,null);
+                getBusiness('.select-business',val,null);
             }
         });
 

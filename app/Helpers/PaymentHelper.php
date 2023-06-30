@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Enums\OrderEnum;
 use App\Enums\ProviderEnum;
 use App\Enums\RoleEnum;
 use App\Enums\UserBankEnum;
@@ -135,7 +136,7 @@ class PaymentHelper
                     "callback_url_cancel" => route('landing-page.orders.index',["code" => $order->code]),
                 ),
                 "payment" => array (
-                    "payment_due_date" => env("DOKU_DUE_DATE"),
+                    "payment_due_date" => ($order->type == OrderEnum::TYPE_ON_TIME_PAY) ? env("DOKU_DUE_DATE") : DateHelper::differentMinute($order->created_at,date("Y-m-d H:i:s",strtotime($order->expired_date))),
                 ),
                 "customer" => array (
                     "id" => $order->user->code ?? null,
@@ -185,7 +186,7 @@ class PaymentHelper
                 ]);
 
                 $order->update([
-                    'payment_due_date' => env("DOKU_DUE_DATE"),
+                    'payment_due_date' => ($order->type == OrderEnum::TYPE_ON_TIME_PAY) ? env("DOKU_DUE_DATE") : DateHelper::differentMinute($order->created_at,date("Y-m-d H:i:s",strtotime($order->expired_date))),
                     'expired_date' => $responseJson["response"]["payment"]["expired_date"],
                     'doku_token_id' => $responseJson["response"]["payment"]["token_id"],
                     'payment_url' => $responseJson["response"]["payment"]["url"],

@@ -38,7 +38,7 @@
                                     <th>Aksi</th>
                                     <th>No</th>
                                     @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-                                    <th>Agen</th>
+                                    <th>Pemilik Usaha</th>
                                     @endif
                                     <th>Nama Bisnis</th>
                                     <th>Kategori Bisnis</th>

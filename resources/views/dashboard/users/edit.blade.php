@@ -87,7 +87,7 @@
                             </div>
                         </div>
                         @endif
-                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
+                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]) && !empty(Auth::user()->business_id))
                         <div class="form-group row mb-3 display-agen @if(!$result->hasRole([\App\Enums\RoleEnum::USER])) d-none @endif">
                             <label class="col-md-3 col-form-label">Agen<span class="text-danger">*</span></label>
                             <div class="col-md-9">
@@ -96,6 +96,14 @@
                                     @foreach ($users as $index => $row)
                                     <option value="{{$row->id}}" @if($row->id == old('user_id',$result->user_id)) selected @endif>{{$row->name}}</option>
                                     @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3 display-business @if(!$result->hasRole([\App\Enums\RoleEnum::USER])) d-none @endif">
+                            <label class="col-md-3 col-form-label">Bisnis<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <select class="form-control select2 select-business" name="business_id" >
+                                    <option value="">==Pilih Bisnis==</option>
                                 </select>
                             </div>
                         </div>
@@ -132,6 +140,10 @@
               formatDate:'YYYY-MM-DD'
         });
 
+        @if($result->hasRole([\App\Enums\RoleEnum::USER]))
+            getBusiness('.select-business','{{$result->user_id}}','{{$result->business->id ?? null}}');
+        @endif
+
         $('button[type="submit"]').attr("disabled",false);
 
         $(document).on('change','.select-role',function(e){
@@ -148,6 +160,17 @@
             }
             else{
                 $(".display-agen").addClass("d-none");
+            }
+        });
+
+        $(document).on('change','.select-user',function(e){
+            e.preventDefault();
+            let val = $(this).val();
+
+            $('.select-business').html('<option value="">==Pilih Bisnis==</option>');
+
+            if(val != null && val != "" && val != undefined){
+                getBusiness('.select-business',val,null);
             }
         });
 

@@ -15,11 +15,10 @@ class UpdateRequest extends FormRequest
     public function prepareForValidation()
     {
         $merge = [];
-        if(Auth::user()->hasRole([RoleEnum::AGEN])){
-            $merge["user_id"] = Auth::user()->id;
-        }
-        if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
-            $merge["user_id"] = Auth::user()->user_id;
+        if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
+            $merge["business_id"] = Auth::user()->business_id;
+            $merge["user_id"] = Auth::user()->business->user_id ?? null;
+            $merge["status"] = UserBankEnum::STATUS_WAITING_APPROVE;
         }
         $this->merge($merge);
     }
@@ -28,6 +27,9 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name' => [
+                'required',
+            ],
+            'branch' => [
                 'required',
             ],
             'number' => [
@@ -42,6 +44,10 @@ class UpdateRequest extends FormRequest
             'user_id' => [
                 'required',
                 Rule::exists('users', 'id'),
+            ],
+            'business_id' => [
+                'required',
+                Rule::exists('business', 'id'),
             ],
             'status' => [
                 (Auth::user()->hasRole([RoleEnum::OWNER])) ? "required" : "nullable",
@@ -61,9 +67,12 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name.required' => 'Atas nama rekening harus diisi',
+            'branch.required' => 'Cabang harus diisi',
             'bank_id.required' => 'Bank harus diisi',
             'bank_id.exists' => 'Bank tidak ditemukan',
             'user_id.required' => 'User harus diisi',
+            'business_id.required' => 'Business harus diisi',
+            'business_id.exists' => 'Business tidak ditemukan',
             'user_id.exists' => 'User tidak ditemukan',
             'number.required' => 'Nomor rekening harus diisi',
             'number.numeric' => 'Nomor rekening harus berupa angka',

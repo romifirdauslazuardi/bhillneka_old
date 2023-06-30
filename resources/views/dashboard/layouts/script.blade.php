@@ -12,28 +12,29 @@
 <script src="{{URL::to('/')}}/templates/dashboard/assets/libs/bootstrap-select2/select2.min.js"></script>
 <script>
 
-    document.onkeydown = function (e) {
-        if (event.keyCode == 123) {
-            return false;
-        }
-        if (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'i'.charCodeAt(0))) {
-            return false;
-        }
-        if (e.ctrlKey && e.shiftKey && (e.keyCode == 'C'.charCodeAt(0) || e.keyCode == 'c'.charCodeAt(0))) {
-            return false;
-        }
-        if (e.ctrlKey && e.shiftKey && (e.keyCode == 'J'.charCodeAt(0) || e.keyCode == 'j'.charCodeAt(0))) {
-            return false;
-        }
-        if (e.ctrlKey && (e.keyCode == 'U'.charCodeAt(0) || e.keyCode == 'u'.charCodeAt(0))) {
-            return false;
-        }
-        if (e.ctrlKey && (e.keyCode == 'S'.charCodeAt(0) || e.keyCode == 's'.charCodeAt(0))) {
-            return false;
-        }
-    }
+    // document.onkeydown = function (e) {
+    //     if (event.keyCode == 123) {
+    //         return false;
+    //     }
+    //     if (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'i'.charCodeAt(0))) {
+    //         return false;
+    //     }
+    //     if (e.ctrlKey && e.shiftKey && (e.keyCode == 'C'.charCodeAt(0) || e.keyCode == 'c'.charCodeAt(0))) {
+    //         return false;
+    //     }
+    //     if (e.ctrlKey && e.shiftKey && (e.keyCode == 'J'.charCodeAt(0) || e.keyCode == 'j'.charCodeAt(0))) {
+    //         return false;
+    //     }
+    //     if (e.ctrlKey && (e.keyCode == 'U'.charCodeAt(0) || e.keyCode == 'u'.charCodeAt(0))) {
+    //         return false;
+    //     }
+    //     if (e.ctrlKey && (e.keyCode == 'S'.charCodeAt(0) || e.keyCode == 's'.charCodeAt(0))) {
+    //         return false;
+    //     }
+    // }
 
     $(function() {
+
         if ($('.select2').length >= 1) {
             $('.select2').select2({
                 width : "100%",
@@ -41,6 +42,86 @@
         }
 
         $('.sidebar-menu').find('li').removeClass("active");
+
+        $('.modal').on('shown.bs.modal', function (e) {
+            $(this).find('.select2').select2({
+                dropdownParent: $(this).find('.modal-content')
+            });
+        })
+
+        @if(Auth::check())
+            @if(!empty(Auth::user()->business_id))
+                getBusiness(".select-business-setting",'{{Auth::user()->business->user_id ?? null}}','{{Auth::user()->business_id}}');
+            @else
+                @if(Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN]))
+                    getBusiness(".select-business-setting",'{{Auth::user()->id}}',null);
+                @elseif(Auth::user()->hasRole([\App\Enums\RoleEnum::ADMIN_AGEN]))
+                    getBusiness(".select-business-setting",'{{Auth::user()->user_id}}',null);
+                @endif
+            @endif
+        @endif
+
+        $(document).on("click",".business-setting",function(e){
+            e.preventDefault();
+            $("#modalBusinessPage").modal("show");
+        });
+
+        $(document).on("change",".select-user-setting",function(e){
+            e.preventDefault();
+            let val = $(this).val();
+
+            $('.select-business-setting').html('<option value="">==Semua Bisnis==</option>');
+
+            if(val != null && val != undefined && val != ""){
+                getBusiness(".select-business-setting",val,null);
+            }
+        });
+
+        $(document).on("change",".select-business-setting",function(e){
+            e.preventDefault();
+            let val = $(this).val();
+
+            if(val == null || val == undefined || val == ""){
+                $('.select-user-setting').val(null).trigger("change");
+            }
+        });
+
+        $(document).on('submit','#frmUpdateBusinessPage',function(e){
+            e.preventDefault();
+            if(confirm("Apakah anda yakin ingin menyimpan data ini ?")){
+                $.ajax({
+                    url : $("#frmUpdateBusinessPage").attr("action"),
+                    method : "POST",
+                    data : new FormData($('#frmUpdateBusinessPage')[0]),
+                    contentType:false,
+                    cache:false,
+                    processData:false,
+                    dataType : "JSON",
+                    beforeSend : function(){
+                        return openLoader();
+                    },
+                    success : function(resp){
+                        if(resp.success == false){
+                            responseFailed(resp.message);                   
+                        }
+                        else{
+                            responseSuccess(resp.message,"{{url()->current()}}");
+                        }
+                    },
+                    error: function (request, status, error) {
+                        if(request.status == 422){
+                            responseFailed(request.responseJSON.message);
+                        }
+                        else{
+                            responseInternalServerError();
+                        }
+                    },
+                    complete :function(){
+                        return closeLoader();
+                    }
+                })
+            }
+        })
     });
 
     function openLoader(){
@@ -259,13 +340,56 @@
         })
     }
 
-    function getProductCategory(selector,user_id,selectedId=null){
+    function getBusiness(selector,user_id,selectedId=null){
+        $.ajax({
+            url : '{{route("base.business.index")}}',
+            method : "GET",
+            dataType : "JSON",
+            data : {
+                user_id : user_id    
+            },
+            beforeSend : function(){
+                return openLoader();
+            },
+            success : function(resp){
+                if(resp.success == false){
+                    responseFailed(resp.message);       
+                    $(selector+'').html("");            
+                }
+                else{
+                    let html = "";
+                    $.each(resp.data,function(index,element){
+                        if(selectedId != null && element.id == selectedId){
+                            html += '<option value="'+element.id+'" selected>'+element.name+'</option>';
+                        }
+                        else{
+                            html += '<option value="'+element.id+'">'+element.name+'</option>';
+                        }
+                    });
+                    $(selector+'').append(html);
+                }
+            },
+            error: function (request, status, error) {
+                if(request.status == 422){
+                    responseFailed(request.responseJSON.message);
+                }
+                else{
+                    responseInternalServerError();
+                }
+            },
+            complete :function(){
+                return closeLoader();
+            }
+        })
+    }
+
+    function getProductCategory(selector,business_category_id,selectedId=null){
         $.ajax({
             url : '{{route("base.product-categories.index")}}',
             method : "GET",
             dataType : "JSON",
             data : {
-                user_id : user_id    
+                business_category_id : business_category_id    
             },
             beforeSend : function(){
                 return openLoader();
@@ -302,13 +426,13 @@
         })
     }
 
-    function getUnit(selector,user_id,selectedId=null){
+    function getTable(selector,business_id,selectedId=null){
         $.ajax({
-            url : '{{route("base.units.index")}}',
+            url : '{{route("base.tables.index")}}',
             method : "GET",
             dataType : "JSON",
             data : {
-                user_id : user_id    
+                business_id : business_id    
             },
             beforeSend : function(){
                 return openLoader();
@@ -345,13 +469,13 @@
         })
     }
 
-    function getCustomer(selector,user_id,selectedId=null){
+    function getCustomer(selector,business_id,selectedId=null){
         $.ajax({
             url : '{{route("base.customers.index")}}',
             method : "GET",
             dataType : "JSON",
             data : {
-                user_id : user_id    
+                business_id : business_id    
             },
             beforeSend : function(){
                 return openLoader();
@@ -369,6 +493,126 @@
                         }
                         else{
                             html += '<option value="'+element.id+'">'+element.name+' - '+element.phone+'</option>';
+                        }
+                    });
+                    $(selector+'').append(html);
+                }
+            },
+            error: function (request, status, error) {
+                if(request.status == 422){
+                    responseFailed(request.responseJSON.message);
+                }
+                else{
+                    responseInternalServerError();
+                }
+            },
+            complete :function(){
+                return closeLoader();
+            }
+        })
+    }
+
+    function getProfilePppoe(selector,selectedName=null){
+        $.ajax({
+            url : '{{route("base.mikrotik-configs.profilePppoe")}}',
+            method : "GET",
+            dataType : "JSON",
+            beforeSend : function(){
+                return openLoader();
+            },
+            success : function(resp){
+                if(resp.success == false){
+                    responseFailed(resp.message);       
+                    $(selector+'').html("");            
+                }
+                else{
+                    let html = "";
+                    $.each(resp.data,function(index,element){
+                        if(selectedName != null && element.name == selectedName){
+                            html += '<option value="'+element.name+'" selected>'+element.name+'</option>';
+                        }
+                        else{
+                            html += '<option value="'+element.name+'">'+element.name+'</option>';
+                        }
+                    });
+                    $(selector+'').append(html);
+                }
+            },
+            error: function (request, status, error) {
+                if(request.status == 422){
+                    responseFailed(request.responseJSON.message);
+                }
+                else{
+                    responseInternalServerError();
+                }
+            },
+            complete :function(){
+                return closeLoader();
+            }
+        })
+    }
+
+    function getProfileHotspot(selector,selectedName=null){
+        $.ajax({
+            url : '{{route("base.mikrotik-configs.profileHotspot")}}',
+            method : "GET",
+            dataType : "JSON",
+            beforeSend : function(){
+                return openLoader();
+            },
+            success : function(resp){
+                if(resp.success == false){
+                    responseFailed(resp.message);       
+                    $(selector+'').html("");            
+                }
+                else{
+                    let html = "";
+                    $.each(resp.data,function(index,element){
+                        if(selectedName != null && element.name == selectedName){
+                            html += '<option value="'+element.name+'" selected>'+element.name+'</option>';
+                        }
+                        else{
+                            html += '<option value="'+element.name+'">'+element.name+'</option>';
+                        }
+                    });
+                    $(selector+'').append(html);
+                }
+            },
+            error: function (request, status, error) {
+                if(request.status == 422){
+                    responseFailed(request.responseJSON.message);
+                }
+                else{
+                    responseInternalServerError();
+                }
+            },
+            complete :function(){
+                return closeLoader();
+            }
+        })
+    }
+
+    function getServerHotspot(selector,selectedName=null){
+        $.ajax({
+            url : '{{route("base.mikrotik-configs.serverHotspot")}}',
+            method : "GET",
+            dataType : "JSON",
+            beforeSend : function(){
+                return openLoader();
+            },
+            success : function(resp){
+                if(resp.success == false){
+                    responseFailed(resp.message);       
+                    $(selector+'').html("");            
+                }
+                else{
+                    let html = "";
+                    $.each(resp.data,function(index,element){
+                        if(selectedName != null && element.name == selectedName){
+                            html += '<option value="'+element.name+'" selected>'+element.name+'</option>';
+                        }
+                        else{
+                            html += '<option value="'+element.name+'">'+element.name+'</option>';
                         }
                     });
                     $(selector+'').append(html);

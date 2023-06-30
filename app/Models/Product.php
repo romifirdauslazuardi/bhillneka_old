@@ -17,12 +17,16 @@ class Product extends Model
         'name',
         'slug',
         'price',
+        'image',
         'description',
         'user_id',
         'category_id',
-        'unit_id',
+        'unit',
+        'weight',
         'status',
         'is_using_stock',
+        'business_id',
+        'mikrotik',
         'author_id',
     ];
 
@@ -36,11 +40,6 @@ class Product extends Model
         return $this->belongsTo(ProductCategory::class, 'category_id', 'id');
     }
 
-    public function unit()
-    {
-        return $this->belongsTo(Unit::class, 'unit_id', 'id');
-    }
-
     public function stocks()
     {
         return $this->hasMany(ProductStock::class, 'product_id')->orderBy("created_at","DESC");
@@ -49,6 +48,11 @@ class Product extends Model
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id', 'id');
+    }
+
+    public function business()
+    {
+        return $this->belongsTo(Business::class, 'business_id', 'id');
     }
 
     public function getPriceAttribute($value)
@@ -94,5 +98,23 @@ class Product extends Model
         }
 
         return $return;
+    }
+
+    public function mikrotik()
+    {
+        $return = null;
+
+        if($this->mikrotik == ProductEnum::MIKROTIK_PPPOE){
+            $return = "PPPOE";
+        }
+        else if($this->mikrotik == ProductEnum::MIKROTIK_HOTSPOT){
+            $return = "Hotspot";
+        }
+
+        return $return;
+    }
+
+    public function weight(){
+        return $this->weight." gram";
     }
 }

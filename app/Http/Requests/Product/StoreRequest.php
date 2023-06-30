@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Product;
 
+use App\Enums\BusinessCategoryEnum;
 use App\Enums\ProductEnum;
 use App\Enums\RoleEnum;
 use App\Exceptions\CustomValidationException;
@@ -15,12 +16,16 @@ class StoreRequest extends FormRequest
     public function prepareForValidation()
     {
         $merge = [];
-        if(Auth::user()->hasRole([RoleEnum::AGEN])){
-            $merge["user_id"] = Auth::user()->id;
+        $merge["user_id"] = Auth::user()->business->user_id ?? null;
+        $merge["business_id"] = Auth::user()->business_id;
+
+        if(in_array(Auth::user()->business->category->name,[BusinessCategoryEnum::JASA,BusinessCategoryEnum::BARANG,BusinessCategoryEnum::FNB])){
+            $merge["mikrotik"] = ProductEnum::MIKROTIK_NONE;
         }
-        if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
-            $merge["user_id"] = Auth::user()->user_id;
+        if(in_array(Auth::user()->business->category->name,[BusinessCategoryEnum::JASA])){
+            $merge["is_using_stock"] = ProductEnum::IS_USING_STOCK_FALSE;
         }
+
         $this->merge($merge);
     }
 
@@ -39,9 +44,12 @@ class StoreRequest extends FormRequest
                 'required',
                 Rule::exists('product_categories', 'id'),
             ],
-            'unit_id' => [
+            'unit' => [
                 'required',
-                Rule::exists('units', 'id'),
+            ],
+            'weight' => [
+                'nullable',
+                'min:1'
             ],
             'user_id' => [
                 'required',
@@ -55,9 +63,17 @@ class StoreRequest extends FormRequest
                 'required',
                 'in:'.implode(",",[ProductEnum::STATUS_TRUE,ProductEnum::STATUS_FALSE])
             ],
+            'business_id' => [
+                'required',
+                Rule::exists('business', 'id'),
+            ],
             'code' => [
                 'required',
-                Rule::unique('products', 'code')->where('user_id', request()->get("user_id"))
+                Rule::unique('products', 'code')->where('business_id', $this->business_id)
+            ],
+            'mikrotik' => [
+                'required',
+                'in:'.implode(",",[ProductEnum::MIKROTIK_NONE,ProductEnum::MIKROTIK_HOTSPOT,ProductEnum::MIKROTIK_PPPOE])
             ],
         ];
     }
@@ -71,8 +87,8 @@ class StoreRequest extends FormRequest
             'price.min' => 'Harga produk minimal 1',
             'category_id.required' => 'Kategori produk harus diisi',
             'category_id.exists' => 'Kategori produk tidak ditemukan',
-            'unit_id.required' => 'Unit harus diisi',
-            'unit_id.exists' => 'Unit tidak ditemukan',
+            'unit.required' => 'Unit harus diisi',
+            'weight.min' => 'Berat minimal 1 gram',
             'user_id.required' => 'User harus diisi',
             'user_id.exists' => 'User tidak ditemukan',
             'status.required' => 'Status produk harus diisi',
@@ -81,6 +97,10 @@ class StoreRequest extends FormRequest
             'is_using_stock.in' => 'Apakah produk menggunakan stok tidak valid',
             'code.required' => 'Kode produk harus diisi',
             'code.unique' => 'Kode produk sudah dipakai',
+            'business_id.required' => 'Bisnis harus diisi',
+            'business_id.exists' => 'Bisnis tidak ditemukan',
+            'mikrotik.required' => 'Jenis mikrotik harus diisi',
+            'mikrotik.in' => 'Jenis mikrotik tidak valid',
         ];
     }
 

@@ -22,6 +22,14 @@
                         </select>
                     </div>
                     @endif
+                    @if(empty(Auth::user()->business_id))
+                    <div class="form-group mb-3">
+                        <label>Bisnis</label>
+                        <select class="form-control select2 select-business" name="business_id" style="width:100%;">
+                            <option value="">==Semua Bisnis==</option>
+                        </select>
+                    </div>
+                    @endif
                     <div class="form-group mb-3">
                         <label>Kategori Produk</label>
                         <select class="form-control select2 select-category" name="category_id" style="width:100%;">

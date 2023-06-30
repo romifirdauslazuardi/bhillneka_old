@@ -40,6 +40,7 @@ class OrderExpiredCommand extends Command
                 if(strtotime($row->expired_date) < strtotime(date("Y-m-d H:i:s"))){
                     $row->update([
                         'status' => OrderEnum::STATUS_EXPIRED,
+                        'progress' => OrderEnum::PROGRESS_EXPIRED,
                     ]);
                 }
             }
@@ -49,7 +50,7 @@ class OrderExpiredCommand extends Command
             return CommandAlias::SUCCESS;
 
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::rollBack();
             Log::emergency($th->getMessage());
             return CommandAlias::FAILURE;
         }

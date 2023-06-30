@@ -61,8 +61,13 @@ class BusinessService extends BaseService
     {
         try {
             $result = $this->business;
-            if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
-                $result = $result->where("user_id",Auth::user()->user_id);
+            if(Auth::check()){
+                if(Auth::user()->hasRole([RoleEnum::AGEN])){
+                    $result = $result->where("user_id",Auth::user()->id);
+                }
+                if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
+                    $result = $result->where("user_id",Auth::user()->user_id);
+                }
             }
             $result = $result->where('id',$id);
             $result = $result->first();

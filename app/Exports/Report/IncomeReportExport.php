@@ -29,6 +29,7 @@ class IncomeReportExport implements FromCollection, WithHeadings, ShouldAutoSize
         $data = [];
         $data[] = "No";
         $data[] = "Kode Transaksi";
+        $data[] = "Customer";
         $data[] = "Pendapatan Agen";
 
         if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER])){
@@ -40,6 +41,7 @@ class IncomeReportExport implements FromCollection, WithHeadings, ShouldAutoSize
         }
 
         $data[] = "Total Transaksi";
+        $data[] = "Progress";
         $data[] = "Status";
         $data[] = "Tanggal Dibuat";
 

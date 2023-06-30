@@ -76,6 +76,7 @@
                             <label class="col-md-3 col-form-label">Roles<span class="text-danger">*</span></label>
                             <div class="col-md-9">
                                 <select class="form-control select2 select-role" name="roles" >
+                                    <option value="">==Pilih Role Pengguna==</option>
                                     @foreach ($roles as $index => $row)
                                     <option value="{{$row}}" @if($row == old('roles')) selected @endif>{{$row}}</option>
                                     @endforeach
@@ -83,15 +84,23 @@
                             </div>
                         </div>
                         @endif
-                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
+                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]) && empty(Auth::user()->business_id))
                         <div class="form-group row mb-3 display-agen d-none">
                             <label class="col-md-3 col-form-label">Agen<span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <select class="form-control select2" name="user_id" >
+                                <select class="form-control select2 select-user" name="user_id" >
                                     <option value="">==Pilih Agen==</option>
                                     @foreach ($users as $index => $row)
                                     <option value="{{$row->id}}" @if($row->id == old('user_id')) selected @endif>{{$row->name}}</option>
                                     @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3 display-business d-none">
+                            <label class="col-md-3 col-form-label">Bisnis<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <select class="form-control select2 select-business" name="business_id" >
+                                    <option value="">==Pilih Bisnis==</option>
                                 </select>
                             </div>
                         </div>
@@ -144,6 +153,23 @@
             }
             else{
                 $(".display-agen").addClass("d-none");
+            }
+
+            $(".display-business").removeClass("d-none").addClass("d-none");
+
+            if(val == '{{\App\Enums\RoleEnum::USER}}'){
+                $(".display-business").removeClass("d-none");
+            }
+        });
+
+        $(document).on('change','.select-user',function(e){
+            e.preventDefault();
+            let val = $(this).val();
+
+            $('.select-business').html('<option value="">==Pilih Bisnis==</option>');
+
+            if(val != null && val != "" && val != undefined){
+                getBusiness('.select-business',val,null);
             }
         });
 

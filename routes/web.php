@@ -51,3 +51,11 @@ Route::group(["as" => "buy-products.", "prefix" => "buy-products"], function () 
     Route::get('/{slug}', 'BuyProductController@index')->name('index');
     Route::post('/', 'BuyProductController@store')->name('store');
 });
+
+Route::group(["as" => "shops.", "prefix" => "shops"], function () {
+    Route::get('/{business_id}/{table_id}', 'ShopController@index')->name('index');
+    Route::post('/addToCart', 'ShopController@addToCart')->name('addToCart');
+    Route::put('/updateCart/{id}', 'ShopController@updateCart')->name('updateCart');
+    Route::delete('/deleteCart/{id}', 'ShopController@deleteCart')->name('deleteCart');
+    Route::post('/clearCart', 'ShopController@clearCart')->name('clearCart');
+});

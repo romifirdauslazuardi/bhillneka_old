@@ -26,43 +26,14 @@
                 @csrf
                 <div class="row mb-3">
                     <div class="col-lg-12">
-                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
+                        @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::FNB]))
                         <div class="form-group row mb-3">
-                            <label class="col-md-3 col-form-label">Pengguna<span class="text-danger">*</span></label>
+                            <label class="col-md-3 col-form-label">Foto Produk</label>
                             <div class="col-md-9">
-                                <select class="form-control select2 select-user" name="user_id" >
-                                    <option value="">==Pilih Pengguna==</option>
-                                    @foreach ($users as $index => $row)
-                                    <option value="{{$row->id}}" @if($row->id == old('user_id')) selected @endif>{{$row->name}} - {{$row->phone}}</option>
-                                    @endforeach
-                                </select>
+                                <input type="file" class="form-control" name="image" accept="image/*">
                             </div>
                         </div>
                         @endif
-                        <div class="form-group row mb-3">
-                            <label class="col-md-3 col-form-label">Kode Produk <span class="text-danger">*</span></label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" name="code" placeholder="Kode Produk" value="{{old('code')}}" >
-                            </div>
-                        </div>
-                        <div class="form-group row mb-3">
-                            <label class="col-md-3 col-form-label">Nama Produk <span class="text-danger">*</span></label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" name="name" placeholder="Nama Produk" value="{{old('name')}}" >
-                            </div>
-                        </div>
-                        <div class="form-group row mb-3">
-                            <label class="col-md-3 col-form-label">Harga Produk <span class="text-danger">*</span></label>
-                            <div class="col-md-9">
-                                <input type="number" class="form-control" name="price" placeholder="Harga Produk" value="{{old('price')}}" >
-                            </div>
-                        </div>
-                        <div class="form-group row mb-3">
-                            <label class="col-md-3 col-form-label">Deskripsi Produk <span class="text-danger">*</span></label>
-                            <div class="col-md-9">
-                                <textarea class="form-control" rows="5" name="description">{{old('description')}}</textarea>
-                            </div>
-                        </div>
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Kategori<span class="text-danger">*</span></label>
                             <div class="col-md-9">
@@ -72,24 +43,116 @@
                             </div>
                         </div>
                         <div class="form-group row mb-3">
-                            <label class="col-md-3 col-form-label">Satuan<span class="text-danger">*</span></label>
+                            <label class="col-md-3 col-form-label">
+                                Kode 
+                                @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
+                                    {{" Produk "}}
+                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
+                                    {{" Jasa "}}
+                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                    {{" Mikrotik "}}
+                                @endif
+                                <span class="text-danger">*</span>
+                            </label>
                             <div class="col-md-9">
-                                <select class="form-control select2 select-unit" name="unit_id" >
-                                    <option value="">==Pilih Satuan==</option>
+                                <input type="text" class="form-control" name="code" placeholder="Kode Produk" value="{{old('code')}}" >
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
+                            <label class="col-md-3 col-form-label">
+                                Nama 
+                                @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
+                                    {{" Produk "}}
+                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
+                                    {{" Jasa "}}
+                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                    {{" Mikrotik "}}
+                                @endif
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="name" placeholder="Nama Produk" value="{{old('name')}}" >
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
+                            <label class="col-md-3 col-form-label">
+                                Harga 
+                                @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
+                                    {{" Produk "}}
+                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
+                                    {{" Jasa "}}
+                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                    {{" Mikrotik "}}
+                                @endif
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-md-9">
+                                <input type="number" class="form-control" name="price" placeholder="Harga Produk" value="{{old('price')}}" >
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
+                            <label class="col-md-3 col-form-label">
+                                Deskripsi 
+                                @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
+                                    {{" Produk "}}
+                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
+                                    {{" Jasa "}}
+                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                    {{" Mikrotik "}}
+                                @endif
+                            </label>
+                            <div class="col-md-9">
+                                <textarea class="form-control" rows="5" name="description">{{old('description')}}</textarea>
+                            </div>
+                        </div>
+                        @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                        <div class="form-group row mb-3">
+                            <label class="col-md-3 col-form-label">Tipe Mikrotik<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <select class="form-control select2" name="mikrotik" >
+                                    <option value="">==Pilih Tipe Mikrotik==</option>
+                                    @foreach ($mikrotik as $index => $row)
+                                    <option value="{{$index}}">{{$row}}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
+                        @endif
+                        <div class="form-group row mb-3">
+                            <label class="col-md-3 col-form-label">Satuan<span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" placeholder="Satuan" name="unit" value="{{old('unit')}}">
+                            </div>
+                        </div>
+                        @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG]))
+                        <div class="form-group row mb-3">
+                            <label class="col-md-3 col-form-label">
+                                Berat Produk
+                            </label>
+                            <div class="col-md-9">
+                                <div class="input-group">
+                                    <input type="number" class="form-control" placeholder="Berat" name="weight" value="{{old('weight')}}">
+                                    <div class="input-group-append">
+                                        <div class="d-flex">
+                                            <span class="input-group-text">GRAM</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Status<span class="text-danger">*</span></label>
                             <div class="col-md-9">
                                 <select class="form-control select2" name="status" >
-                                    <option value="">==Pilih Status Produk==</option>
+                                    <option value="">==Pilih Status==</option>
                                     @foreach ($status as $index => $row)
                                     <option value="{{$index}}">{{$row}}</option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
+                        @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB,\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Apakah Produk Stok ? <span class="text-danger">*</span></label>
                             <div class="col-md-9">
@@ -101,6 +164,7 @@
                                 </select>
                             </div>
                         </div>
+                        @endif
                     </div>
                 </div>
                 <div class="row">
@@ -124,23 +188,7 @@
 
         $('button[type="submit"]').attr("disabled",false);
 
-        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN]))
-            getProductCategory('.select-category','{{Auth::user()->id}}',null);
-            getUnit('.select-unit','{{Auth::user()->id}}',null);
-        @endif
-
-        $(document).on("change", ".select-user", function(e) {
-            e.preventDefault();
-            let val = $(this).val();
-
-            $('.select-category').html('<option value="">==Pilih Kategori==</option>');
-            $('.select-unit').html('<option value="">==Pilih Unit==</option>');
-
-            if(val != "" && val != undefined && val != null){
-                getProductCategory('.select-category',val,null);
-                getUnit('.select-unit',val,null);
-            }
-        });
+        getProductCategory('.select-category','{{Auth::user()->business->category_id ?? null}}',null);
 
         $(document).on('submit','#frmStore',function(e){
             e.preventDefault();

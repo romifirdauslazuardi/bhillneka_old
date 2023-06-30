@@ -2,10 +2,15 @@
 
 namespace App\Helpers;
 
+use App\Enums\RoleEnum;
 use App\Models\SettingFee;
+use App\Models\MikrotikConfig;
+use App\Services\UserService;
 use App\Settings\DashboardSetting;
 use App\Settings\LandingPageSetting;
+use Illuminate\Http\Request;
 use Log;
+use Auth;
 
 class SettingHelper
 {
@@ -64,5 +69,29 @@ class SettingHelper
 
         ResultData:
         return $return;
+    }
+
+    public static function userAgen(){
+        $users = new UserService();
+        $users = $users->index(new Request(['role' => RoleEnum::AGEN]),false);
+        $users = $users->data;
+
+        return $users;
+    }
+
+    public static function mikrotikConfig($business_id=null,$user_id=null){
+        if(Auth::check()){
+            if(!empty(Auth::user()->business_id)){
+                $business_id = Auth::user()->business_id;
+                $user_id = Auth::user()->business->user_id ?? null;
+            }
+        }
+        $data = new MikrotikConfig();
+        $data = $data->where("business_id",$business_id);
+        $data = $data->where("user_id",$user_id);
+        $data = $data->orderBy("created_at","DESC");
+        $data = $data->first();
+
+        return $data;
     }
 }

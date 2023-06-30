@@ -14,12 +14,14 @@ class UserBank extends Model
     protected $table = "user_banks";
     protected $fillable = [
         'name',
+        'branch',
         'number',
         'user_id',
         'bank_id',
         'status',
         'bank_settlement_id',
         'default',
+        'business_id',
         'author_id',
     ];
 
@@ -36,6 +38,11 @@ class UserBank extends Model
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id', 'id');
+    }
+
+    public function business()
+    {
+        return $this->belongsTo(Business::class, 'business_id', 'id');
     }
 
     public function status()

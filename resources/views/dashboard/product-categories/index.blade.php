@@ -12,7 +12,7 @@
     <nav aria-label="breadcrumb" class="d-inline-block mt-2 mt-sm-0">
         <ul class="breadcrumb bg-transparent rounded mb-0 p-0">
             <li class="breadcrumb-item text-capitalize"><a href="#">Kategori Produk</a></li>
-            <li class="breadcrumb-item text-capitalize active" aria-current="page">Index</li>
+            <li class="breadcrumb-item text-capitalize active" aria-current="page">Daftar Kategori Produk</li>
         </ul>
     </nav>
 </div>
@@ -24,7 +24,9 @@
         <div class="card border-0 rounded shadow p-4">
             <div class="row mb-3">
                 <div class="col-lg-12">
-                    <a href="#" class="btn btn-primary btn-sm btn-add"><i class="fa fa-plus"></i> Tambah</a>
+                    @if(!empty(Auth::user()->business_id))
+                    <a href="{{route('dashboard.product-categories.create')}}" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Tambah</a>
+                    @endif
                     <a href="#" class="btn btn-success btn-sm btn-filter"><i class="fa fa-filter"></i> Filter</a>
                     <a href="{{route('dashboard.product-categories.index')}}" class="btn @if(!empty(request()->all())) btn-warning @else btn-secondary @endif btn-sm"><i class="fa fa-refresh"></i> Refresh</a>
                 </div>
@@ -38,8 +40,9 @@
                                     <th>Aksi</th>
                                     <th>No</th>
                                     <th>Nama</th>
+                                    <th>Bisnis</th>
                                     @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-                                    <th>Pengguna</th>
+                                    <th>Pemilik Usaha</th>
                                     @endif
                                     <th>Author</th>
                                     <th>Dibuat Pada</th>
@@ -53,13 +56,16 @@
                                                     <i class="fa fa-bars"></i>
                                                 </button>
                                                 <div class="dropdown-menu">
-                                                    <a href="#" class="dropdown-item btn-edit" data-id="{{$row->id}}" data-name="{{$row->name}}" data-user-id="{{$row->user_id}}"><i class="fa fa-edit"></i> Edit</a>
+                                                    @if(!empty(Auth::user()->business_id))
+                                                    <a href="{{route('dashboard.product-categories.edit',$row->id)}}" class="dropdown-item btn-edit"><i class="fa fa-edit"></i> Edit</a>
                                                     <a href="#" class="dropdown-item btn-delete" data-id="{{$row->id}}"><i class="fa fa-trash"></i> Hapus</a>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </td>
                                         <td>{{$table->firstItem() + $index}}</td>
                                         <td>{{$row->name}}</td>
+                                        <td>{{$row->business->name ?? null}}</td>
                                         @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
                                         <td>{{$row->user->name ?? null}}</td>
                                         @endif
@@ -98,6 +104,16 @@
     $(function() {
 
         $('button[type="submit"]').attr("disabled",false);
+
+        @if(!empty(Auth::user()->business_id))
+            getBusiness('.select-business','{{Auth::user()->business->user_id ?? null}}',null);
+        @else
+            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN]))
+                getBusiness('.select-business','{{Auth::user()->id}}',null);
+            @elseif(Auth::user()->hasRole([\App\Enums\RoleEnum::ADMIN_AGEN]))
+                getBusiness('.select-business','{{Auth::user()->user_id}}',null);
+            @endif
+        @endif
         
         $(document).on("click", ".btn-filter", function(e) {
             e.preventDefault();
@@ -111,17 +127,15 @@
             $('#modalStore').modal("show");
         });
 
-        $(document).on("click", ".btn-edit", function(e) {
+        $(document).on("change",".select-user",function(e){
             e.preventDefault();
+            let val = $(this).val();
 
-            let id = $(this).data("id");
-            let name = $(this).data("name");
-            let userId = $(this).data("user-id");
+            $('.select-business').html('<option value="">==Semua Bisnis==</option>');
 
-            $("#frmUpdate").attr("action", "{{ route('dashboard.product-categories.update', '_id_') }}".replace("_id_", id));
-            $('#frmUpdate').find('input[name="name"]').val(name);
-            $('#frmUpdate').find('select[name="user_id"]').val(userId).trigger("change");
-            $('#modalUpdate').modal("show");
+            if(val != null && val != undefined && val != ""){
+                getBusiness(".select-business",val,null);
+            }
         });
 
         $(document).on("click", ".btn-delete", function() {
@@ -130,80 +144,6 @@
                 $("#frmDelete").attr("action", "{{ route('dashboard.product-categories.destroy', '_id_') }}".replace("_id_", id));
                 $("#frmDelete").find('input[name="id"]').val(id);
                 $("#frmDelete").submit();
-            }
-        })
-
-        $(document).on('submit','#frmStore',function(e){
-            e.preventDefault();
-            if(confirm("Apakah anda yakin ingin menyimpan data ini ?")){
-                $.ajax({
-                    url : $("#frmStore").attr("action"),
-                    method : "POST",
-                    data : new FormData($('#frmStore')[0]),
-                    contentType:false,
-                    cache:false,
-                    processData:false,
-                    dataType : "JSON",
-                    beforeSend : function(){
-                        return openLoader();
-                    },
-                    success : function(resp){
-                        if(resp.success == false){
-                            responseFailed(resp.message);                   
-                        }
-                        else{
-                            responseSuccess(resp.message,"{{route('dashboard.product-categories.index')}}");
-                        }
-                    },
-                    error: function (request, status, error) {
-                        if(request.status == 422){
-                            responseFailed(request.responseJSON.message);
-                        }
-                        else{
-                            responseInternalServerError();
-                        }
-                    },
-                    complete :function(){
-                        return closeLoader();
-                    }
-                })
-            }
-        })
-
-        $(document).on('submit','#frmUpdate',function(e){
-            e.preventDefault();
-            if(confirm("Apakah anda yakin ingin menyimpan data ini ?")){
-                $.ajax({
-                    url : $("#frmUpdate").attr("action"),
-                    method : "POST",
-                    data : new FormData($('#frmUpdate')[0]),
-                    contentType:false,
-                    cache:false,
-                    processData:false,
-                    dataType : "JSON",
-                    beforeSend : function(){
-                        return openLoader();
-                    },
-                    success : function(resp){
-                        if(resp.success == false){
-                            responseFailed(resp.message);                   
-                        }
-                        else{
-                            responseSuccess(resp.message,"{{route('dashboard.product-categories.index')}}");
-                        }
-                    },
-                    error: function (request, status, error) {
-                        if(request.status == 422){
-                            responseFailed(request.responseJSON.message);
-                        }
-                        else{
-                            responseInternalServerError();
-                        }
-                    },
-                    complete :function(){
-                        return closeLoader();
-                    }
-                })
             }
         })
     })

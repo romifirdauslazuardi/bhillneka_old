@@ -11,6 +11,7 @@ use App\Http\Requests\ProductCategory\StoreRequest;
 use App\Http\Requests\ProductCategory\UpdateRequest;
 use App\Services\ProductCategoryService;
 use App\Services\UserService;
+use App\Services\BusinessService;
 use Log;
 use Auth;
 
@@ -20,6 +21,7 @@ class ProductCategoryController extends Controller
     protected $view;
     protected $productCategoryService;
     protected $userService;
+    protected $businessService;
 
     public function __construct()
     {
@@ -27,6 +29,7 @@ class ProductCategoryController extends Controller
         $this->view = "dashboard.product-categories.";
         $this->productCategoryService = new ProductCategoryService();
         $this->userService = new UserService();
+        $this->businessService = new BusinessService();
     }
 
     public function index(Request $request)
@@ -36,9 +39,13 @@ class ProductCategoryController extends Controller
         $users = $this->userService->index(new Request(['role' => RoleEnum::AGEN]),false);
         $users = $users->data;
 
+        $business = $this->businessService->index(new Request([]),false);
+        $business = $business->data;
+
         $data = [
             'table' => $response->data,
-            'users' => $users
+            'users' => $users,
+            'business' => $business,
         ];
 
         return view($this->view . 'index', $data);
@@ -46,14 +53,7 @@ class ProductCategoryController extends Controller
 
     public function create()
     {
-        $users = $this->userService->getUserAgen();
-        $users = $users->data;
-
-        $data = [
-            'users' => $users,
-        ];
-
-        return view($this->view . "create", $data);
+        return view($this->view . "create");
     }
 
     public function show($id)
@@ -81,11 +81,7 @@ class ProductCategoryController extends Controller
         }
         $result = $result->data;
 
-        $users = $this->userService->getUserAgen();
-        $users = $users->data;
-
         $data = [
-            'users' => $users,
             'result' => $result
         ];
 

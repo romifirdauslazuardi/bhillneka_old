@@ -32,13 +32,24 @@ class UserBankController extends Controller
         $this->userBankService = new UserBankService();
         $this->userService = new UserService();
         $this->bankService = new BankService();
+
+        $this->middleware(function ($request, $next) {
+            if(Auth::user()->hasRole([
+                RoleEnum::AGEN,
+                RoleEnum::ADMIN_AGEN]) 
+            && empty(Auth::user()->business_id)){
+                alert()->error('Gagal', "Bisnis page belum diaktifkan");
+                return redirect()->route("dashboard.index");
+            }
+            return $next($request);
+        },['only' => ['index','show','store','update','destroy','create','edit']]);
     }
 
     public function index(Request $request)
     {
         $response = $this->userBankService->index($request);
 
-        $users = $this->userService->index(new Request([]),false);
+        $users = $this->userService->getUserOwnerAgen();
         $users = $users->data;
 
         $status = UserBankEnum::status();

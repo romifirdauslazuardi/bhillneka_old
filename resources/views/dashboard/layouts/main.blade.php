@@ -5,7 +5,7 @@
         @include("dashboard.layouts.head")
     </head>
 
-    <body oncontextmenu="return false;">
+    <body oncontextmenu="return true;">
 
         @include('sweetalert::alert')
 
@@ -77,6 +77,8 @@
         <!-- page-wrapper -->
 
         @include("dashboard.layouts.rightbar")
+
+        @include("dashboard.layouts.select-business")
         
         @include("dashboard.layouts.script")
     </body>

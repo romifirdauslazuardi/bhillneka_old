@@ -31,11 +31,11 @@ class UserBankService extends BaseService
     public function index(Request $request, bool $paginate = true)
     {
         $search = (empty($request->search)) ? null : trim(strip_tags($request->search));
-        $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
+        $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
         $status = (empty($request->status)) ? null : trim(strip_tags($request->status));
 
-        if(Auth::user()->hasRole([RoleEnum::AGEN])){
-            $user_id = Auth::user()->id;
+        if(!empty(Auth::user()->business_id)){
+            $business_id = Auth::user()->business_id;
         }
 
         $table = $this->userBank;
@@ -43,16 +43,14 @@ class UserBankService extends BaseService
             $table = $this->userBank->where(function ($query2) use ($search) {
                 $query2->where('name', 'like', '%' . $search . '%');
                 $query2->orWhere('number', 'like', '%' . $search . '%');
+                $query2->orWhere('branch', 'like', '%' . $search . '%');
             });
         }
-        if(!empty($user_id)){
-            $table = $table->where("user_id",$user_id);
+        if(!empty($business_id)){
+            $table = $table->where("business_id",$business_id);
         }
         if(isset($status)){
             $table = $table->where("status",$status);
-        }
-        if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
-            $table = $table->where("user_id",Auth::user()->user_id);
         }
         $table = $table->orderBy('created_at', 'DESC');
 
@@ -70,13 +68,10 @@ class UserBankService extends BaseService
     {
         try {
             $result = $this->userBank;
-            if(Auth::user()->hasRole([RoleEnum::AGEN])){
-                $result = $result->where("user_id",Auth::user()->id);
-            }
-            if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
-                $result = $result->where("user_id",Auth::user()->user_id);
-            }
             $result = $result->where('id',$id);
+            if(!empty(Auth::user()->business_id)){
+                $result = $result->where("business_id",Auth::user()->business_id);
+            }
             $result = $result->first();
 
             if(!$result){
@@ -86,6 +81,9 @@ class UserBankService extends BaseService
             $verified = $this->userBank;
             $verified = $verified->where("user_id",$result->user_id);
             $verified = $verified->where("id","!=",$result->id);
+            if(!empty(Auth::user()->business_id)){
+                $verified = $verified->where("business_id",Auth::user()->business_id);
+            }
             $verified = $verified->orderBy("created_at","DESC");
             $verified = $verified->where("status",UserBankEnum::STATUS_APPROVED);
             $verified = $verified->get();
@@ -111,6 +109,8 @@ class UserBankService extends BaseService
             $status = (empty($request->status)) ? null : trim(strip_tags($request->status));
             $default = (empty($request->default)) ? UserBankEnum::DEFAULT_FALSE : trim(strip_tags($request->default));
             $bank_settlement_id = (empty($request->bank_settlement_id)) ? null : trim(strip_tags($request->bank_settlement_id));
+            $branch = (empty($request->branch)) ? null : trim(strip_tags($request->branch));
+            $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
 
             $create = $this->userBank->create([
                 'name' => $name,
@@ -120,6 +120,8 @@ class UserBankService extends BaseService
                 'status' => $status,
                 'default' => $default,
                 'bank_settlement_id' => $bank_settlement_id,
+                'branch' => $branch,
+                'business_id' => $business_id,
                 'author_id' => Auth::user()->id,
             ]);
 
@@ -166,6 +168,8 @@ class UserBankService extends BaseService
             $status = (empty($request->status)) ? null : trim(strip_tags($request->status));
             $default = (empty($request->default)) ? UserBankEnum::DEFAULT_FALSE : trim(strip_tags($request->default));
             $bank_settlement_id = (empty($request->bank_settlement_id)) ? null : trim(strip_tags($request->bank_settlement_id));
+            $branch = (empty($request->branch)) ? null : trim(strip_tags($request->branch));
+            $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
 
             $result = $this->userBank->findOrFail($id);
 
@@ -187,6 +191,8 @@ class UserBankService extends BaseService
                 'status' => $status,
                 'default' => $default,
                 'bank_settlement_id' => $bank_settlement_id,
+                'branch' => $branch,
+                'business_id' => $business_id,
             ]);
 
             if($result->default == UserBankEnum::DEFAULT_TRUE){

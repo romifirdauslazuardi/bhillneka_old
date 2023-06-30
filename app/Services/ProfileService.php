@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Services\BaseService;
 use App\Http\Requests\Profile\UpdateRequest;
+use App\Http\Requests\Profile\UpdateBusinessPageRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Helpers\UploadHelper;
@@ -60,6 +61,25 @@ class ProfileService extends BaseService
             ]);
 
             return $this->response(true, "Data berhasil diubah");
+        } catch (\Throwable $th) {
+            Log::emergency($th->getMessage());
+
+            return $this->response(false, "Terjadi kesalahan saat memproses data");
+        }
+    }
+
+    public function updateBusinessPage(UpdateBusinessPageRequest $request)
+    {
+        try {
+            $result = Auth::user();
+
+            $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
+
+            $result->update([
+                'business_id' => $business_id,
+            ]);
+
+            return $this->response(true, "Business page berhasil diubah");
         } catch (\Throwable $th) {
             Log::emergency($th->getMessage());
 

@@ -22,6 +22,14 @@ class ProductStockController extends Controller
         $this->route = "dashboard.products.";
         $this->view = "dashboard.products.";
         $this->productStockService = new ProductStockService();
+
+        $this->middleware(function ($request, $next) {
+            if(empty(Auth::user()->business_id)){
+                alert()->error('Gagal', "Bisnis page belum diaktifkan");
+                return redirect()->route("dashboard.index");
+            }
+            return $next($request);
+        },['only' => ['store','update','destroy']]);
     }
 
     public function store(StoreRequest $request)

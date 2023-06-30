@@ -13,17 +13,17 @@ class ProductCategory extends Model
     protected $table = "product_categories";
     protected $fillable = [
         'name',
-        'user_id',
+        'business_category_id',
         'author_id',
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id', 'id');
-    }
 
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id', 'id');
+    }
+
+    public function business_category()
+    {
+        return $this->belongsTo(BusinessCategory::class, 'business_category_id', 'id');
     }
 }

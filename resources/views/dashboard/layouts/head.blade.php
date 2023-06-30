@@ -62,7 +62,6 @@
     .select2-dropdown{
         z-index: 3051;
     }
-
     .swal2-container {
         z-index: 4444;
     }

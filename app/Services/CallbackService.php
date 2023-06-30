@@ -2,14 +2,23 @@
 
 namespace App\Services;
 
+use App\Enums\BusinessCategoryEnum;
 use App\Enums\DokuEnum;
 use App\Enums\ProviderEnum;
 use App\Enums\OrderEnum;
+use App\Enums\OrderMikrotikEnum;
 use App\Enums\RoleEnum;
+use App\Helpers\DateHelper;
+use App\Helpers\LogHelper;
+use App\Helpers\SettingHelper;
+use App\Helpers\WhatsappHelper;
+use App\Jobs\OrderMikrotikHotspotJob;
 use App\Models\Provider;
 use App\Models\OrderDoku;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\User;
+use App\Models\RouterosAPI;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Notifications\PaymentNotification;
@@ -25,6 +34,7 @@ class CallbackService extends BaseService
     protected $orderDoku;
     protected $provider;
     protected $user;
+    protected $routerosApi;
 
     public function __construct()
     {
@@ -32,6 +42,7 @@ class CallbackService extends BaseService
         $this->orderDoku = new OrderDoku();
         $this->provider = new Provider();
         $this->user = new User();
+        $this->routerosApi = new RouterosAPI();
     }
 
     public function doku(Request $request) {
@@ -89,6 +100,128 @@ class CallbackService extends BaseService
                         'paid_date' => date("Y-m-d H:i:s"),
                         'doku_fee' => $doku_fee,
                     ]);
+
+                    if($findOrder->business->category->name == BusinessCategoryEnum::MIKROTIK){
+
+                        $mikrotikConfig = SettingHelper::mikrotikConfig($findOrder->business_id,$findOrder->business->user_id ?? null);
+                        $ip = $mikrotikConfig->ip ?? null;
+                        $username = $mikrotikConfig->username ?? null;
+                        $password = $mikrotikConfig->password ?? null;
+                        $port = $mikrotikConfig->port ?? null;
+
+                        foreach($findOrder->items as $index => $row){
+                            $connect = $this->routerosApi;
+                            $connect->debug("false");
+                            
+                            if(!$connect->connect($ip,$username,$password,$port)){
+                                Log::emergency('Callback : Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda');
+                            }
+
+                            if(!empty($row->order_mikrotik)){
+                                if($row->order_mikrotik->type == OrderMikrotikEnum::TYPE_PPPOE){
+                                    $connectData = [
+                                        'name' => $row->order_mikrotik->username ?? null,
+                                        'password' => $row->order_mikrotik->password ?? null,
+                                        'service' => $row->order_mikrotik->service ?? null,
+                                        'profile' => $row->order_mikrotik->profile ?? null,
+                                        'local-address' => $row->order_mikrotik->local_address ?? null,
+                                        'remote-address' => $row->order_mikrotik->remote_address ?? null,
+                                        'comment' => $row->order_mikrotik->comment ?? null,
+                                        'disabled' => OrderMikrotikEnum::DISABED_NO,
+                                    ];
+
+                                    if(!empty($row->order_mikrotik->mikrotik_id)){
+                                        $connectData[".id"] = $row->order_mikrotik->mikrotik_id;
+                                        $connect = $connect->comm('/ppp/secret/set',$connectData);
+                                    }
+                                    else{
+                                        $connect = $connect->comm('/ppp/secret/add',$connectData);
+                                    }
+                
+                                    $connectLog = LogHelper::mikrotikLog($connect);
+
+                                    if($connectLog["IsError"] == TRUE){
+                                        Log::emergency("Callback : ".$connectLog["Message"]);
+                                    }
+
+                                    $row->order_mikrotik()->update([
+                                        'disabled' => OrderMikrotikEnum::DISABED_NO,
+                                    ]);
+
+                                    if(empty($row->order_mikrotik->mikrotik_id)){
+                                        $row->order_mikrotik()->update([
+                                            'mikrotik_id' => $connect
+                                        ]);
+                                    }
+                                }
+                                else{
+                                    $connectData = [
+                                        'name' => $row->order_mikrotik->username ?? null,
+                                        'password' => $row->order_mikrotik->password ?? null,
+                                        'server' => $row->order_mikrotik->server ?? null,
+                                        'profile' => $row->order_mikrotik->profile ?? null,
+                                        'limit-uptime' => $row->order_mikrotik->time_limit ?? null,
+                                        'comment' => $row->order_mikrotik->comment ?? null,
+                                        'disabled' => OrderMikrotikEnum::DISABED_NO,
+                                    ];
+            
+                                    if(!empty($row->order_mikrotik->address)){
+                                        $connectData["address"] = $row->order_mikrotik->address ?? null;
+                                    }
+            
+                                    if(!empty($row->order_mikrotik->mac_address)){
+                                        $connectData["mac-address"] = $row->order_mikrotik->mac_address ?? null;
+                                    }
+
+                                    if(!empty($row->order_mikrotik->mikrotik_id)){
+                                        $connectData[".id"] = $row->order_mikrotik->mikrotik_id;
+                                        $connect = $connect->comm('/ip/hotspot/user/set',$connectData);
+                                    }
+                                    else{
+                                        $connect = $connect->comm('/ip/hotspot/user/add',$connectData);
+                                    }
+
+                                    $connectLog = LogHelper::mikrotikLog($connect);
+
+                                    if($connectLog["IsError"] == TRUE){
+                                        Log::emergency("Callback : ".$connectLog["Message"]);
+                                    }
+
+                                    $row->order_mikrotik()->update([
+                                        'disabled' => OrderMikrotikEnum::DISABED_NO,
+                                    ]);
+
+                                    if(empty($row->order_mikrotik->mikrotik_id)){
+                                        $row->order_mikrotik()->update([
+                                            'mikrotik_id' => $connect
+                                        ]);
+                                    }
+
+                                    $explodeTimeLimit = str_split($row->order_mikrotik->time_limit);
+
+                                    $totalSeconds = 0;
+                                    foreach($explodeTimeLimit as $i => $value){
+                                        if(isset($explodeTimeLimit[$i+1])){
+                                            if(strtolower($explodeTimeLimit[$i+1]) == "d"){
+                                                $totalSeconds += (((int)$value) * 24 * 60 * 60);
+                                            }
+                                            if(strtolower($explodeTimeLimit[$i+1]) == "h"){
+                                                $totalSeconds += (((int)$value) * 60 * 60);
+                                            }
+                                            if(strtolower($explodeTimeLimit[$i+1]) == "m"){
+                                                $totalSeconds += (((int)$value) * 60);
+                                            }
+                                            if(strtolower($explodeTimeLimit[$i+1]) == "s"){
+                                                $totalSeconds += (((int)$value));
+                                            }
+                                        }
+                                    }
+
+                                    OrderMikrotikHotspotJob::dispatch($findOrder->id)->delay(now()->addSeconds($totalSeconds));
+                                }
+                            }
+                        }
+                    }
                     
                 }
 
@@ -109,19 +242,107 @@ class CallbackService extends BaseService
 
                 Notification::send($received,new PaymentNotification(route('dashboard.orders.show',$findOrder->id),'Pembayaran Pesanan','Pembayaran dengan kode transaksi '.$findOrder->code." sebesar <b>".number_format($findOrder->totalNeto(),0,',','.')."</b> telah <b>[".$decode["transaction"]["status"]."</b>] dilakukan.",$findOrder));
 
+                self::sendWhatsapp($findOrder);
+
                 DB::commit();
                 
                 return $this->response(true, "Callback berhasil",null,Response::HTTP_OK);
             } else {
 
-                DB::rollback();
+                DB::rollBack();
 
                 return $this->response(false, "Invalid Signature",null,Response::HTTP_BAD_REQUEST);
             }
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::rollBack();
             Log::emergency($th->getMessage());
             return $this->response(false, "Terjadi kesalahan saat memproses data");
+        }
+    }
+
+    private function sendWhatsapp($order,string $type = "pesanan"){
+        $message = "";
+        if($type == "pesanan"){
+            if($order->status == OrderEnum::STATUS_WAITING_PAYMENT){
+                $message .= "Selesaikan Pembayaran Anda sebelum ".date("d F Y H:i:s",strtotime($order->expired_date))." WIB";
+            }
+        }
+        else if($type == "progress"){
+            $message = "Progress pesanan anda diubah menjadi *".$order->progress()->msg."*";
+        }
+        
+        $message .= "\r\n";
+        $message .= "\r\n";
+        $message .= $order->business->name;
+        $message .= "\r\n";
+        $message .= $order->business->location;
+        $message .= "\r\n";
+        $message .= $order->business->user->phone;
+        $message .= "\r\n";
+        $message .= "=====";
+        $message .= "\r\n";
+        $message .= $order->status()->msg." #".$order->code;
+        $message .= "\r\n";
+        $message .= "=====";
+        $message .= "\r\n";
+        foreach($order->items as $index => $row){
+            $message .= $row->product_name;
+            $message .= "\r\n";
+            $message .= $row->qty." x ".number_format($row->product_price,0,',','.')." = ".number_format($row->totalNeto(),0,',','.');
+            if($order->status == OrderEnum::STATUS_SUCCESS){
+                if(!empty($row->order_mikrotik->mikrotik_id)){
+                    $message .= " | username = ".$row->order_mikrotik->username." , "."password = ".$row->order_mikrotik->password;
+                }
+            }
+            $message .= "\r\n";
+            $message .= "=====";
+            $message .= "\r\n";
+        }
+        $message .= "Subtotal : ".number_format($order->totalNeto() + $order->discount,0,',','.');
+        $message .= "\r\n";
+        $message .= "Discount : ".number_format($order->discount,0,',','.');
+        $message .= "\r\n";
+        $message .= "Total : ".number_format($order->totalNeto(),0,',','.');
+        $message .= "\r\n";
+        if($order->status == OrderEnum::STATUS_SUCCESS){
+            $message .= "Bayar : ".number_format($order->totalNeto(),0,',','.');
+            $message .= "\r\n";
+        }
+        else{
+            $message .= "Bayar : ".number_format(0,0,',','.');
+            $message .= "\r\n";
+        }
+        $message .= "Kembalian : ".number_format(0,0,',','.');
+        $message .= "\r\n";
+        $message .= "\r\n";
+
+        if($order->status == OrderEnum::STATUS_WAITING_PAYMENT){
+            if($order->provider->type == ProviderEnum::TYPE_DOKU){
+                $message .= "Link Pembayaran : ".$order->payment_url;
+            }
+            else if($order->provider->type == ProviderEnum::TYPE_MANUAL_TRANSFER){
+                $message .= "Link Pembayaran : ".route('landing-page.manual-payments.index',$order->code);
+            }
+        }
+        else{
+            $message .= "Link Invoice : ".route('landing-page.orders.index',['code' => $order->code]);
+        }
+
+        $message .= "\r\n";
+        $message .= "\r\n";
+
+        $message .= "Penyedia Layanan / www.bhilnekka.com";
+        $message .= "\r\n";
+        $message .= "TERIMAKASIH";
+        $message .= "\r\n";
+
+        if(!empty($order->customer_id)){
+            return WhatsappHelper::send($order->customer->phone,$order->customer->name,["title" => "Notifikasi Pesanan" ,"message" => $message],false);
+        }
+        else{
+            if(!empty($order->customer_name) && !empty($order->customer_phone)){
+                return WhatsappHelper::send($order->customer_phone,$order->customer_name,["title" => "Notifikasi Pesanan" ,"message" => $message],false);
+            }
         }
     }
 

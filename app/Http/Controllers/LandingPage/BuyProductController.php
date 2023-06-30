@@ -9,6 +9,7 @@ use App\Http\Requests\Order\StoreRequest;
 use App\Services\ProductService;
 use App\Services\OrderService;
 use App\Services\ProviderService;
+use App\Services\CartService;
 use Illuminate\Http\Request;
 use Log;
 
@@ -19,6 +20,7 @@ class BuyProductController extends Controller
     protected $productService;
     protected $orderService;
     protected $providerService;
+    protected $cartService;
 
     public function __construct()
     {
@@ -27,6 +29,7 @@ class BuyProductController extends Controller
         $this->productService = new ProductService();
         $this->orderService = new OrderService();
         $this->providerService = new ProviderService();
+        $this->cartService = new CartService(); 
     }
 
     public function index($slug){
@@ -56,6 +59,8 @@ class BuyProductController extends Controller
                 alert()->html("Gagal",$response->message, 'error');
                 return redirect()->back()->with("error",$response->message)->withInput();
             }
+
+            $this->cartService->clear();
             
             if($response->data->provider->type == ProviderEnum::TYPE_DOKU){
                 return redirect($response->data->payment_url);

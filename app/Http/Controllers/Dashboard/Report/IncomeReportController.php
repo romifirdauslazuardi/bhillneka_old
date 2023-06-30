@@ -52,10 +52,18 @@ class IncomeReportController extends Controller
 
             $collection = new Collection();
             foreach($orders as $index => $row){
+
+                $customer = $row->customer->name ?? null;
+
+                if(empty($row->customer_id)){
+                    $customer = $row->customer_name;
+                }
+
                 $pushData = [];
 
                 $pushData[] = $index+1;
                 $pushData[] = $row->code;
+                $pushData[] = $customer;
                 $pushData[] = $row->incomeAgen();
 
                 if(Auth::user()->hasRole([RoleEnum::OWNER])){
@@ -67,6 +75,7 @@ class IncomeReportController extends Controller
                 }
 
                 $pushData[] = $row->totalNeto();
+                $pushData[] = $row->progress()->msg ?? null;
                 $pushData[] = $row->status()->msg ?? null;
                 $pushData[] = date('d-m-Y H:i:s',strtotime($row->created_at));
 
@@ -74,6 +83,7 @@ class IncomeReportController extends Controller
             }
 
             $collection->push([
+                null,
                 null,
                 null,
                 null,
@@ -94,6 +104,7 @@ class IncomeReportController extends Controller
                     $total,
                     null,
                     null,
+                    null,
                 ]);
             }
             else{
@@ -103,6 +114,7 @@ class IncomeReportController extends Controller
                     $total_agen,
                     $total_owner + $total_doku_fee,
                     $total,
+                    null,
                     null,
                     null,
                 ]);

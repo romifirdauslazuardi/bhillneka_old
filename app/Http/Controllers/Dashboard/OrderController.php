@@ -14,11 +14,16 @@ use App\Http\Requests\Order\UpdateRequest;
 use App\Services\UserService;
 use App\Services\ProviderService;
 use App\Services\OrderService;
+use App\Services\BusinessService;
+use App\Services\MikrotikConfigService;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\Order\ProofOrderRequest;
+use App\Http\Requests\Order\UpdateProgressRequest;
+use App\Http\Requests\Order\UpdateStatusRequest;
+use Illuminate\Support\Collection;
 use Log;
 use Excel;
-use Illuminate\Support\Collection;
+use Auth;
 
 class OrderController extends Controller
 {
@@ -27,6 +32,8 @@ class OrderController extends Controller
     protected $userService;
     protected $providerService;
     protected $orderService;
+    protected $businessService;
+    protected $mikrotikConfigService;
 
     public function __construct()
     {
@@ -35,6 +42,27 @@ class OrderController extends Controller
         $this->userService = new UserService();
         $this->providerService = new ProviderService();
         $this->orderService = new OrderService();
+        $this->businessService = new BusinessService();
+        $this->mikrotikConfigService = new MikrotikConfigService();
+
+        $this->middleware(function ($request, $next) {
+            if(empty(Auth::user()->business_id)){
+                alert()->error('Gagal', "Bisnis page belum diaktifkan");
+                return redirect()->route("dashboard.index");
+            }
+            return $next($request);
+        },['only' => 'create','edit','store','update','destroy']);
+
+        $this->middleware(function ($request, $next) {
+            if(Auth::user()->hasRole([
+                RoleEnum::AGEN,
+                RoleEnum::ADMIN_AGEN]) 
+            && empty(Auth::user()->business_id)){
+                alert()->error('Gagal', "Bisnis page belum diaktifkan");
+                return redirect()->route("dashboard.index");
+            }
+            return $next($request);
+        },['only' => ['index','show']]);
     }
 
     public function index(Request $request)
@@ -47,12 +75,18 @@ class OrderController extends Controller
         $providers = $this->providerService->index(new Request([]),false);
         $providers = $providers->data;
 
+        $business = $this->businessService->index(new Request([]),false);
+        $business = $business->data;
+
         $status = OrderEnum::status();
+
+        $progress = OrderEnum::progress();
 
         $data = [
             'table' => $response->data,
             'users' => $users,
             'status' => $status,
+            'progress' => $progress,
             'providers' => $providers,
         ];
 
@@ -61,15 +95,17 @@ class OrderController extends Controller
 
     public function create()
     {
-        $users = $this->userService->getUserAgen();
-        $users = $users->data;
-
         $providers = $this->providerService->index(new Request(['status' => ProviderEnum::STATUS_TRUE]),false);
         $providers = $providers->data;
 
+        $type = OrderEnum::type();
+
+        $fnb_type = OrderEnum::fnb_type();
+
         $data = [
-            'users' => $users,
             'providers' => $providers,
+            'type' => $type,
+            'fnb_type' => $fnb_type,
         ];
 
         return view($this->view."create",$data);
@@ -100,19 +136,36 @@ class OrderController extends Controller
         }
         $result = $result->data;
 
-        $users = $this->userService->getUserAgen();
-        $users = $users->data;
-
         $providers = $this->providerService->index(new Request(['status' => ProviderEnum::STATUS_TRUE]),false);
         $providers = $providers->data;
 
         $status = OrderEnum::status();
 
+        $progress = OrderEnum::progress();
+
+        $type = OrderEnum::type();
+
+        $fnb_type = OrderEnum::fnb_type();
+
+        $serverHotspot = $this->mikrotikConfigService->serverHotspot();
+        $serverHotspot = $serverHotspot->data;
+
+        $profileHotspot = $this->mikrotikConfigService->profileHotspot();
+        $profileHotspot = $profileHotspot->data;
+
+        $profilePppoe = $this->mikrotikConfigService->profilePppoe();
+        $profilePppoe = $profilePppoe->data;
+
         $data = [
-            'users' => $users,
             'result' => $result,
             'status' => $status,
+            'progress' => $progress,
+            'type' => $type,
             'providers' => $providers,
+            'fnb_type' => $fnb_type,
+            'serverHotspot' => $serverHotspot,
+            'profileHotspot' => $profileHotspot,
+            'profilePppoe' => $profilePppoe,
         ];
 
         return view($this->view . "edit", $data);
@@ -185,6 +238,38 @@ class OrderController extends Controller
         }
     }
 
+    public function updateProgress(UpdateProgressRequest $request, $id)
+    {
+        try {
+            $response = $this->orderService->updateProgress($request, $id);
+            if (!$response->success) {
+                return ResponseHelper::apiResponse(false, $response->message , null, null, $response->code);
+            }
+            
+            return ResponseHelper::apiResponse(true, $response->message , $response->data , null, $response->code);
+        } catch (\Throwable $th) {
+            Log::emergency($th->getMessage());
+
+            return ResponseHelper::apiResponse(false, $th->getMessage() , null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function updateStatus(UpdateStatusRequest $request, $id)
+    {
+        try {
+            $response = $this->orderService->updateStatus($request, $id);
+            if (!$response->success) {
+                return ResponseHelper::apiResponse(false, $response->message , null, null, $response->code);
+            }
+            
+            return ResponseHelper::apiResponse(true, $response->message , $response->data , null, $response->code);
+        } catch (\Throwable $th) {
+            Log::emergency($th->getMessage());
+
+            return ResponseHelper::apiResponse(false, $th->getMessage() , null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function exportExcel(Request $request){
         try {
             $orders = $this->orderService->index($request,false);
@@ -235,5 +320,21 @@ class OrderController extends Controller
             alert()->error('Gagal', $th->getMessage());
             return redirect()->route($this->route . 'index')->withInput();
         }
+    }
+
+    public function print($id)
+    {
+        $result = $this->orderService->show($id);
+        if (!$result->success) {
+            alert()->error('Gagal', $result->message);
+            return redirect()->route($this->route . 'index')->withInput();
+        }
+        $result = $result->data;
+
+        $data = [
+            'result' => $result
+        ];
+
+        return view($this->view . "print", $data);
     }
 }

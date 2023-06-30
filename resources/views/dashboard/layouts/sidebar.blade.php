@@ -11,62 +11,108 @@
         </div>
         
         <ul class="sidebar-menu">
-            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::USER,\App\Enums\RoleEnum::ADMIN_AGEN]))
+            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN,\App\Enums\RoleEnum::USER]))
             <li>
                 <li><a href="{{route('dashboard.index')}}"><i class="fa fa-tachometer"></i>Dashboard</a></li>
             </li>
             @endif
-            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
-            <li class="sidebar-dropdown">
-                <a href="javascript:void(0)"><i class="fa fa-database"></i>Master</a>
-                <div class="sidebar-submenu">
-                    <ul>
-                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-                        <li><a href="{{route('dashboard.business-categories.index')}}">Kategori Bisnis</a></li>
+
+            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]) || (Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]) && !empty(Auth::user()->business_id)))
+                <li>
+                    <li><a href="{{route('dashboard.products.index')}}"><i class="fa fa-cube"></i>Produk</a></li>
+                </li>
+            @endif
+
+            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]) || (Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]) && !empty(Auth::user()->business_id)) || Auth::user()->hasRole([\App\Enums\RoleEnum::USER]))
+            <li>
+                <li>
+                    <a href="{{route('dashboard.orders.index')}}"><i class="fa fa-shopping-cart"></i>
+                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
+                            Penjualan
+                        @else
+                            Pembelian
                         @endif
-                        <li><a href="{{route('dashboard.business.index')}}">Bisnis</a></li>
+                    </a>
+                </li>
+            </li>
+            @endif
+
+            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]) || (Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]) && !empty(Auth::user()->business_id)))
+                @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
+                    @if(!empty(Auth::user()->business_id) && in_array(Auth::user()->business->category->name,[App\Enums\BusinessCategoryEnum::FNB]))
+                    <li>
+                        <li><a href="{{route('dashboard.tables.index')}}"><i class="fa fa-table"></i>Meja</a></li>
+                    </li>
+                    @endif
+                @endif
+            @endif
+
+            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]) || (Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]) && !empty(Auth::user()->business_id)))
+            <li>
+                <li><a href="{{route('dashboard.user-banks.index')}}"><i class="fa fa-bank"></i>Rekening Bank</a></li>
+            </li>
+            @endif
+
+            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]) || (Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]) && !empty(Auth::user()->business_id)))
+
+                @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]) || (!empty(Auth::user()->business_id) && in_array(Auth::user()->business->category->name,[App\Enums\BusinessCategoryEnum::MIKROTIK])))
+                <li>
+                    <li><a href="{{route('dashboard.mikrotik-configs.index')}}"><i class="fa fa-cogs"></i>Konfigurasi Mikrotik</a></li>
+                </li>
+                @endif
+
+            @endif
+
+            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]) || (Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]) && !empty(Auth::user()->business_id)))
+            <li>
+                <li>
+                    <a href="{{route('dashboard.users.index')}}">
+                        <i class="fa fa-users"></i>
                         @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-                        <li><a href="{{route('dashboard.banks.index')}}">Bank</a></li>
+                        Pengguna
+                        @elseif(Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN]))
+                        Pelanggan dan Admin
+                        @elseif(Auth::user()->hasRole([\App\Enums\RoleEnum::ADMIN_AGEN]))
+                        Pelanggan
                         @endif
-                        <li><a href="{{route('dashboard.user-banks.index')}}">Rekening Bank Pengguna</a></li>
-                        <li><a href="{{route('dashboard.users.index')}}">Pengguna</a></li>
-                    </ul>
-                </div>
+                    </a>
+                </li>
             </li>
             @endif
+
             @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
-            <li class="sidebar-dropdown">
-                <a href="javascript:void(0)"><i class="fa fa-tags"></i>Produk</a>
-                <div class="sidebar-submenu">
-                    <ul>
-                        <li><a href="{{route('dashboard.units.index')}}">Unit</a></li>
-                        <li><a href="{{route('dashboard.product-categories.index')}}">Kategori</a></li>
-                        <li><a href="{{route('dashboard.products.index')}}">Produk</a></li>
-                    </ul>
-                </div>
+            <li>
+                <li><a href="{{route('dashboard.business.index')}}"><i class="fa fa-building"></i>List Bisnis</a></li>
             </li>
             @endif
-            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN,\App\Enums\RoleEnum::USER]))
-            <li class="sidebar-dropdown">
-                <a href="javascript:void(0)"><i class="fa fa-shopping-cart"></i>Transaksi</a>
-                <div class="sidebar-submenu">
-                    <ul>
-                        <li><a href="{{route('dashboard.orders.index')}}">Order</a></li>
-                    </ul>
-                </div>
-            </li>
-            @endif
-            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
+
+            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]) || (Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]) && !empty(Auth::user()->business_id)))
             <li class="sidebar-dropdown">
                 <a href="javascript:void(0)"><i class="fa fa-file"></i>Laporan</a>
                 <div class="sidebar-submenu">
                     <ul>
-                        <li><a href="{{route('dashboard.reports.sales.index')}}">Laporan Penjualan</a></li>
                         <li><a href="{{route('dashboard.reports.incomes.index')}}">Laporan Pendapatan</a></li>
+                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]) || (!empty(Auth::user()->business_id) && in_array(Auth::user()->business->category->name,[App\Enums\BusinessCategoryEnum::MIKROTIK])))
+                        <li><a href="{{route('dashboard.reports.order-mikrotiks.index')}}">Laporan Pengguna Mikrotik</a></li>
+                        @endif
                     </ul>
                 </div>
             </li>
             @endif
+
+            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
+            <li class="sidebar-dropdown">
+                <a href="javascript:void(0)"><i class="fa fa-database"></i>Master</a>
+                <div class="sidebar-submenu">
+                    <ul>
+                        <li><a href="{{route('dashboard.business-categories.index')}}">Kategori Bisnis</a></li>
+                        <li><a href="{{route('dashboard.banks.index')}}">Bank</a></li>
+                        <li><a href="{{route('dashboard.product-categories.index')}}">Kategori Produk</a></li>
+                    </ul>
+                </div>
+            </li>
+            @endif
+
             @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
             <li class="sidebar-dropdown">
                 <a href="javascript:void(0)"><i class="fa fa-chrome"></i>Landing Page</a>

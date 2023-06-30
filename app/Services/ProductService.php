@@ -10,6 +10,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Helpers\SlugHelper;
 use App\Enums\RoleEnum;
+use App\Helpers\UploadHelper;
 use Auth;
 use DB;
 use Log;
@@ -29,11 +30,22 @@ class ProductService extends BaseService
         $search = (empty($request->search)) ? null : trim(strip_tags($request->search));
         $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
         $category_id = (empty($request->category_id)) ? null : trim(strip_tags($request->category_id));
-        $unit_id = (empty($request->unit_id)) ? null : trim(strip_tags($request->unit_id));
         $status = (!isset($request->status)) ? null : trim(strip_tags($request->status));
+        $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
+        $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
 
-        if(Auth::user()->hasRole([RoleEnum::AGEN])){
-            $user_id = Auth::user()->id;
+        if(Auth::check()){
+            if(Auth::user()->hasRole([RoleEnum::AGEN])){
+                $user_id = Auth::user()->id;
+            }
+    
+            if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
+                $user_id = Auth::user()->user_id;
+            }
+    
+            if(!empty(Auth::user()->business_id)){
+                $business_id = Auth::user()->business_id;
+            }
         }
 
         $table = $this->product;
@@ -42,6 +54,7 @@ class ProductService extends BaseService
                 $query2->where('name', 'like', '%' . $search . '%');
                 $query2->orWhere('price', 'like', '%' . $search . '%');
                 $query2->orWhere('description', 'like', '%' . $search . '%');
+                $query2->orWhere('unit', 'like', '%' . $search . '%');
             });
         }
         if(!empty($user_id)){
@@ -50,14 +63,11 @@ class ProductService extends BaseService
         if(!empty($category_id)){
             $table = $table->where("category_id",$category_id);
         }
-        if(!empty($unit_id)){
-            $table = $table->where("unit_id",$unit_id);
-        }
         if(isset($status)){
             $table = $table->where("status",$status);
         }
-        if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
-            $table = $table->where("user_id",Auth::user()->user_id);
+        if(!empty($business_id)){
+            $table = $table->where("business_id",$business_id);
         }
         $table = $table->orderBy('created_at', 'DESC');
 
@@ -80,6 +90,9 @@ class ProductService extends BaseService
             }
             if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
                 $result = $result->where("user_id",Auth::user()->user_id);
+            }
+            if(!empty(Auth::user()->business_id)){
+                $result = $result->where("business_id",Auth::user()->business_id);
             }
             $result = $result->where('id',$id);
             $result = $result->first();
@@ -120,26 +133,19 @@ class ProductService extends BaseService
     {
         try {
             $code = (empty($request->code)) ? null : trim(strip_tags($request->code));
-            $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
+            $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
 
-            if(Auth::user()->hasRole([RoleEnum::AGEN])){
-                $user_id = Auth::user()->id;
-            }
-            if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
-                $user_id = Auth::user()->user_id;
+            if(!empty(Auth::user()->business_id)){
+                $business_id = Auth::user()->business_id;
             }
 
             if(!$code){
                 return $this->response(false, "Kode Transaksi harus diisi");
             }
 
-            if(!$user_id){
-                return $this->response(false, "Pelanggan harus diisi");
-            }
-
             $result = $this->product;
             $result = $result->where('code',$code);
-            $result = $result->where('user_id',$user_id);
+            $result = $result->where('business_id',$business_id);
             $result = $result->first();
 
             if(!$result){
@@ -163,25 +169,43 @@ class ProductService extends BaseService
             $description = (empty($request->description)) ? null : trim(strip_tags($request->description));;
             $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
             $category_id = (empty($request->category_id)) ? null : trim(strip_tags($request->category_id));
-            $unit_id = (empty($request->unit_id)) ? null : trim(strip_tags($request->unit_id));
+            $unit = (empty($request->unit)) ? null : trim(strip_tags($request->unit));
+            $weight = (empty($request->weight)) ? null : trim(strip_tags($request->weight));
             $status = (empty($request->status)) ? ProductEnum::STATUS_FALSE : trim(strip_tags($request->status));
             $is_using_stock = (empty($request->is_using_stock)) ? ProductEnum::IS_USING_STOCK_FALSE : trim(strip_tags($request->is_using_stock));
+            $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
+            $mikrotik = (!isset($request->mikrotik)) ? null : trim(strip_tags($request->mikrotik));
+            $image = $request->file("image");
 
             $slug = SlugHelper::generate(Product::class,$name,"slug");
 
             $code = str_replace(" ","-",$code);
+
+            if ($image) {
+                $upload = UploadHelper::upload_file($image, 'products', ProductEnum::IMAGE_EXT);
+
+                if ($upload["IsError"] == TRUE) {
+                    return $this->response(false, $upload["Message"]);
+                }
+
+                $image = $upload["Path"];
+            }
 
             $create = $this->product->create([
                 'slug' => $slug,
                 'name' => $name,
                 'code' => $code,
                 'price' => $price,
+                'image' => $image,
                 'description' => $description,
                 'user_id' => $user_id,
                 'category_id' => $category_id,
-                'unit_id' => $unit_id,
+                'unit' => $unit,
+                'weight' => $weight,
                 'status' => $status,
                 'is_using_stock' => $is_using_stock,
+                'business_id' => $business_id,
+                'mikrotik' => $mikrotik,
                 'author_id' => Auth::user()->id,
             ]);
 
@@ -202,9 +226,13 @@ class ProductService extends BaseService
             $description = (empty($request->description)) ? null : trim(strip_tags($request->description));;
             $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
             $category_id = (empty($request->category_id)) ? null : trim(strip_tags($request->category_id));
-            $unit_id = (empty($request->unit_id)) ? null : trim(strip_tags($request->unit_id));
+            $unit = (empty($request->unit)) ? null : trim(strip_tags($request->unit));
+            $weight = (empty($request->weight)) ? null : trim(strip_tags($request->weight));
             $status = (empty($request->status)) ? ProductEnum::STATUS_FALSE : trim(strip_tags($request->status));
             $is_using_stock = (empty($request->is_using_stock)) ? ProductEnum::IS_USING_STOCK_FALSE : trim(strip_tags($request->is_using_stock));
+            $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
+            $mikrotik = (!isset($request->mikrotik)) ? null : trim(strip_tags($request->mikrotik));
+            $image = $request->file("image");
 
             $result = $this->product->findOrFail($id);
 
@@ -217,17 +245,34 @@ class ProductService extends BaseService
 
             $code = str_replace(" ","-",$code);
 
+            if ($image) {
+                $upload = UploadHelper::upload_file($image, 'products', ProductEnum::IMAGE_EXT);
+
+                if ($upload["IsError"] == TRUE) {
+                    return $this->response(false, $upload["Message"]);
+                }
+
+                $image = $upload["Path"];
+            }
+            else{
+                $image = $result->image;
+            }
+
             $result->update([
                 'slug' => $slug,
                 'name' => $name,
                 'code' => $code,
                 'price' => $price,
+                'image' => $image,
                 'description' => $description,
                 'user_id' => $user_id,
                 'category_id' => $category_id,
-                'unit_id' => $unit_id,
+                'unit' => $unit,
+                'weight' => $weight,
                 'status' => $status,
                 'is_using_stock' => $is_using_stock,
+                'business_id' => $business_id,
+                'mikrotik' => $mikrotik,
             ]);
 
             return $this->response(true, 'Berhasil mengubah data',$result);

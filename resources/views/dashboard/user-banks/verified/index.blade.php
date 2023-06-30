@@ -9,7 +9,7 @@
                             <table class="table table-striped table-bordered">
                                 <thead>
                                     <th>No</th>
-                                    <th>Pengguna</th>
+                                    <th>Pemilik Usaha</th>
                                     <th>Atas Nama</th>
                                     <th>Nomor Rekening</th>
                                     <th>Bank</th>

@@ -13,6 +13,7 @@ use App\Http\Requests\Product\UpdateRequest;
 use App\Models\Product;
 use App\Services\ProductService;
 use App\Services\UserService;
+use App\Services\BusinessService;
 use Log;
 use Auth;
 
@@ -22,6 +23,7 @@ class ProductController extends Controller
     protected $view;
     protected $productService;
     protected $userService;
+    protected $businessService;
 
     public function __construct()
     {
@@ -29,6 +31,26 @@ class ProductController extends Controller
         $this->view = "dashboard.products.";
         $this->productService = new ProductService();
         $this->userService = new UserService();
+        $this->businessService = new BusinessService();
+
+        $this->middleware(function ($request, $next) {
+            if(empty(Auth::user()->business_id)){
+                alert()->error('Gagal', "Bisnis page belum diaktifkan");
+                return redirect()->route("dashboard.index");
+            }
+            return $next($request);
+        },['only' => ['create','edit','store','destroy']]);
+
+        $this->middleware(function ($request, $next) {
+            if(Auth::user()->hasRole([
+                RoleEnum::AGEN,
+                RoleEnum::ADMIN_AGEN]) 
+            && empty(Auth::user()->business_id)){
+                alert()->error('Gagal', "Bisnis page belum diaktifkan");
+                return redirect()->route("dashboard.index");
+            }
+            return $next($request);
+        },['only' => ['index','show']]);
     }
 
     public function index(Request $request)
@@ -41,11 +63,15 @@ class ProductController extends Controller
         $status = ProductEnum::status();
         $is_using_stock = ProductEnum::is_using_stock();
 
+        $business = $this->businessService->index(new Request([]),false);
+        $business = $business->data;
+
         $data = [
             'table' => $response->data,
             'users' => $users,
             'status' => $status,
             'is_using_stock' => $is_using_stock,
+            'business' => $business,
         ];
 
         return view($this->view . 'index', $data);
@@ -53,16 +79,15 @@ class ProductController extends Controller
 
     public function create()
     {
-        $users = $this->userService->getUserAgen();
-        $users = $users->data;
-
         $status = ProductEnum::status();
         $is_using_stock = ProductEnum::is_using_stock();
 
+        $mikrotik = ProductEnum::mikrotik();
+
         $data = [
-            'users' => $users,
             'status' => $status,
             'is_using_stock' => $is_using_stock,
+            'mikrotik' => $mikrotik,
         ];
 
         return view($this->view . "create", $data);
@@ -93,17 +118,16 @@ class ProductController extends Controller
         }
         $result = $result->data;
 
-        $users = $this->userService->getUserAgen();
-        $users = $users->data;
-
         $status = ProductEnum::status();
         $is_using_stock = ProductEnum::is_using_stock();
 
+        $mikrotik = ProductEnum::mikrotik();
+
         $data = [
-            'users' => $users,
             'result' => $result,
             'status' => $status,
             'is_using_stock' => $is_using_stock,
+            'mikrotik' => $mikrotik,
         ];
 
         return view($this->view . "edit", $data);

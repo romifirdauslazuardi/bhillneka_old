@@ -164,6 +164,7 @@ return [
         Laravel\Socialite\SocialiteServiceProvider::class,
         SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
+        Darryldecode\Cart\CartServiceProvider::class,
         /*
          * Application Service Providers...
          */
@@ -189,9 +190,11 @@ return [
         // 'Example' => App\Facades\Example::class,
         'Alert' => RealRashid\SweetAlert\Facades\Alert::class,
         'SettingHelper' => App\Helpers\SettingHelper::class,
+        'DateHelper' => App\Helpers\DateHelper::class,
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
         'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'Cart' => Darryldecode\Cart\Facades\CartFacade::class
     ])->toArray(),
 
 ];

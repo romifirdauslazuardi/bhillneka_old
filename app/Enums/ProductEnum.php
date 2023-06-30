@@ -13,8 +13,15 @@ final class ProductEnum extends Enum
 {
     const STATUS_TRUE = 1;
     const STATUS_FALSE = 0;
+
     const IS_USING_STOCK_TRUE = 1;
     const IS_USING_STOCK_FALSE = 0;
+    
+    const MIKROTIK_NONE = 0;
+    const MIKROTIK_PPPOE = 1;
+    const MIKROTIK_HOTSPOT = 2;
+
+    const IMAGE_EXT = ['jpeg','jpg','png'];
 
     public static function status()
     {
@@ -31,6 +38,16 @@ final class ProductEnum extends Enum
         $data = [
             self::IS_USING_STOCK_TRUE => 'Ya',
             self::IS_USING_STOCK_FALSE => 'Tidak',
+        ];
+
+        return $data;
+    }
+
+    public static function mikrotik()
+    {
+        $data = [
+            self::MIKROTIK_PPPOE => 'PPPOE',
+            self::MIKROTIK_HOTSPOT => 'Hotspot',
         ];
 
         return $data;

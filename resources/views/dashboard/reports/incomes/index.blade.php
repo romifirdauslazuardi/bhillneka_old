@@ -1,19 +1,18 @@
 @extends("dashboard.layouts.main")
 
-@section("title","Income Report")
+@section("title","Laporan Pendapatan")
 
 @section("css")
 @endsection
 
 @section("breadcumb")
 <div class="d-md-flex justify-content-between align-items-center">
-    <h5 class="mb-0">Income Report</h5>
+    <h5 class="mb-0">Laporan Pendapatan</h5>
 
     <nav aria-label="breadcrumb" class="d-inline-block mt-2 mt-sm-0">
         <ul class="breadcrumb bg-transparent rounded mb-0 p-0">
-            <li class="breadcrumb-item text-capitalize"><a href="#">Report</a></li>
-            <li class="breadcrumb-item text-capitalize"><a href="#">Income</a></li>
-            <li class="breadcrumb-item text-capitalize active" aria-current="page">Index</li>
+            <li class="breadcrumb-item text-capitalize"><a href="#">Laporan</a></li>
+            <li class="breadcrumb-item text-capitalize active" aria-current="page">Pendapatan</li>
         </ul>
     </nav>
 </div>
@@ -53,6 +52,7 @@
                                 <thead>
                                     <th>No</th>
                                     <th>Kode Transaksi</th>
+                                    <th>Customer</th>
                                     <th>Pendapatan Agen</th>
                                     @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
                                     <th>Pendapatan Owner</th>
@@ -60,7 +60,7 @@
                                     @else
                                     <th>Jasa Aplikasi & Layanan</th>
                                     @endif
-                                    <th>Status</th>
+                                    <th>Status Pembayaran</th>
                                     <th>Dibuat Pada</th>
                                 </thead>
                                 <tbody>
@@ -68,6 +68,17 @@
                                     <tr>
                                         <td>{{$table->firstItem() + $index}}</td>
                                         <td>{{$row->code}}</td>
+                                        <td>
+                                            @if(!empty($row->customer))
+                                            {{$row->customer->name ?? null}}
+                                            <br>
+                                            {{$row->customer->phone ?? null}}
+                                            @else
+                                            {{$row->customer_name}}
+                                            <br>
+                                            {{$row->customer_phone}}
+                                            @endif
+                                        </td>
                                         <td>{{number_format($row->incomeAgen(),0,',','.')}}</td>
                                         @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
                                         <td>{{number_format($row->incomeOwnerNeto(),0,',','.')}}</td>

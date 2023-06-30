@@ -12,7 +12,7 @@
     <nav aria-label="breadcrumb" class="d-inline-block mt-2 mt-sm-0">
         <ul class="breadcrumb bg-transparent rounded mb-0 p-0">
             <li class="breadcrumb-item text-capitalize"><a href="#">Rekening Pengguna</a></li>
-            <li class="breadcrumb-item text-capitalize active" aria-current="page">Index</li>
+            <li class="breadcrumb-item text-capitalize active" aria-current="page">Daftar Rekening Pengguna</li>
         </ul>
     </nav>
 </div>
@@ -40,8 +40,10 @@
                                     <th>Atas Nama</th>
                                     <th>Nomor Rekening</th>
                                     <th>Bank</th>
+                                    <th>Cabang</th>
                                     @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-                                    <th>Pengguna</th>
+                                    <th>Bisnis</th>
+                                    <th>Pemilik Usaha</th>
                                     @endif
                                     <th>Status</th>
                                     <th>Default</th>
@@ -66,7 +68,9 @@
                                         <td>{{$row->name}}</td>
                                         <td>{{$row->number}}</td>
                                         <td>{{$row->bank->name ?? null}}</td>
+                                        <td>{{$row->branch}}</td>
                                         @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
+                                        <td>{{$row->business->name ?? null}}</td>
                                         <td>{{$row->user->name ?? null}}</td>
                                         @endif
                                         <td>
@@ -79,7 +83,7 @@
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="10" class="text-center">Data tidak ditemukan</td>
+                                        <td colspan="12" class="text-center">Data tidak ditemukan</td>
                                     </tr>
                                     @endforelse
                                 </tbody>
@@ -107,6 +111,22 @@
 @section("script")
 <script>
     $(function() {
+
+        @if(!empty(Auth::user()->business_id))
+            getBusiness('.select-business','{{Auth::user()->business->user_id ?? null}}',null);
+        @endif
+        
+        $(document).on('change','.select-user',function(e){
+            e.preventDefault();
+            let val = $(this).val();
+
+            $('.select-business').html('<option value="">==Semua Bisnis==</option>');
+
+            if(val != null && val != "" && val != undefined){
+                getBusiness('.select-business',val,null);
+            }
+        });
+
         $(document).on("click", ".btn-filter", function(e) {
             e.preventDefault();
 

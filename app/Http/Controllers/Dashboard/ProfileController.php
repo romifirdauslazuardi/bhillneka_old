@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\Profile\UpdateBusinessPageRequest;
 use App\Http\Requests\Profile\UpdateRequest;
 use App\Services\ProfileService;
 use Auth;
@@ -39,6 +40,22 @@ class ProfileController extends Controller
     {
         try {
             $response = $this->profileService->update($request);
+            if (!$response->success) {
+                return ResponseHelper::apiResponse(false, $response->message , null, null, $response->code);
+            }
+
+            return ResponseHelper::apiResponse(true, $response->message , $response->data , null, $response->code);
+        } catch (\Throwable $th) {
+            Log::emergency($th->getMessage());
+
+            return ResponseHelper::apiResponse(false, $th->getMessage() , null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function updateBusinessPage(UpdateBusinessPageRequest $request)
+    {
+        try {
+            $response = $this->profileService->updateBusinessPage($request);
             if (!$response->success) {
                 return ResponseHelper::apiResponse(false, $response->message , null, null, $response->code);
             }

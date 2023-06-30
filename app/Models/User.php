@@ -33,6 +33,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at',
         'author_id',
         'provider',
+        'business_id',
     ];
 
     /**
@@ -77,5 +78,15 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         return $return;
+    }
+
+    public function business()
+    {
+        return $this->belongsTo(Business::class, 'business_id', 'id');
+    }
+
+    public function hasManyBusiness()
+    {
+        return $this->hasMany(Business::class, 'user_id');
     }
 }

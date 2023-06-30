@@ -30,7 +30,7 @@
                 <li><a href="{{route('landing-page.our-services.index')}}" class="sub-menu-item">Layanan Kami</a></li>
                 <li><a href="{{route('landing-page.faqs.index')}}" class="sub-menu-item">Faq</a></li>
                 <li><a href="{{route('landing-page.contact-us.index')}}" class="sub-menu-item">Hubungi Kami</a></li>
-                <li><a href="{{route('landing-page.orders.index')}}" class="sub-menu-item">Status Order</a></li>
+                <li><a href="{{route('landing-page.orders.index')}}" class="sub-menu-item">Status Pesanan</a></li>
             </ul><!--end navigation menu-->
         </div><!--end navigation-->
     </div><!--end container-->

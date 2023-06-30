@@ -36,7 +36,8 @@ class OrderController extends Controller
                     'status' => [
                         'class' => $row->status()->class ?? null,
                         'msg' => $row->status()->msg ?? null
-                    ]
+                    ],
+                    'created_at' => date("d-m-Y H:i:s",strtotime($row->created_at))
                 ]);
             }
 

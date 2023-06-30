@@ -28,10 +28,11 @@ class OrderExport implements FromCollection, WithHeadings, ShouldAutoSize
         return [
             'No',
             'Kode Transaksi',
-            'Pengguna',
+            'Pemilik Usaha',
             'Customer',
             'Total',
             'Metode Pembayaran',
+            'Progress',
             'Status',
             'Tanggal Dibuat',
         ];

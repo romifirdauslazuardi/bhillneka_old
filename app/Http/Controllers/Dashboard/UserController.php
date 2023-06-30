@@ -24,6 +24,17 @@ class UserController extends Controller
         $this->route = "dashboard.users.";
         $this->view = "dashboard.users.";
         $this->userService = new UserService();
+
+        $this->middleware(function ($request, $next) {
+            if(Auth::user()->hasRole([
+                RoleEnum::AGEN,
+                RoleEnum::ADMIN_AGEN]) 
+            && empty(Auth::user()->business_id)){
+                alert()->error('Gagal', "Bisnis page belum diaktifkan");
+                return redirect()->route("dashboard.index");
+            }
+            return $next($request);
+        },['only' => ['index','show','create','edit','store','update','destroy']]);
     }
 
     public function index(Request $request)

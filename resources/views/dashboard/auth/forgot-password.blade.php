@@ -14,7 +14,9 @@
                 <div class="card form-signin p-4 rounded shadow">
                     <form method="POST" action="{{route('dashboard.auth.forgot-password.post')}}" autocomplete="off">
                         @csrf
+                        
                         @include("dashboard.auth.layouts.logo")
+
                         <h5 class="mb-3 text-center">Lupa Password</h5>
                         
                         <div class="row">

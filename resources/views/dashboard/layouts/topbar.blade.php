@@ -11,6 +11,21 @@
             <a id="close-sidebar" class="btn btn-icon btn-soft-light" href="javascript:void(0)">
                 <i class="ti ti-menu-2"></i>
             </a>
+            @if(Auth::user()->hasRole([App\Enums\RoleEnum::OWNER,App\Enums\RoleEnum::AGEN,App\Enums\RoleEnum::ADMIN_AGEN]))
+            <a class="btn btn-sm business-setting" href="#" style="margin-left: 5px;">
+                @if(!empty(Auth::user()->business_id))
+                <span class="text-success">{{Auth::user()->business->name ?? null}} @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER])) - ({{Auth::user()->business->user->name ?? null}}) @endif</span>
+                <i class="fa fa-caret-down text-success"></i>
+                <br>
+                <small><i>(Klik untuk ubah bisnis page)</i></small>
+                @else
+                <span class="text-warning">==Pilih Bisnis Page==</span>
+                <i class="fa fa-caret-down text-warning"></i>
+                <br>
+                <small><i>(Klik untuk mengaktifkan bisnis page)</i></small>
+                @endif
+            </a>
+            @endif
         </div>
 
         <ul class="list-unstyled mb-0">

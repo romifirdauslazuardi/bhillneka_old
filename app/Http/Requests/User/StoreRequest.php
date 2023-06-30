@@ -20,9 +20,16 @@ class StoreRequest extends FormRequest
         }
         if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
             $merge["user_id"] = Auth::user()->user_id;
-            $merge["roles"] = [RoleEnum::USER];
+            $merge["roles"] = RoleEnum::USER;
+            $merge["email_verified_at"] = date("Y-m-d H:i:s");
         }
         $this->merge($merge);
+
+        if($this->roles == RoleEnum::USER){
+            if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
+                $this->merge(["business_id" => Auth::user()->business_id]);
+            }
+        }
     }
 
     public function rules(): array
@@ -61,9 +68,13 @@ class StoreRequest extends FormRequest
                 'date_format:Y-m-d H:i:s'
             ],
             'user_id' => [
-                (in_array(request()->get("roles"),[RoleEnum::USER])) ? "required" : "nullable",
+                (in_array($this->roles,[RoleEnum::USER])) ? "required" : "nullable",
                 Rule::exists('users', 'id'),
-            ]
+            ],
+            'business_id' => [
+                (in_array($this->roles,[RoleEnum::USER])) ? "required" : "nullable",
+                Rule::exists('business', 'id'),
+            ],
         ];
     }
 
@@ -92,6 +103,8 @@ class StoreRequest extends FormRequest
             'email_verified_at.date_format' => 'Format verifikasi email at tidak sesuai',
             'user_id.required' => 'User harus diisi',
             'user_id.exists' => 'User tidak ditemukan',
+            'business_id.required' => 'Business harus diisi',
+            'business_id.exists' => 'Business tidak ditemukan',
         ];
     }
 

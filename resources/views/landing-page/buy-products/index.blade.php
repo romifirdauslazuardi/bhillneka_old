@@ -68,6 +68,20 @@
                                                     <td>{{number_format($result->price,0,',','.')}}</td>
                                                 </tr>
                                                 <tr>
+                                                    <td>Nama Customer</td>
+                                                    <td class="text-center">:</td>
+                                                    <td>
+                                                        <input type="text" class="form-control" placeholder="Nama Customer" name="customer_name">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Telp Customer</td>
+                                                    <td class="text-center">:</td>
+                                                    <td>
+                                                        <input type="text" class="form-control" placeholder="Telp Customer" name="customer_phone">
+                                                    </td>
+                                                </tr>
+                                                <tr>
                                                     <td>Quantity</td>
                                                     <td class="text-center">:</td>
                                                     <td>
@@ -75,7 +89,7 @@
                                                             <input type="number" class="form-control code" placeholder="Quantity" name="repeater[0][qty]" value="1">
                                                             <div class="input-group-append">
                                                                 <div class="d-flex">
-                                                                    <span class="input-group-text">{{$result->unit->name ?? null}}</span>
+                                                                    <span class="input-group-text">{{$result->unit}}</span>
                                                                 </div>
                                                             </div>
                                                         </div>

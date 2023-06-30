@@ -38,6 +38,11 @@ class OrderItem extends Model
         return $this->belongsTo(User::class, 'author_id', 'id');
     }
 
+    public function order_mikrotik()
+    {
+        return $this->belongsTo(OrderMikrotik::class, 'id', 'order_item_id');
+    }
+
     public function getProductPriceAttribute($value)
     {
         return (int)$value;

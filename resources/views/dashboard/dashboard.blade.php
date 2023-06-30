@@ -10,6 +10,9 @@
         font-size: 14px !important;
         text-transform: uppercase;
     }
+    .box-total{
+        height: 110px;;
+    }
 </style>
 @endsection
 
@@ -25,8 +28,8 @@
 @section("content")
 <div class="row">
     @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
-    <div class="col-md-3 mt-4 col-xs-12">
-        <a href="{{route('dashboard.products.index')}}" class="features feature-primary d-flex justify-content-between align-items-center rounded shadow p-3">
+    <div class="col-md-4 mt-4 col-xs-12">
+        <a href="{{route('dashboard.products.index')}}" class="features feature-primary d-flex justify-content-between align-items-center rounded shadow p-3 box-total">
             <div class="d-flex align-items-center">
                 <div class="icon text-center rounded-pill">
                     <i class="fa fa-tags fs-5 mb-0"></i>
@@ -39,22 +42,9 @@
         </a>
     </div>
     @endif
-    <div class="col-md-3 mt-4 col-xs-12">
-        <a href="{{route('dashboard.reports.sales.index')}}" class="features feature-primary d-flex justify-content-between align-items-center rounded shadow p-3">
-            <div class="d-flex align-items-center">
-                <div class="icon text-center rounded-pill">
-                    <i class="fa fa-dollar fs-5 mb-0"></i>
-                </div>
-                <div class="flex-1 ms-3">
-                    <p class="mb-0 text-muted p-total">Transaksi {{date("F Y")}}</p>
-                    <p class="fs-5 text-dark fw-bold mb-0">{{number_format($total_sales,0,',','.')}}</p>
-                </div>
-            </div>
-        </a>
-    </div>
     @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
-    <div class="col-md-3 mt-4 col-xs-12">
-        <a href="{{route('dashboard.reports.incomes.index')}}" class="features feature-primary d-flex justify-content-between align-items-center rounded shadow p-3">
+    <div class="col-md-4 mt-4 col-xs-12">
+        <a href="{{route('dashboard.reports.incomes.index')}}" class="features feature-primary d-flex justify-content-between align-items-center rounded shadow p-3 box-total">
             <div class="d-flex align-items-center">
                 <div class="icon text-center rounded-pill">
                     <i class="fa fa-dollar fs-5 mb-0"></i>
@@ -68,8 +58,8 @@
     </div>
     @endif
     @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-    <div class="col-md-3 mt-4 col-xs-12">
-        <a href="{{route('dashboard.reports.incomes.index')}}" class="features feature-primary d-flex justify-content-between align-items-center rounded shadow p-3">
+    <div class="col-md-4 mt-4 col-xs-12">
+        <a href="{{route('dashboard.reports.incomes.index')}}" class="features feature-primary d-flex justify-content-between align-items-center rounded shadow p-3 box-total">
             <div class="d-flex align-items-center">
                 <div class="icon text-center rounded-pill">
                     <i class="fa fa-dollar fs-5 mb-0"></i>
@@ -84,7 +74,7 @@
     @endif
 </div>
 
-@if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
+@if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN,\App\Enums\RoleEnum::USER]))
 
 @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
 <div class="row mt-4">
@@ -116,14 +106,17 @@
                         <thead>
                             <th>No</th>
                             <th>Kode Transaksi</th>
-                            <th>Pendapatan Agen</th>
-                            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-                            <th>Pendapatan Owner</th>
-                            <th>Biaya Penanganan</th>
-                            @else
-                            <th>Jasa Aplikasi & Layanan</th>
+                            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
+                                <th>Pendapatan Agen</th>
+                                @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
+                                <th>Pendapatan Owner</th>
+                                <th>Biaya Penanganan</th>
+                                @else
+                                <th>Jasa Aplikasi & Layanan</th>
+                                @endif
                             @endif
                             <th>Total</th>
+                            <th>Progress</th>
                             <th>Status</th>
                             <th>Dibuat Pada</th>
                         </thead>
@@ -132,14 +125,19 @@
                             <tr>
                                 <td>{{$index + 1}}</td>
                                 <td>{{$row->code}}</td>
-                                <td>{{number_format($row->incomeAgen(),0,',','.')}}</td>
-                                @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-                                <td>{{number_format($row->incomeOwnerNeto(),0,',','.')}}</td>
-                                <td>{{number_format($row->doku_fee,0,',','.')}}</td>
-                                @else
-                                <td>{{number_format($row->incomeOwnerBruto(),0,',','.')}}</td>
+                                @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
+                                    <td>{{number_format($row->incomeAgen(),0,',','.')}}</td>
+                                    @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
+                                    <td>{{number_format($row->incomeOwnerNeto(),0,',','.')}}</td>
+                                    <td>{{number_format($row->doku_fee,0,',','.')}}</td>
+                                    @else
+                                    <td>{{number_format($row->incomeOwnerBruto(),0,',','.')}}</td>
+                                    @endif
                                 @endif
                                 <td>{{number_format($row->totalNeto(),0,',','.')}}</td>
+                                <td>
+                                    <span class="badge bg-{{$row->progress()->class ?? null}}">{{$row->progress()->msg ?? null}}</span>
+                                </td>
                                 <td>
                                     <span class="badge bg-{{$row->status()->class ?? null}}">{{$row->status()->msg ?? null}}</span>
                                 </td>
@@ -157,7 +155,11 @@
         </div>
     </div>
 </div>
+
 @endif
+
+@include("dashboard.components.loader")
+
 @endsection
 
 @section("script")
@@ -165,6 +167,12 @@
 <script src="{{URL::to('/')}}/templates/dashboard/assets/libs/chartjs/Chart.min.js"></script>
 <script>
     $(function(){
+
+        @if((Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]) && empty(Auth::user()->business_id)))
+            $("#modalBusinessPage").find('button[type="button"]').remove();
+            $("#modalBusinessPage").modal("show");
+        @endif
+
         @if(Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
         var ctxAgen = document.getElementById('agenChart').getContext('2d');
         @endif

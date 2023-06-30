@@ -35,17 +35,6 @@ class DashboardService extends BaseService
         return $this->response(true, 'Berhasil mendapatkan data', count($products));
     }
 
-    public function totalSales(){
-        $orders = $this->orderSuccess();
-
-        $total = 0;
-        foreach($orders as $index => $row){
-            $total += $row->totalNeto();
-        }
-
-        return $this->response(true, 'Berhasil mendapatkan data', $total);
-    }
-
     public function totalIncomeOwnerBruto(){
         $orders = $this->orderSuccess();
 
@@ -159,6 +148,7 @@ class DashboardService extends BaseService
     private function orderSuccess(bool $latest = false){
         $user_id = null;
         $customer_id = null;
+        $business_id = null;
 
         if(Auth::user()->hasRole([RoleEnum::AGEN])){
             $user_id = Auth::user()->id;
@@ -169,6 +159,9 @@ class DashboardService extends BaseService
         if(Auth::user()->hasRole([RoleEnum::USER])){
             $customer_id = Auth::user()->id;
         }
+        if(!empty(Auth::user()->business_id)){
+            $business_id = Auth::user()->business_id;
+        }
 
         $orders = $this->order;
         if(!empty($user_id)){
@@ -176,6 +169,9 @@ class DashboardService extends BaseService
         }
         if(!empty($customer_id)){
             $orders = $orders->where("customer_id",$customer_id);
+        }
+        if(!empty($business_id)){
+            $orders = $orders->where("business_id",$business_id);
         }
         $orders = $orders->whereMonth('created_at',date("m"));
         $orders = $orders->whereYear('created_at',date("Y"));

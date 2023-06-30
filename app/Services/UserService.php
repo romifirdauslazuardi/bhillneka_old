@@ -35,6 +35,12 @@ class UserService extends BaseService
             $user_id = Auth::user()->id;
         }
 
+        if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
+            $user_id = Auth::user()->user_id;
+        }
+
+        if(!empty(Auth::user()->business_id)){}
+
         $table = $this->user;
         if (!empty($search)) {
             $table = $this->user->where(function ($query2) use ($search) {
@@ -53,12 +59,23 @@ class UserService extends BaseService
         if (Auth::user()->hasRole([
             RoleEnum::AGEN
         ])) {
-            $table = $table->role([RoleEnum::USER,RoleEnum::ADMIN_AGEN]);
+            $table = $table->where(function($query2){
+                $query2->role([RoleEnum::ADMIN_AGEN]);
+                $query2->orWhere(function($query3){
+                    $query3->role([RoleEnum::USER]);
+                    $query3->where("business_id",Auth::user()->business_id);
+                });
+            });
         }
         if (Auth::user()->hasRole([
             RoleEnum::ADMIN_AGEN
         ])) {
-            $table = $table->role([RoleEnum::USER]);
+            $table = $table->where(function($query2){
+                $query2->where(function($query3){
+                    $query3->role([RoleEnum::USER]);
+                    $query3->where("business_id",Auth::user()->business_id);
+                });
+            });
         }
         if(!empty($user_id)){
             $table = $table->where("user_id",$user_id);
@@ -123,6 +140,7 @@ class UserService extends BaseService
             $roles = (empty($request->roles)) ? null : trim(strip_tags($request->roles));
             $avatar = $request->file("avatar");
             $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
+            $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
 
             if ($avatar) {
                 $upload = UploadHelper::upload_file($avatar, 'user-avatar', UserEnum::AVATAR_EXT);
@@ -143,6 +161,7 @@ class UserService extends BaseService
                 'password' => bcrypt($password),
                 'avatar' => $avatar,
                 'user_id' => $user_id,
+                'business_id' => $business_id,
                 'author_id' => Auth::user()->id,
             ]);
 
@@ -171,6 +190,7 @@ class UserService extends BaseService
             $roles = (empty($request->roles)) ? null : trim(strip_tags($request->roles));
             $avatar = $request->file("avatar");
             $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
+            $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
 
             $result = $this->user;
             if (Auth::user()->hasRole([
@@ -206,6 +226,7 @@ class UserService extends BaseService
                 'password' => $password,
                 'avatar' => $avatar,
                 'user_id' => $user_id,
+                'business_id' => $business_id,
             ]);
 
             $result->syncRoles($roles);
