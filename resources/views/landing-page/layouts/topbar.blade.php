@@ -22,6 +22,22 @@
             </div>
         </div>
 
+        <!--Login button Start-->
+        <ul class="buy-button list-inline mb-0">
+            <li class="list-inline-item ps-1 mb-0">
+                @if(!Auth::check())
+                <a href="{{route('dashboard.auth.login.index')}}">
+                    <div class="btn btn-primary">Login</div>
+                </a>
+                @else
+                <a href="{{route('dashboard.index')}}">
+                    <div class="btn btn-primary">Dashboard</div>
+                </a>
+                @endif
+            </li>
+        </ul>
+        <!--Login button End-->
+
         <div id="navigation">
             <!-- Navigation Menu-->   
             <ul class="navigation-menu">
