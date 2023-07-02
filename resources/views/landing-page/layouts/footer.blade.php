@@ -33,7 +33,7 @@
                                 <li><a href="{{route('landing-page.our-services.index')}}" class="text-foot"><i class="uil uil-angle-right-b me-1"></i> Layanan Kami</a></li>
                                 <li><a href="{{route('landing-page.faqs.index')}}" class="text-foot"><i class="uil uil-angle-right-b me-1"></i> Faq</a></li>
                                 <li><a href="{{route('landing-page.contact-us.index')}}" class="text-foot"><i class="uil uil-angle-right-b me-1"></i> Hubungi Kami</a></li>
-                                <li><a href="{{route('landing-page.orders.index')}}" class="text-foot"><i class="uil uil-angle-right-b me-1"></i> Status Order</a></li>
+                                <li><a href="{{route('landing-page.orders.index')}}" class="text-foot"><i class="uil uil-angle-right-b me-1"></i> Status Pesanan</a></li>
                             </ul>
                         </div><!--end col-->
                 
