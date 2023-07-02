@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Dashboard\Setting;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Response;
-use App\Http\Requests\Setting\LandingpageSettingRequest;
+use App\Http\Requests\Setting\LandingPageSettingRequest;
 use App\Settings\LandingPageSetting;
 use App\Helpers\UploadHelper;
 use App\Helpers\ResponseHelper;
