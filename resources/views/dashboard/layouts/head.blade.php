@@ -1,7 +1,7 @@
 <meta charset="utf-8" />
 <title>
-@if(!empty(\SettingHelper::settings('dashboard', 'footer')))    
-    {{\SettingHelper::settings('dashboard', 'footer')}} | @yield("title")
+@if(!empty(\SettingHelper::settings('dashboard', 'title')))    
+    {{\SettingHelper::settings('dashboard', 'title')}} | @yield("title")
 @else
     @yield("title")
 @endif
