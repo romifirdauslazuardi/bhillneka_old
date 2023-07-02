@@ -26,7 +26,7 @@
             <!-- Navigation Menu-->   
             <ul class="navigation-menu">
                 <li><a href="{{route('landing-page.home.index')}}" class="sub-menu-item">Home</a></li>
-                <li><a href="{{route('landing-page.pages.index','about-us')}}" class="sub-menu-item">Tentang Kami</a></li>
+                <li><a href="{{route('landing-page.pages.index','tentang-kami')}}" class="sub-menu-item">Tentang Kami</a></li>
                 <li><a href="{{route('landing-page.our-services.index')}}" class="sub-menu-item">Layanan Kami</a></li>
                 <li><a href="{{route('landing-page.faqs.index')}}" class="sub-menu-item">Faq</a></li>
                 <li><a href="{{route('landing-page.contact-us.index')}}" class="sub-menu-item">Hubungi Kami</a></li>

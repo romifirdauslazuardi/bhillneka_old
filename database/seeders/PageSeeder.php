@@ -14,10 +14,10 @@ class PageSeeder extends Seeder
     public function run(): void
     {
         Page::updateOrCreate([
-            'slug' => 'about-us'
+            'slug' => 'tentang-kami'
         ],[
-            'name' => 'About Us',
-            'slug' => 'about-us',
+            'name' => 'Tentang Kami',
+            'slug' => 'tentang-kami',
         ]);
 
         Page::updateOrCreate([

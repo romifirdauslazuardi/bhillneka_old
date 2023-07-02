@@ -123,6 +123,7 @@
                         <li><a href="{{route('dashboard.landing-page.faqs.index')}}">Faq</a></li>
                         <li><a href="{{route('dashboard.landing-page.testimonials.index')}}">Testimoni</a></li>
                         <li><a href="{{route('dashboard.landing-page.why-us.index')}}">Why Us</a></li>
+                        <li><a href="{{route('dashboard.landing-page.google-analytics.index')}}">Laporan Pengujung</a></li>
                     </ul>
                 </div>
             </li>

@@ -227,6 +227,10 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
 			Route::put('/{id}', 'WhyUsController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
 			Route::delete('/{id}', 'WhyUsController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
 		});
+
+		Route::group(["as" => "google-analytics.", "prefix" => "google-analytics"], function () {
+			Route::get('/', 'GoogleAnalyticController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+		});
 	});
 
 	Route::group(["as" => "reports.", "prefix" => "reports","namespace" => "Report"], function () {

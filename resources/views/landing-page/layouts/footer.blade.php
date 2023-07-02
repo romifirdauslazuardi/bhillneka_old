@@ -29,7 +29,7 @@
                             <h5 class="footer-head">Link Cepat</h5>
                             <ul class="list-unstyled footer-list mt-4">
                                 <li><a href="{{route('landing-page.home.index')}}" class="text-foot"><i class="uil uil-angle-right-b me-1"></i> Home</a></li>
-                                <li><a href="{{route('landing-page.pages.index','about-us')}}" class="text-foot"><i class="uil uil-angle-right-b me-1"></i> Tentang Kami</a></li>
+                                <li><a href="{{route('landing-page.pages.index','tentang-kami')}}" class="text-foot"><i class="uil uil-angle-right-b me-1"></i> Tentang Kami</a></li>
                                 <li><a href="{{route('landing-page.our-services.index')}}" class="text-foot"><i class="uil uil-angle-right-b me-1"></i> Layanan Kami</a></li>
                                 <li><a href="{{route('landing-page.faqs.index')}}" class="text-foot"><i class="uil uil-angle-right-b me-1"></i> Faq</a></li>
                                 <li><a href="{{route('landing-page.contact-us.index')}}" class="text-foot"><i class="uil uil-angle-right-b me-1"></i> Hubungi Kami</a></li>
