@@ -108,19 +108,19 @@ class Order extends Model
         else if($this->status == OrderEnum::STATUS_WAITING_PAYMENT){
             $return = (object) [
                 'class' => 'secondary',
-                'msg' => 'Waiting Payment',
+                'msg' => 'Menunggu Pembayaran',
             ];
         }
         else if($this->status == OrderEnum::STATUS_SUCCESS){
             $return = (object) [
                 'class' => 'success',
-                'msg' => 'Success',
+                'msg' => 'Berhasil',
             ];
         }
         else if($this->status == OrderEnum::STATUS_FAILED){
             $return = (object) [
                 'class' => 'danger',
-                'msg' => 'Failed',
+                'msg' => 'Gagal',
             ];
         }
         else if($this->status == OrderEnum::STATUS_EXPIRED){

@@ -28,6 +28,8 @@ class OrderMikrotik extends Model
         'author_id',
         'local_address',
         'remote_address',
+        'address',
+        'mac_address',
     ];
 
     public function order_item()

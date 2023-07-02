@@ -166,11 +166,11 @@ class CallbackService extends BaseService
                                     ];
             
                                     if(!empty($row->order_mikrotik->address)){
-                                        $connectData["address"] = $row->order_mikrotik->address ?? null;
+                                        $connectData = array_merge($connectData,["address" => $row->order_mikrotik->address]);
                                     }
             
                                     if(!empty($row->order_mikrotik->mac_address)){
-                                        $connectData["mac-address"] = $row->order_mikrotik->mac_address ?? null;
+                                        $connectData = array_merge($connectData,["mac-address" => $row->order_mikrotik->mac_address]);
                                     }
 
                                     if(!empty($row->order_mikrotik->mikrotik_id)){

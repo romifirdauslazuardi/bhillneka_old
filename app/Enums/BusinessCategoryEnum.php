@@ -11,8 +11,8 @@ use BenSampo\Enum\Enum;
  */
 final class BusinessCategoryEnum extends Enum
 {
-    const JASA = "JASA";
-    const BARANG = "BARANG";
-    const MIKROTIK = "MIKROTIK";
-    const FNB = "FNB";
+    const JASA = "Jasa";
+    const BARANG = "Barang";
+    const MIKROTIK = "Mikrotik";
+    const FNB = "Food & Beverage";
 }

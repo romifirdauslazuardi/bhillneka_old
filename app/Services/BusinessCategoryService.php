@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\BusinessCategoryEnum;
 use App\Services\BaseService;
 use App\Http\Requests\BusinessCategory\StoreRequest;
 use App\Http\Requests\BusinessCategory\UpdateRequest;
@@ -31,6 +32,7 @@ class BusinessCategoryService extends BaseService
                 $query2->where('name', 'like', '%' . $search . '%');
             });
         }
+        $table = $table->where("name","!=",BusinessCategoryEnum::BARANG);
         $table = $table->orderBy('created_at', 'DESC');
 
         if ($paginate) {

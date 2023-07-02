@@ -14,7 +14,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('order:expired')->daily()->at('00:00')->timezone('Asia/Jakarta');
         $schedule->command('order:repeat')->daily()->at('09:00')->timezone('Asia/Jakarta');
-        $schedule->command('order:expired-mikrotik')->daily()->at("00:00")->timezone('Asia/Jakarta');
+        // $schedule->command('order:expired-mikrotik')->daily()->at("00:00")->timezone('Asia/Jakarta');
     }
 
     /**

@@ -126,7 +126,7 @@ class OrderMikrotikExpiredCommand extends Command
 
         if(!empty($orderItem->order_mikrotik->mikrotik_id)){
             if($orderItem->order_mikrotik->type == OrderMikrotikEnum::TYPE_PPPOE){
-                $connect = $connect->comm('/ppp/secret/set',[
+                $connect = $connect->comm('/ppp/secret/remove',[
                     '.id' => $orderItem->order_mikrotik->mirkotik_id ?? null,
                     'disabled' => OrderMikrotikEnum::DISABLED_TRUE
                 ]);

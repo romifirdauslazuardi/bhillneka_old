@@ -83,6 +83,18 @@
                         @endif
                         @if($result->type == \App\Enums\OrderMikrotikEnum::TYPE_HOTSPOT)
                         <div class="form-group row mb-3">
+                            <label class="col-md-3 col-form-label">Address</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="address" placeholder="Address" value="{{old('address',$result->address)}}" >
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
+                            <label class="col-md-3 col-form-label">Mac Address</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="mac_address" placeholder="Mac Address" value="{{old('mac_address',$result->mac_address)}}" >
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Time Limit<span class="text-danger">*</span></label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control" name="time_limit" placeholder="Contoh : 1d4h30m20s" value="{{old('time_limit',$result->time_limit)}}" >

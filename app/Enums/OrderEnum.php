@@ -45,10 +45,10 @@ final class OrderEnum extends Enum
     public static function status()
     {
         $data = [
-            self::STATUS_WAITING_PAYMENT => 'WAITING PAYMENT',
+            self::STATUS_WAITING_PAYMENT => 'MENUNGGU PEMBAYARAN',
             self::STATUS_PENDING => 'PENDING',
-            self::STATUS_SUCCESS => 'SUCCESS',
-            self::STATUS_FAILED => 'FAILED',
+            self::STATUS_SUCCESS => 'BERHASIL',
+            self::STATUS_FAILED => 'GAGAL',
             self::STATUS_EXPIRED => 'EXPIRED',
             self::STATUS_REFUNDED => 'REFUNDED',
             self::STATUS_REDIRECT => 'REDIRECT',

@@ -99,6 +99,23 @@
                         @if($result->type == \App\Enums\OrderMikrotikEnum::TYPE_HOTSPOT)
                         <div class="row mb-2">
                             <div class="col-md-3">
+                                Address
+                            </div>
+                            <div class="col-md-8">
+                                : {{$result->address}}
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-3">
+                                Mac Address
+                            </div>
+                            <div class="col-md-8">
+                                : {{$result->mac_address}}
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-3">
                                 Time Limit
                             </div>
                             <div class="col-md-8">

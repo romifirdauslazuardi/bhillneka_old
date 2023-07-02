@@ -98,6 +98,8 @@ class OrderMikrotikReportService extends BaseService
             $time_limit = (empty($request->time_limit)) ? null : trim(strip_tags($request->time_limit));
             $comment = (empty($request->comment)) ? null : trim(strip_tags($request->comment));
             $disabled = (empty($request->disabled)) ? null : trim(strip_tags($request->disabled));
+            $address = (empty($request->address)) ? null : trim(strip_tags($request->address));
+            $mac_address = (empty($request->mac_address)) ? null : trim(strip_tags($request->mac_address));
 
             $result = $this->orderMikrotik->findOrFail($id);
 
@@ -112,6 +114,8 @@ class OrderMikrotikReportService extends BaseService
                 'time_limit' => $time_limit,
                 'comment' => $comment,
                 'disabled' => $disabled,
+                'address' => $address,
+                'mac-address' => $mac_address,
             ]);
 
             $mikrotikConfig = SettingHelper::mikrotikConfig();
@@ -125,7 +129,7 @@ class OrderMikrotikReportService extends BaseService
             }
 
             if($result->type == OrderMikrotikEnum::TYPE_PPPOE){
-                $connect = $connect->comm('/ppp/secret/set',array(
+                $connectData = [
                     '.id' => $result->mikrotik_id,
                     'name' => $username,
                     'password' => $password,
@@ -135,10 +139,11 @@ class OrderMikrotikReportService extends BaseService
                     'remote-address' => $remote_address,
                     'comment' => $comment,
                     'disabled' => $disabled,
-                ));
+                ];
+                $connect = $connect->comm('/ppp/secret/set',$connectData);
             }
             else{
-                $connect = $connect->comm('/ip/hotspot/user/set',array(
+                $connectData = [
                     '.id' => $result->mikrotik_id,
                     'name' => $username,
                     'password' => $password,
@@ -147,7 +152,17 @@ class OrderMikrotikReportService extends BaseService
                     'limit-uptime' => $time_limit,
                     'comment' => $comment,
                     'disabled' => $disabled,
-                ));
+                ];
+
+                if(!empty($address)){
+                    $connectData = array_merge($connectData,["address" => $address]);
+                }
+
+                if(!empty($mac_address)){
+                    $connectData = array_merge($connectData,["mac-address" => $mac_address]);
+                }
+
+                $connect = $connect->comm('/ip/hotspot/user/set',$connectData);
             }
 
             $connectLog = LogHelper::mikrotikLog($connect);
