@@ -29,23 +29,20 @@
                             <table class="table table-striped table-bordered">
                                 <thead>
                                     <th>No</th>
-                                    <th>URL</th>
+                                    <th>Tanggal</th>
+                                    <th>Visitors</th>
+                                    <th>Page Title</th>
                                     <th>Page Views</th>
                                 </thead>
                                 <tbody>
-                                    @php 
-                                        $no = 1;
-                                    @endphp
                                     @forelse ($table as $index => $row)
                                     <tr>
-                                        <td>{{$no}}</td>
-                                        <td>{{$row['url'] }}</td>
+                                        <td>{{$index+1}}</td>
+                                        <td>{{$row['date'] }}</td>
+                                        <td>{{$row['visitors'] }}</td>
+                                        <td>{{$row['pageTitle'] }}</td>
                                         <td>{{$row['pageViews'] }}</td>
                                     </tr>
-
-                                    @php
-                                        $no += 1;
-                                    @endphp
                                     @empty
                                     <tr>
                                         <td colspan="10" class="text-center">Data tidak ditemukan</td>
