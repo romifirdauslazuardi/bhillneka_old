@@ -28,16 +28,11 @@
                         <div class="card">
                             <div class="features feature-primary d-flex justify-content-between align-items-center rounded shadow p-3">
                                 <div class="d-flex align-items-center">
-                                    <div class="icon bg-soft-primary text-center rounded-pill">
-                                        <i class="uil uil-usd-circle fs-4 mb-0"></i>
-                                    </div>
                                     <div class="flex-1 ms-3">
-                                        <h6 class="mb-0 text-muted">Revenue</h6>
-                                        <p class="fs-5 text-dark fw-bold mb-0">$<span class="counter-value" data-target="48575">45968</span></p>
+                                        <h6 class="mb-0 text-muted">Visitor Website</h6>
+                                        <p class="fs-5 text-dark fw-bold mb-0"><span>45968</span></p>
                                     </div>
                                 </div>
-
-                                <span class="text-success ms-4"><i class="uil uil-arrow-growth"></i> 3.84%</span>
                             </div>
                         </div>
                     </div>
@@ -45,10 +40,9 @@
                     <div class="modern-saas-absolute-right wow animate__animated animate__fadeInUp" data-wow-delay=".5s">
                         <div class="card rounded shadow">
                             <div class="p-3">
-                                <h5>Manage Your Software</h5>
-
-                                <div class="progress-box mt-2">
-                                    <h6 class="title fw-normal text-muted">Work in dashboard</h6>
+                                <h5>Transaksi Sukses</h5>
+                                <div class="progress-box mt-5">
+                                    <p></p>
                                     <div class="progress">
                                         <div class="progress-bar position-relative bg-primary" style="width:84%;">
                                             <div class="progress-value d-block text-muted h6 mt-1">84%</div>
