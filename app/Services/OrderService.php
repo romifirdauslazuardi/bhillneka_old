@@ -174,6 +174,15 @@ class OrderService extends BaseService
 
             $result->related = $related;
 
+
+            $orderDueDate = $this->order;
+            $orderDueDate = $orderDueDate->where("order_id",$result->id);
+            $orderDueDate = $orderDueDate->orderBy("created_at","DESC");
+            $orderDueDate = $orderDueDate->get();
+
+            $result->related = $related;
+            $result->orderDueDate = $orderDueDate;
+
             return $this->response(true, 'Berhasil mendapatkan data', $result);
         } catch (Throwable $th) {
             Log::emergency($th->getMessage());

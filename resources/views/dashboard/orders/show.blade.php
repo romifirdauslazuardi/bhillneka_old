@@ -371,6 +371,8 @@
     @include("dashboard.orders.manual.modal")
 @endif
 
+@include("dashboard.orders.duedate.index")
+
 <form id="frmDelete" method="POST">
     @csrf
     @method('DELETE')
