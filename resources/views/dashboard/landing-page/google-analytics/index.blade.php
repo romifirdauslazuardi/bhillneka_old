@@ -29,19 +29,17 @@
                             <table class="table table-striped table-bordered">
                                 <thead>
                                     <th>No</th>
-                                    <th>Tanggal</th>
-                                    <th>Visitors</th>
-                                    <th>Page Title</th>
-                                    <th>Page Views</th>
+                                    <th>Judul</th>
+                                    <th>URL</th>
+                                    <th>Jumlah Dilihat</th>
                                 </thead>
                                 <tbody>
                                     @forelse ($table as $index => $row)
                                     <tr>
                                         <td>{{$index+1}}</td>
-                                        <td>{{$row['date'] }}</td>
-                                        <td>{{$row['visitors'] }}</td>
                                         <td>{{$row['pageTitle'] }}</td>
-                                        <td>{{$row['pageViews'] }}</td>
+                                        <td>{{$row['fullPageUrl'] }}</td>
+                                        <td>{{$row['screenPageViews'] }}</td>
                                     </tr>
                                     @empty
                                     <tr>

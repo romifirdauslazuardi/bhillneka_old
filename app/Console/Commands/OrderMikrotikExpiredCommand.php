@@ -128,7 +128,6 @@ class OrderMikrotikExpiredCommand extends Command
             if($orderItem->order_mikrotik->type == OrderMikrotikEnum::TYPE_PPPOE){
                 $connect = $connect->comm('/ppp/secret/remove',[
                     '.id' => $orderItem->order_mikrotik->mirkotik_id ?? null,
-                    'disabled' => OrderMikrotikEnum::DISABLED_TRUE
                 ]);
 
                 $connectLog = LogHelper::mikrotikLog($connect);
@@ -141,12 +140,34 @@ class OrderMikrotikExpiredCommand extends Command
                     'disabled' => OrderMikrotikEnum::DISABLED_TRUE,
                 ]);
 
+                if($connectLog["IsError"] == FALSE){
+                    $orderItem->order_mikrotik()->update([
+                        'mikrotik_id' => null
+                    ]);
+                }
+
             }
             else{
+
+                $connect = $connect->comm('/ip/hotspot/user/remove',[
+                    '.id' => $orderItem->order_mikrotik->mirkotik_id ?? null,
+                ]);
+
+                $connectLog = LogHelper::mikrotikLog($connect);
+
+                if($connectLog["IsError"] == TRUE){
+                    Log::emergency("OrderMikrotikExpiredCommand : ".$connectLog["Message"]. " #". $orderItem->order->code);
+                }
 
                 $orderItem->order_mikrotik()->update([
                     'disabled' => OrderMikrotikEnum::DISABLED_TRUE,
                 ]);
+
+                if($connectLog["IsError"] == FALSE){
+                    $orderItem->order_mikrotik()->update([
+                        'mikrotik_id' => null
+                    ]);
+                }
             }
         }
     }

@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Broadcasting\WhatsappChannel;
 use App\Enums\OrderEnum;
+use App\Enums\OrderMikrotikEnum;
 use App\Enums\ProviderEnum;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -99,8 +100,15 @@ class PaymentNotification extends Notification implements ShouldQueue
             $message .= "\r\n";
             $message .= $row->qty." x ".number_format($row->product_price,0,',','.')." = ".number_format($row->totalNeto(),0,',','.');
             if($order->status == OrderEnum::STATUS_SUCCESS){
+                $message .= "\r\n";
                 if(!empty($row->order_mikrotik->mikrotik_id)){
-                    $message .= " | username = ".$row->order_mikrotik->username." , "."password = ".$row->order_mikrotik->password;
+                    if($row->order_mikrotik->type == OrderMikrotikEnum::TYPE_HOTSPOT){
+                        $message .= "SSID : ".$row->order_mikrotik->server;
+                        $message .= "\r\n";
+                    }
+                    $message .= "Username : ".$row->order_mikrotik->username;
+                    $message .= "\r\n";
+                    $message .= "Password : ".$row->order_mikrotik->password;
                 }
             }
             $message .= "\r\n";

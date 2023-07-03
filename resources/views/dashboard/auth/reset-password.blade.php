@@ -19,7 +19,7 @@
 
                         <div class="form-group mb-2">
                             <label>Email <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" name="email" placeholder="Email" readonly>
+                            <input type="email" class="form-control" name="email" placeholder="Email">
                         </div>
 
                         <div class="form-group mb-2">

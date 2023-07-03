@@ -506,7 +506,7 @@ class OrderService extends BaseService
 
             OrderJob::dispatch($order->id)->delay(now()->addMinutes((env("DOKU_DUE_DATE")+1)));
 
-            self::sendWhatsapp($order,"pesanan");
+            self::sendWhatsapp($order->id,"pesanan");
 
             DB::commit();
 
@@ -909,7 +909,7 @@ class OrderService extends BaseService
                 ]);
             }
 
-            self::sendWhatsapp($result);
+            self::sendWhatsapp($result->id);
 
             DB::commit();
 
@@ -936,7 +936,7 @@ class OrderService extends BaseService
                 'progress' => $progress
             ]);
 
-            self::sendWhatsapp($result,"progress");
+            self::sendWhatsapp($result->id,"progress");
 
             DB::commit();
 
@@ -949,8 +949,13 @@ class OrderService extends BaseService
         }
     }
 
-    private function sendWhatsapp($order,string $type = "pesanan"){
+    private function sendWhatsapp($orderId,string $type = "pesanan"){
         $message = "";
+
+        $order = $this->order;
+        $order = $order->where("id",$orderId);
+        $order = $order->first();
+
         if($type == "pesanan"){
             if($order->status == OrderEnum::STATUS_WAITING_PAYMENT){
                 $message .= "Selesaikan Pembayaran Anda sebelum ".date("d F Y H:i:s",strtotime($order->expired_date))." WIB";
@@ -978,6 +983,16 @@ class OrderService extends BaseService
             $message .= $row->product_name;
             $message .= "\r\n";
             $message .= $row->qty." x ".number_format($row->product_price,0,',','.')." = ".number_format($row->totalNeto(),0,',','.');
+            if(!empty($row->order_mikrotik->mikrotik_id)){
+                $message .= "\r\n";
+                if($row->order_mikrotik->type == OrderMikrotikEnum::TYPE_HOTSPOT){
+                    $message .= "SSID : ".$row->order_mikrotik->server;
+                    $message .= "\r\n";
+                }
+                $message .= "Username : ".$row->order_mikrotik->username;
+                $message .= "\r\n";
+                $message .= "Password : ".$row->order_mikrotik->password;
+            }
             $message .= "\r\n";
             $message .= "=====";
             $message .= "\r\n";

@@ -40,7 +40,7 @@ class OrderItem extends Model
 
     public function order_mikrotik()
     {
-        return $this->belongsTo(OrderMikrotik::class, 'id', 'order_item_id');
+        return $this->hasOne(OrderMikrotik::class, 'order_item_id', 'id');
     }
 
     public function getProductPriceAttribute($value)

@@ -103,7 +103,7 @@ class CallbackService extends BaseService
 
                     if($findOrder->business->category->name == BusinessCategoryEnum::MIKROTIK){
 
-                        $mikrotikConfig = SettingHelper::mikrotikConfig($findOrder->business_id,$findOrder->business->user_id ?? null);
+                        $mikrotikConfig = SettingHelper::mikrotikConfig($findOrder->business_id,$findOrder->business->user_id);
                         $ip = $mikrotikConfig->ip ?? null;
                         $username = $mikrotikConfig->username ?? null;
                         $password = $mikrotikConfig->password ?? null;
@@ -131,7 +131,7 @@ class CallbackService extends BaseService
                                     ];
 
                                     if(!empty($row->order_mikrotik->mikrotik_id)){
-                                        $connectData[".id"] = $row->order_mikrotik->mikrotik_id;
+                                        $connectData = array_merge($connectData,[".id" => $row->order_mikrotik->mikrotik_id]);
                                         $connect = $connect->comm('/ppp/secret/set',$connectData);
                                     }
                                     else{
@@ -149,9 +149,11 @@ class CallbackService extends BaseService
                                     ]);
 
                                     if(empty($row->order_mikrotik->mikrotik_id)){
-                                        $row->order_mikrotik()->update([
-                                            'mikrotik_id' => $connect
-                                        ]);
+                                        if($connectLog["IsError"] == FALSE){
+                                            $row->order_mikrotik()->update([
+                                                'mikrotik_id' => $connect
+                                            ]);
+                                        }
                                     }
                                 }
                                 else{
@@ -174,7 +176,7 @@ class CallbackService extends BaseService
                                     }
 
                                     if(!empty($row->order_mikrotik->mikrotik_id)){
-                                        $connectData[".id"] = $row->order_mikrotik->mikrotik_id;
+                                        $connectData = array_merge($connectData,[".id" => $row->order_mikrotik->mikrotik_id]);
                                         $connect = $connect->comm('/ip/hotspot/user/set',$connectData);
                                     }
                                     else{
@@ -192,32 +194,34 @@ class CallbackService extends BaseService
                                     ]);
 
                                     if(empty($row->order_mikrotik->mikrotik_id)){
-                                        $row->order_mikrotik()->update([
-                                            'mikrotik_id' => $connect
-                                        ]);
+                                        if($connectLog["IsError"] == FALSE){
+                                            $row->order_mikrotik()->update([
+                                                'mikrotik_id' => $connect
+                                            ]);
+                                        }
                                     }
 
                                     $explodeTimeLimit = str_split($row->order_mikrotik->time_limit);
 
-                                    $totalSeconds = 0;
+                                    $totalSecond = 0;
                                     foreach($explodeTimeLimit as $i => $value){
                                         if(isset($explodeTimeLimit[$i+1])){
                                             if(strtolower($explodeTimeLimit[$i+1]) == "d"){
-                                                $totalSeconds += (((int)$value) * 24 * 60 * 60);
+                                                $totalSecond += (((int)$value) * 24 * 60 * 60);
                                             }
                                             if(strtolower($explodeTimeLimit[$i+1]) == "h"){
-                                                $totalSeconds += (((int)$value) * 60 * 60);
+                                                $totalSecond += (((int)$value) * 60 * 60);
                                             }
                                             if(strtolower($explodeTimeLimit[$i+1]) == "m"){
-                                                $totalSeconds += (((int)$value) * 60);
+                                                $totalSecond += (((int)$value) * 60);
                                             }
                                             if(strtolower($explodeTimeLimit[$i+1]) == "s"){
-                                                $totalSeconds += (((int)$value));
+                                                $totalSecond += (((int)$value));
                                             }
                                         }
                                     }
 
-                                    OrderMikrotikHotspotJob::dispatch($findOrder->id)->delay(now()->addSeconds($totalSeconds));
+                                    OrderMikrotikHotspotJob::dispatch($findOrder->id)->delay(now()->addSeconds($totalSecond));
                                 }
                             }
                         }
@@ -242,9 +246,9 @@ class CallbackService extends BaseService
 
                 Notification::send($received,new PaymentNotification(route('dashboard.orders.show',$findOrder->id),'Pembayaran Pesanan','Pembayaran dengan kode transaksi '.$findOrder->code." sebesar <b>".number_format($findOrder->totalNeto(),0,',','.')."</b> telah <b>[".$decode["transaction"]["status"]."</b>] dilakukan.",$findOrder));
 
-                self::sendWhatsapp($findOrder);
-
                 DB::commit();
+
+                self::sendWhatsapp($findOrder->id);
                 
                 return $this->response(true, "Callback berhasil",null,Response::HTTP_OK);
             } else {
@@ -260,7 +264,11 @@ class CallbackService extends BaseService
         }
     }
 
-    private function sendWhatsapp($order,string $type = "pesanan"){
+    private function sendWhatsapp($orderId,string $type = "pesanan"){
+        $order = $this->order;
+        $order = $order->where("id",$orderId);
+        $order = $order->first();
+
         $message = "";
         if($type == "pesanan"){
             if($order->status == OrderEnum::STATUS_WAITING_PAYMENT){
@@ -285,13 +293,23 @@ class CallbackService extends BaseService
         $message .= "\r\n";
         $message .= "=====";
         $message .= "\r\n";
+
         foreach($order->items as $index => $row){
+            Log::info($order->status);
+            Log::info($row->order_mikrotik);
             $message .= $row->product_name;
             $message .= "\r\n";
             $message .= $row->qty." x ".number_format($row->product_price,0,',','.')." = ".number_format($row->totalNeto(),0,',','.');
             if($order->status == OrderEnum::STATUS_SUCCESS){
                 if(!empty($row->order_mikrotik->mikrotik_id)){
-                    $message .= " | username = ".$row->order_mikrotik->username." , "."password = ".$row->order_mikrotik->password;
+                    $message .= "\r\n";
+                    if($row->order_mikrotik->type == OrderMikrotikEnum::TYPE_HOTSPOT){
+                        $message .= "SSID : ".$row->order_mikrotik->server;
+                        $message .= "\r\n";
+                    }
+                    $message .= "Username : ".$row->order_mikrotik->username;
+                    $message .= "\r\n";
+                    $message .= "Password : ".$row->order_mikrotik->password;
                 }
             }
             $message .= "\r\n";

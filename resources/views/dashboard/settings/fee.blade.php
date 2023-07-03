@@ -28,10 +28,10 @@
                 <div class="row mb-3">
                     <div class="col-lg-12">
                         <div class="form-group row mb-3">
-                            <label class="col-md-3 col-form-label">Fee Owner<span class="text-danger">*</span></label>
+                            <label class="col-md-3 col-form-label">Biaya Layanan & Aplikasi<span class="text-danger">*</span></label>
                             <div class="col-md-9">
                                 <div class="input-group">
-                                    <input type="number" class="form-control" placeholder="Fee Owner" value="{{$result->owner_fee ?? null}}" name="owner_fee">
+                                    <input type="number" class="form-control" placeholder="Biaya Layanan & Aplikasi" value="{{$result->owner_fee ?? null}}" name="owner_fee">
                                     <button class="input-group-text btn btn-secondary" type="button">%</button>
                                 </div>
                             </div>

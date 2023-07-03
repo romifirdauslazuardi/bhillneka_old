@@ -30,7 +30,7 @@
                                 <div class="d-flex align-items-center">
                                     <div class="flex-1 ms-3">
                                         <h6 class="mb-0 text-muted">Visitor Website</h6>
-                                        <p class="fs-5 text-dark fw-bold mb-0"><span>45968</span></p>
+                                        <p class="fs-5 text-dark fw-bold mb-0"><span>{{$totalVisitor}}</span></p>
                                     </div>
                                 </div>
                             </div>
@@ -44,8 +44,8 @@
                                 <div class="progress-box mt-5">
                                     <p></p>
                                     <div class="progress">
-                                        <div class="progress-bar position-relative bg-primary" style="width:84%;">
-                                            <div class="progress-value d-block text-muted h6 mt-1">84%</div>
+                                        <div class="progress-bar position-relative bg-primary" style="width:{{$totalPresentase}}%;">
+                                            <div class="progress-value d-block text-muted h6 mt-1">{{$totalPresentase}}%</div>
                                         </div>
                                     </div>
                                 </div><!--end process box-->

@@ -5,7 +5,10 @@ namespace App\Jobs;
 use App\Enums\BusinessCategoryEnum;
 use App\Enums\OrderEnum;
 use App\Enums\OrderMikrotikEnum;
+use App\Helpers\LogHelper;
+use App\Helpers\SettingHelper;
 use App\Models\Order;
+use App\Models\RouterosAPI;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -47,9 +50,40 @@ class OrderMikrotikHotspotJob implements ShouldQueue
             $order = $order->first();
 
             if($order){
+                $mikrotikConfig = SettingHelper::mikrotikConfig($order->business_id,$order->business->user_id ?? null);
+                $ip = $mikrotikConfig->ip ?? null;
+                $username = $mikrotikConfig->username ?? null;
+                $password = $mikrotikConfig->password ?? null;
+                $port = $mikrotikConfig->port ?? null;
+
+                $connect = new RouterosAPI();
+                $connect->debug("false");
+
+                if(!$connect->connect($ip,$username,$password,$port)){
+                    Log::emergency('OrdferMikrotikHotspotJob : Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda '.$order->code);
+                }
                 foreach($order->items as $index => $row){
                     if(!empty($row->order_mikrotik)){
                         if($row->order_mikrotik->type == OrderMikrotikEnum::TYPE_HOTSPOT){
+
+                            if(!empty($row->order_mikrotik->mikrotik_id)){
+                                $connect = $connect->comm('/ip/hotspot/user/remove',[
+                                    '.id' => $row->order_mikrotik->mirkotik_id ?? null,
+                                ]);
+    
+                                $connectLog = LogHelper::mikrotikLog($connect);
+    
+                                if($connectLog["IsError"] == TRUE){
+                                    Log::emergency("OrderMikrotikExpiredCommand : ".$connectLog["Message"]. " #". $order->code);
+                                }
+
+                                if($connectLog["IsError"] == FALSE){
+                                    $row->order_mikrotik()->update([
+                                        'mikrotik_id' => null
+                                    ]);
+                                }
+                            }
+
                             $row->order_mikrotik()->update([
                                 'disabled' => OrderMikrotikEnum::DISABLED_TRUE,
                             ]);

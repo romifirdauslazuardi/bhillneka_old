@@ -9,6 +9,8 @@ use App\Models\Product;
 use App\Models\Order;
 use App\Enums\RoleEnum;
 use App\Services\ProductService;
+use Spatie\Analytics\Facades\Analytics;
+use Spatie\Analytics\Period;
 use Auth;
 
 /**
@@ -143,6 +145,37 @@ class DashboardService extends BaseService
         $orders = $this->orderSuccess(true)->take(10);
 
         return $this->response(true, 'Berhasil mendapatkan data', $orders);
+    }
+
+    public function totalVisitor(){
+        $table = Analytics::fetchMostVisitedPages(Period::months(6));
+
+        $total = 0;
+        foreach($table as $index => $row){
+            $total += $row["screenPageViews"];
+        }
+
+        return $total;
+    }
+
+    public function totalPresentase(){
+        $orderSuccess = $this->order;
+        $orderSuccess = $orderSuccess->where("status",OrderEnum::STATUS_SUCCESS);
+        $orderSuccess = $orderSuccess->count();
+
+        $orderPembagi = $this->order;
+        $orderPembagi = $orderPembagi->where("status","!=",OrderEnum::STATUS_SUCCESS);
+        $orderPembagi = $orderPembagi->count();
+
+        if($orderSuccess >= 1 && $orderPembagi <= 0){
+            return 100;
+        }
+        
+        if($orderSuccess >= 1 && $orderPembagi >= 1){
+            return floatval(($orderSuccess/$orderPembagi) * 100);
+        }
+
+        return 0;
     }
 
     private function orderSuccess(bool $latest = false){

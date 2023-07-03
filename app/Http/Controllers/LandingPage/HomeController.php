@@ -8,6 +8,7 @@ use App\Services\WhyUsService;
 use App\Services\TestimonialService;
 use App\Services\FaqService;
 use App\Services\OurServiceService;
+use App\Services\DashboardService;
 
 class HomeController extends Controller
 {
@@ -17,6 +18,7 @@ class HomeController extends Controller
     protected $testimonialService;
     protected $faqService;
     protected $ourServiceService;
+    protected $dashboardService;
 
     public function __construct()
     {
@@ -26,6 +28,7 @@ class HomeController extends Controller
         $this->testimonialService = new TestimonialService();
         $this->faqService = new FaqService();
         $this->ourServiceService = new OurServiceService();
+        $this->dashboardService = new DashboardService();
     }
 
     public function index(Request $request){
@@ -41,11 +44,17 @@ class HomeController extends Controller
         $our_services = $this->ourServiceService->index($request,false);
         $our_services = $our_services->data;
 
+        $totalVisitor = $this->dashboardService->totalVisitor();
+        
+        $totalPresentase = $this->dashboardService->totalPresentase();
+
         $data = [
             'whyUs' => $whyUs,
             'testimonials' => $testimonials,
             'faqs' => $faqs,
             'our_services' => $our_services,
+            'totalVisitor' => $totalVisitor,
+            'totalPresentase' => $totalPresentase,
         ];
 
         return view($this->view."index",$data);

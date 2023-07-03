@@ -21,7 +21,7 @@ class GoogleAnalyticController extends Controller
     public function index(Request $request)
     {
         
-        $table = Analytics::fetchVisitorsAndPageViews(Period::months(6));
+        $table = Analytics::fetchMostVisitedPages(Period::months(6));
 
         $data = [
             'table' => $table,

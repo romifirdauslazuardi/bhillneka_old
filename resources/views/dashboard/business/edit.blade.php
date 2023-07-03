@@ -30,7 +30,7 @@
                         @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Agen<span class="text-danger">*</span></label>
-                            <div class="col-md-9">
+                            <div class="col-md-4">
                                 <select class="form-control select2" name="user_id" >
                                     <option value="">==Pilih Agen==</option>
                                     @foreach ($users as $index => $row)

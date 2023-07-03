@@ -69,4 +69,31 @@ class OrderMikrotik extends Model
 
         return $return;
     }
+
+    public function totalSecond(){
+        $totalSecond = 0;
+
+        if($this->type == OrderMikrotikEnum::TYPE_HOTSPOT){
+            $explodeTimeLimit = str_split($this->time_limit);
+            
+            foreach($explodeTimeLimit as $i => $value){
+                if(isset($explodeTimeLimit[$i+1])){
+                    if(strtolower($explodeTimeLimit[$i+1]) == "d"){
+                        $totalSecond += (((int)$value) * 24 * 60 * 60);
+                    }
+                    if(strtolower($explodeTimeLimit[$i+1]) == "h"){
+                        $totalSecond += (((int)$value) * 60 * 60);
+                    }
+                    if(strtolower($explodeTimeLimit[$i+1]) == "m"){
+                        $totalSecond += (((int)$value) * 60);
+                    }
+                    if(strtolower($explodeTimeLimit[$i+1]) == "s"){
+                        $totalSecond += (((int)$value));
+                    }
+                }
+            }
+        }
+
+        return $totalSecond;
+    }
 }

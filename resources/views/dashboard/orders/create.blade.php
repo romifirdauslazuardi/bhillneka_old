@@ -36,10 +36,10 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group row">
-                                        <label class="col-md-3 col-form-label">Fee Owner</label>
+                                        <label class="col-md-3 col-form-label">Biaya Layanan & Aplikasi</label>
                                         <div class="col-md-9">
                                             <div class="input-group">
-                                                <input type="text" class="form-control" placeholder="Fee Owner" value="{{\SettingHelper::settingFee()->owner_fee ?? null}} (Include Biaya Penanganan)" readonly disabled>
+                                                <input type="text" class="form-control" placeholder="Biaya Layanan & Aplikasi" value="{{\SettingHelper::settingFee()->owner_fee ?? null}}" readonly disabled>
                                                 <button class="input-group-text btn btn-secondary" type="button" disabled>%</button>
                                             </div>
                                         </div>
@@ -50,7 +50,7 @@
                                         <label class="col-md-3 col-form-label">Fee Agen</label>
                                         <div class="col-md-9">
                                             <div class="input-group">
-                                                <input type="text" class="form-control" placeholder="Fee Owner" value="{{\SettingHelper::settingFee()->agen_fee ?? null}}" readonly disabled>
+                                                <input type="text" class="form-control" placeholder="Fee Agen" value="{{\SettingHelper::settingFee()->agen_fee ?? null}}" readonly disabled>
                                                 <button class="input-group-text btn btn-secondary" type="button" disabled>%</button>
                                             </div>
                                         </div>
