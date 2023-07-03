@@ -292,6 +292,7 @@
                                                                                 <option value="{{$v['name']}}" @if($v['name'] == $row->order_mikrotik->server) selected @endif>{{$v['name']}}</option>
                                                                                 @endforeach
                                                                             </select>
+                                                                            <p class="text-info" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;"><small><i>Nama server akan ditampikan sebagai SSID</i></small></p>
                                                                         </div>
                                                                         <div class="form-group mb-3">
                                                                             <label>Profile</label>
@@ -858,6 +859,7 @@
                                                     <select class="form-control select2 server server-${index}" style="width:100%" name="repeater[${index}][server]">
                                                         <option value="">==Pilih Server</option>
                                                     </select>
+                                                    <p class="text-info" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;"><small><i>Nama server akan ditampikan sebagai SSID</i></small></p>
                                                 </div>
                                                 <div class="form-group mb-3">
                                                     <label>Profile</label>
