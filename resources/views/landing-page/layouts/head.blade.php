@@ -30,6 +30,11 @@
 <link href="{{URL::to('/')}}/templates/landing-page/assets/css/style-green.min.css" id="color-opt" class="theme-opt" rel="stylesheet" type="text/css">
 <!-- Font Awesome -->
 <link href="{{URL::to('/')}}/templates/dashboard/assets/css/font-awesome.css" type="text/css" rel="stylesheet" />
+<style>
+  .bg-half-170 {
+    padding: 100px 0 !important;
+  }
+</style>
 @yield("css")
 
 <!-- Google tag (gtag.js) -->
