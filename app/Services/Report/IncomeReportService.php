@@ -38,7 +38,7 @@ class IncomeReportService extends BaseService
         $total_agen = 0;
         $total_doku_fee = 0;
         foreach($ordersWithoutPagination as $index => $row){
-            $total_owner += $row->incomeOwnerNeto();
+            $total_owner += $row->incomeOwnerBruto();
             $total_agen += $row->incomeAgen();
             $total += $row->totalNeto();
             $total_doku_fee += $row->doku_fee;

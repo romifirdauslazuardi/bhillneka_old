@@ -12,15 +12,17 @@
                         <input type="text" class="form-control" placeholder="Search (Kode Produk , Nama Produk , Harga Produk)" value="{{request()->get('search')}}" name="search">
                     </div>
                     @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-                    <div class="form-group mb-3">
-                        <label>Pengguna</label>
-                        <select class="form-control select2 select-user" name="user_id" style="width:100%;">
-                            <option value="">==Semua Pengguna==</option>
-                            @foreach($users as $index => $row)
-                            <option value="{{$row->id}}">{{$row->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                        @if(empty(Auth::user()->business_id))
+                        <div class="form-group mb-3">
+                            <label>Pengguna</label>
+                            <select class="form-control select2 select-user" name="user_id" style="width:100%;">
+                                <option value="">==Semua Pengguna==</option>
+                                @foreach($users as $index => $row)
+                                <option value="{{$row->id}}">{{$row->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
                     @endif
                     @if(empty(Auth::user()->business_id))
                     <div class="form-group mb-3">
@@ -30,18 +32,6 @@
                         </select>
                     </div>
                     @endif
-                    <div class="form-group mb-3">
-                        <label>Kategori Produk</label>
-                        <select class="form-control select2 select-category" name="category_id" style="width:100%;">
-                            <option value="">==Semua Kategori Produk==</option>
-                        </select>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label>Unit</label>
-                        <select class="form-control select2 select-unit" name="unit_id" style="width:100%;">
-                            <option value="">==Semua Unit==</option>
-                        </select>
-                    </div>
                     <div class="form-group mb-3">
                         <label>Status</label>
                         <select class="form-control select2" name="status" style="width:100%;">

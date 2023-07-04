@@ -108,16 +108,7 @@
 <script>
     $(function() {
         @if(!empty(Auth::user()->business_id))
-            getProductCategory('.select-category','{{Auth::user()->business->category_id ?? null}}',null);
             getBusiness('.select-business','{{Auth::user()->business->user_id ?? null}}',null);
-        @else
-            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN]))
-                getProductCategory('.select-category','{{Auth::user()->business->category_id ?? null}}',null);
-                getBusiness('.select-business','{{Auth::user()->id}}',null);
-            @elseif(Auth::user()->hasRole([\App\Enums\RoleEnum::ADMIN_AGEN]))
-                getProductCategory('.select-category','{{Auth::user()->business->category_id ?? null}}',null);
-                getBusiness('.select-business','{{Auth::user()->user_id}}',null);
-            @endif
         @endif
 
         $(document).on("click", ".btn-filter", function(e) {
@@ -130,7 +121,6 @@
             e.preventDefault();
             let val = $(this).val();
 
-            $('.select-category').html('<option value="">==Semua Kategori Produk==</option>');
             $('.select-business').html('<option value="">==Semua Bisnis==</option>');
 
             if(val != "" && val != undefined && val != null){

@@ -42,7 +42,7 @@
                 <div class="col-lg-12">
                     <div class="d-flex justify-content-between">
                         @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-                        <h5 class="my-3">Pendapatan Owner : <b>{{number_format($total_owner,0,',','.')}}</b></h5>
+                        <h5 class="my-3">Biaya Layanan & Aplikasi : <b>{{number_format($total_owner,0,',','.')}}</b></h5>
                         @endif
                         <h5 class="my-3">Pendapatan Agen : <b>{{number_format($total_agen,0,',','.')}}</b></h5>
                     </div>
@@ -54,12 +54,7 @@
                                     <th>Kode Transaksi</th>
                                     <th>Customer</th>
                                     <th>Pendapatan Agen</th>
-                                    @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-                                    <th>Pendapatan Owner</th>
-                                    <th>Biaya Penanganan</th>
-                                    @else
                                     <th>Jasa Aplikasi & Layanan</th>
-                                    @endif
                                     <th>Status Pembayaran</th>
                                     <th>Dibuat Pada</th>
                                 </thead>
@@ -80,12 +75,7 @@
                                             @endif
                                         </td>
                                         <td>{{number_format($row->incomeAgen(),0,',','.')}}</td>
-                                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-                                        <td>{{number_format($row->incomeOwnerNeto(),0,',','.')}}</td>
-                                        <td>{{number_format($row->doku_fee,0,',','.')}}</td>
-                                        @else
                                         <td>{{number_format($row->incomeOwnerBruto(),0,',','.')}}</td>
-                                        @endif
                                         <td>
                                             <span class="badge bg-{{$row->status()->class ?? null}}">{{$row->status()->msg ?? null}}</span>
                                         </td>
