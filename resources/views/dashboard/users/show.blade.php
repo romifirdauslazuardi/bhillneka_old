@@ -136,7 +136,7 @@
 
 <form id="frmRestore" method="POST">
     @csrf
-    @method('PATCH')
+    @method('PUT')
     <input type="hidden" name="id"/>
 </form>
 
