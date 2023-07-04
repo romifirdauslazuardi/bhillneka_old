@@ -179,7 +179,7 @@ class OrderController extends Controller
                 return ResponseHelper::apiResponse(false, $response->message , null, null, $response->code);
             }
 
-            return ResponseHelper::apiResponse(false, $response->message , $response->data , null, $response->code);
+            return ResponseHelper::apiResponse(true, $response->message , $response->data , null, $response->code);
         } catch (\Throwable $th) {
             Log::emergency($th->getMessage());
 
