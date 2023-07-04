@@ -96,6 +96,18 @@
                 @endif
 
                 <div class="mt-3">
+                    <p class="font-size-12 text-muted mb-1">Status</p>
+                    <h6 class="">
+                        <span class="badge bg-{{$result->status()->class ?? null}}">{{$result->status()->msg ?? null}}</span>
+                    </h6>
+                </div>
+
+                <div class="mt-3">
+                    <p class="font-size-12 text-muted mb-1">Email Verified At</p>
+                    <h6 class="">@if(!empty($result->email_verified_at)) {{ date('d-m-Y H:i:s',strtotime($result->email_verified_at)) }} @endif</h6>
+                </div>
+
+                <div class="mt-3">
                     <p class="font-size-12 text-muted mb-1">Tanggal Dibuat</p>
                     <h6 class="">{{ date('d-m-Y H:i:s',strtotime($result->created_at)) }}</h6>
                 </div>

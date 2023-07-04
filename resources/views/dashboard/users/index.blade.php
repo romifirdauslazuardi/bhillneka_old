@@ -40,6 +40,7 @@
                                     <th>Nama</th>
                                     <th>Email</th>
                                     <th>Role</th>
+                                    <th>Status</th>
                                     <th>Dibuat Pada</th>
                                 </thead>
                                 <tbody>
@@ -73,6 +74,9 @@
                                         <td>{{$row->name}}</td>
                                         <td>{{$row->email}}</td>
                                         <td>{{$row->getRoleNames()->implode(', ') }}</td>
+                                        <td>
+                                            <span class="badge bg-{{$row->status()->class ?? null}}">{{$row->status()->msg ?? null}}</span>
+                                        </td>
                                         <td>{{date('d-m-Y H:i:s',strtotime($row->created_at))}}</td>
                                     </tr>
                                     @empty

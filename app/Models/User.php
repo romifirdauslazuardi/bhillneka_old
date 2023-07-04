@@ -89,4 +89,24 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Business::class, 'user_id');
     }
+
+    public function status()
+    {
+        $return = null;
+
+        if(!empty($this->deleted_at)){
+            $return = (object) [
+                'class' => 'danger',
+                'msg' => 'Tidak Aktif',
+            ];
+        }
+        else{
+            $return = (object) [
+                'class' => 'success',
+                'msg' => 'Aktif',
+            ];
+        }
+
+        return $return;
+    }
 }
