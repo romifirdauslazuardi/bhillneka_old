@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <title>
-@if(!empty(\SettingHelper::settings('landing_page', 'footer')))    
-    {{\SettingHelper::settings('landing_page', 'footer')}} | @yield("title")
+@if(!empty(\SettingHelper::settings('landing_page', 'title')))    
+    {{\SettingHelper::settings('landing_page', 'title')}} | @yield("title")
 @else
     @yield("title")
 @endif
