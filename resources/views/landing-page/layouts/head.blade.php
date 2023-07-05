@@ -37,12 +37,15 @@
 </style>
 @yield("css")
 
+@if(app()->isProduction())
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WDWE4H597R"></script>
 <script>
+  alert("ok")
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
   gtag('config', 'G-WDWE4H597R');
 </script>
+@endif
