@@ -6,7 +6,6 @@ use App\Enums\OrderEnum;
 use App\Http\Controllers\Controller;
 use App\Services\ProductService;
 use App\Services\BusinessService;
-use App\Services\ProductCategoryService;
 use App\Services\TableService;
 use App\Services\ProviderService;
 use App\Enums\ProviderEnum;
@@ -22,7 +21,6 @@ class ShopController extends Controller
     protected $route;
     protected $view;
     protected $productService;
-    protected $productCategoryService;
     protected $businessService;
     protected $tableService;
     protected $providerService;
@@ -33,7 +31,6 @@ class ShopController extends Controller
         $this->route = "landing-page.shops.";
         $this->view = "landing-page.shops.";
         $this->productService = new ProductService();
-        $this->productCategoryService = new ProductCategoryService();
         $this->businessService = new BusinessService();
         $this->tableService = new TableService();
         $this->providerService = new ProviderService();
@@ -49,9 +46,6 @@ class ShopController extends Controller
 
         $products = $this->productService->index($request,false);
         $products = $products->data;
-
-        $product_categories = $this->productCategoryService->index(new Request(['business_id' => $business_id]),false);
-        $product_categories = $product_categories->data;
 
         $business = $this->businessService->show($business_id);
         $business = $business->data;
@@ -69,7 +63,6 @@ class ShopController extends Controller
 
         $data = [
             'products' => $products,
-            'product_categories' => $product_categories,
             'business' => $business,
             'table' => $table,
             'providers' => $providers,

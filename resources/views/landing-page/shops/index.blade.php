@@ -31,17 +31,7 @@
     <div class="container">
         <form method="get">
             <div class="row mb-5">
-                <div class="col-md-4 mb-3">
-                    <div class="form-group">
-                        <select name="category_id" class="form-control">
-                            <option value="">==Semua Kategori==</option>
-                            @foreach($product_categories as $index => $row)
-                            <option value="{{$row->id}}">{{$row->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-8 mb-3">
+                <div class="col-12">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Nama Produk" name="search" value="{{request()->get('search')}}">
                         <div class="input-group-append">
