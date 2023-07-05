@@ -30,6 +30,7 @@ class OrderMikrotik extends Model
         'remote_address',
         'address',
         'mac_address',
+        'expired_date'
     ];
 
     public function order_item()

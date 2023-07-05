@@ -111,15 +111,6 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
 		Route::delete('/{id}', 'UserBankController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 	});
 
-	Route::group(["as" => "product-categories.", "prefix" => "product-categories"], function () {
-		Route::get('/', 'ProductCategoryController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-		Route::get('/create', 'ProductCategoryController@create')->name("create")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-		Route::get('/{id}/edit', 'ProductCategoryController@edit')->name("edit")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-		Route::post('/', 'ProductCategoryController@store')->name("store")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-		Route::put('/{id}', 'ProductCategoryController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-		Route::delete('/{id}', 'ProductCategoryController@update')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-	});
-
 	Route::group(["as" => "products.", "prefix" => "products"], function () {
 		Route::get('/', 'ProductController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 		Route::get('/create', 'ProductController@create')->name("create")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
@@ -245,6 +236,7 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
 			Route::get('/{id}', 'OrderMikrotikReportController@show')->name("show")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
 			Route::get('/{id}/edit', 'OrderMikrotikReportController@edit')->name("edit")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
 			Route::put('/{id}', 'OrderMikrotikReportController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
+			Route::delete('/{id}', 'OrderMikrotikReportController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
 		});
 	});
 

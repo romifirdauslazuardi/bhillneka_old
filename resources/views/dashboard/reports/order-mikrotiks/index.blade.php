@@ -44,7 +44,10 @@
                                     <th>Produk</th>
                                     <th>Harga</th>
                                     <th>Tipe</th>
-                                    <th>Disabled</th>
+                                    <th>Username</th>
+                                    <th>Password</th>
+                                    <th>Disabled (Database)</th>
+                                    <th>Disabled (Mikrotik)</th>
                                     <th>Dibuat Pada</th>
                                 </thead>
                                 <tbody>
@@ -58,6 +61,7 @@
                                                 <div class="dropdown-menu">
                                                     <a href="{{route('dashboard.reports.order-mikrotiks.show',$row->id)}}" class="dropdown-item"><i class="fa fa-eye"></i> Show</a>
                                                     <a href="{{route('dashboard.reports.order-mikrotiks.edit',$row->id)}}" class="dropdown-item"><i class="fa fa-edit"></i> Edit</a>
+                                                    <a href="#" class="dropdown-item btn-delete" data-id="{{$row->id}}"><i class="fa fa-trash"></i> Hapus Dari Mikrotik</a>
                                                 </div>
                                             </div>
                                         </td>
@@ -77,7 +81,10 @@
                                         <td>{{$row->order_item->product_name ?? null}}</td>
                                         <td>{{number_format($row->order_item->product_price,0,',','.')}}</td>
                                         <td>{{$row->order_item->product->mikrotik() ?? null}} </td>
+                                        <td>{{$row->username}}</td>
+                                        <td>{{$row->password}}</td>
                                         <td>{{$row->disabled}}</td>
+                                        <td>{{$row->disabled_mikrotik}}</td>
                                         <td>{{date('d-m-Y H:i:s',strtotime($row->created_at))}}</td>
                                     </tr>
                                     @empty
@@ -99,6 +106,12 @@
 @include("dashboard.reports.order-mikrotiks.modal.index")
 @include("dashboard.components.loader")
 
+<form id="frmDelete" method="POST">
+    @csrf
+    @method('DELETE')
+    <input type="hidden" name="id" />
+</form>
+
 @endsection
 
 @section("script")
@@ -109,6 +122,15 @@
 
             $("#modalFilter").modal("show");
         });
+
+        $(document).on("click", ".btn-delete", function() {
+            let id = $(this).data("id");
+            if (confirm("Apakah anda yakin ingin menghapus data ini ?")) {
+                $("#frmDelete").attr("action", "{{ route('dashboard.reports.order-mikrotiks.destroy', '_id_') }}".replace("_id_", id));
+                $("#frmDelete").find('input[name="id"]').val(id);
+                $("#frmDelete").submit();
+            }
+        })
     })
 </script>
 @endsection

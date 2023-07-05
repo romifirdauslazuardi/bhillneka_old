@@ -156,7 +156,7 @@ class RepeatOrderCommand extends Command
 
                     OrderJob::dispatch($generateOrder->id)->delay(now()->addMinutes(env("DOKU_DUE_DATE")));
 
-                    self::sendWhatsapp($generateOrder,"pesanan");
+                    self::sendWhatsapp($generateOrder->id,"pesanan");
                 }
             }
 
@@ -200,16 +200,21 @@ class RepeatOrderCommand extends Command
         return $create;
     }
 
-    private function sendWhatsapp($order,string $type = "pesanan"){
+    private function sendWhatsapp($orderId,string $type = "pesanan"){
+        $order = new Order();
+        $order = $order->where("id",$orderId);
+        $order = $order->first();
+        
         $message = "";
         if($type == "pesanan"){
             $message .= "Selesaikan Pembayaran Anda sebelum ".date("d F Y H:i:s",strtotime($order->expired_date))." WIB";
+            $message .= "\r\n";
         }
         else if($type == "progress"){
             $message = "Progress pesanan anda diubah menjadi *".$order->progress()->msg."*";
+            $message .= "\r\n";
         }
         
-        $message .= "\r\n";
         $message .= "\r\n";
         $message .= $order->business->name;
         $message .= "\r\n";

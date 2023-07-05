@@ -62,6 +62,43 @@ class OrderMikrotikReportService extends BaseService
             $table = $table->get();
         }
 
+        foreach($table as $index => $row){
+            $row->disabled_mikrotik = "Data tidak ditemukan didatabase/mikrotik";
+
+            if(!empty($row->mikrotik_id)){
+                $mikrotikConfig = SettingHelper::mikrotikConfig($row->order_item->order->business_id,$row->order_item->order->business->user_id);
+                $ip = $mikrotikConfig->ip ?? null;
+                $username = $mikrotikConfig->username ?? null;
+                $password = $mikrotikConfig->password ?? null;
+                $port = $mikrotikConfig->port ?? null;
+                
+                $connect = $this->routerosApi;
+                $connect->debug("false");
+
+                if($connect->connect($ip,$username,$password,$port)){
+                    if($row->type == OrderMikrotikEnum::TYPE_PPPOE){
+                        $connect = $connect->comm('/ppp/secret/print',[
+                            '?.id' => $row->mikrotik_id
+                        ]);
+                    }
+                    else{
+                        $connect = $connect->comm('/ip/hotspot/user/print',[
+                            '?.id' => $row->mikrotik_id
+                        ]);
+                    }
+
+                    if(isset($connect[0]["disabled"])){
+                        if($connect[0]["disabled"] == "false"){
+                            $row->disabled_mikrotik = "no";
+                        }
+                        else if($connect[0]["disabled"] == "true"){
+                            $row->disabled_mikrotik = "yes";
+                        }
+                    }
+                }
+            }
+        }
+
         return $this->response(true, 'Berhasil mendapatkan data', $table);
     }
 
@@ -74,6 +111,49 @@ class OrderMikrotikReportService extends BaseService
 
             if(!$result){
                 return $this->response(false, "Data tidak ditemukan");
+            }
+
+            $result->disabled_mikrotik = "Data tidak ditemukan didatabase/mikrotik";
+
+            if(!empty($result->mikrotik_id)){
+                $mikrotikConfig = SettingHelper::mikrotikConfig($result->order_item->order->business_id,$result->order_item->order->business->user_id);
+                $ip = $mikrotikConfig->ip ?? null;
+                $username = $mikrotikConfig->username ?? null;
+                $password = $mikrotikConfig->password ?? null;
+                $port = $mikrotikConfig->port ?? null;
+                
+                $connect = $this->routerosApi;
+                $connect->debug("false");
+                
+                if(!$connect->connect($ip,$username,$password,$port)){
+                    return $this->response(false,'Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda');
+                }
+
+                if($result->type == OrderMikrotikEnum::TYPE_PPPOE){
+                    $connect = $connect->comm('/ppp/secret/print',[
+                        '?.id' => $result->mikrotik_id
+                    ]);
+                }
+                else{
+                    $connect = $connect->comm('/ip/hotspot/user/print',[
+                        '?.id' => $result->mikrotik_id
+                    ]);
+                }
+
+                $connectLog = LogHelper::mikrotikLog($connect);
+
+                if($connectLog["IsError"] == TRUE){
+                    return $this->response(false, $connectLog["Message"]);
+                }
+
+                if(isset($connect[0]["disabled"])){
+                    if($connect[0]["disabled"] == "false"){
+                        $result->disabled_mikrotik = "no";
+                    }
+                    else if($connect[0]["disabled"] == "true"){
+                        $result->disabled_mikrotik = "yes";
+                    }
+                }
             }
 
             return $this->response(true, 'Berhasil mendapatkan data', $result);
@@ -100,6 +180,7 @@ class OrderMikrotikReportService extends BaseService
             $disabled = (empty($request->disabled)) ? null : trim(strip_tags($request->disabled));
             $address = (empty($request->address)) ? null : trim(strip_tags($request->address));
             $mac_address = (empty($request->mac_address)) ? null : trim(strip_tags($request->mac_address));
+            $expired_date = (empty($request->expired_date)) ? null : trim(strip_tags($request->expired_date));
 
             $result = $this->orderMikrotik->findOrFail($id);
 
@@ -116,14 +197,19 @@ class OrderMikrotikReportService extends BaseService
                 'disabled' => $disabled,
                 'address' => $address,
                 'mac-address' => $mac_address,
+                'expired_date' => $expired_date,
             ]);
 
-            $mikrotikConfig = SettingHelper::mikrotikConfig();
+            $mikrotikConfig = SettingHelper::mikrotikConfig($result->order_item->order->business_id ?? null,$result->order_item->order->business->user_id ?? null);
+            $ip = $mikrotikConfig->ip ?? null;
+            $username = $mikrotikConfig->username ?? null;
+            $password = $mikrotikConfig->password ?? null;
+            $port = $mikrotikConfig->port ?? null;
 
             $connect = $this->routerosApi;
             $connect->debug("false");
 
-            if(!$connect->connect($mikrotikConfig->ip,$mikrotikConfig->username,$mikrotikConfig->password,$mikrotikConfig->port)){
+            if(!$connect->connect($ip,$username,$password,$port)){
                 DB::rollback();
                 return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
             }
@@ -177,6 +263,57 @@ class OrderMikrotikReportService extends BaseService
             return $this->response(true, 'Berhasil mengubah data',$result);
         } catch (Throwable $th) {
             DB::rollback();
+            Log::emergency($th->getMessage());
+
+            return $this->response(false, "Terjadi kesalahan saat memproses data");
+        }
+    }
+
+    public function delete($id)
+    {
+        try {
+            $result = $this->orderMikrotik->findOrFail($id);
+            
+            $mikrotikConfig = SettingHelper::mikrotikConfig($result->order_item->order->business_id ?? null,$result->order_item->order->business->user_id ?? null);
+            $ip = $mikrotikConfig->ip ?? null;
+            $username = $mikrotikConfig->username ?? null;
+            $password = $mikrotikConfig->password ?? null;
+            $port = $mikrotikConfig->port ?? null;
+
+            $connect = $this->routerosApi;
+            $connect->debug("false");
+
+            if(!$connect->connect($ip,$username,$password,$port)){
+                return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
+            }
+
+            if(empty($result->mikrotik_id)){
+                return $this->response(false, "Data mikrotik belum tersimpan kedatabase");
+            }else{
+                if($result->type == OrderMikrotikEnum::TYPE_PPPOE){
+                    $connect = $connect->comm('/ppp/secret/remove',[
+                        '.id' => $result->mikrotik_id
+                    ]);
+                }
+                else{
+                    $connect = $connect->comm('/ip/hotspot/user/remove',[
+                        '.id' => $result->mikrotik_id
+                    ]);
+                }
+    
+                $connectLog = LogHelper::mikrotikLog($connect);
+    
+                if($connectLog["IsError"] == TRUE){
+                    return $this->response(false, $connectLog["Message"]);
+                }
+    
+                $result->update([
+                    'mikrotik_id' => null,
+                ]);
+            }
+
+            return $this->response(true, 'Berhasil menghapus data');
+        } catch (Throwable $th) {
             Log::emergency($th->getMessage());
 
             return $this->response(false, "Terjadi kesalahan saat memproses data");

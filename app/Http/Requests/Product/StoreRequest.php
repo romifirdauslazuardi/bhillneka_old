@@ -40,13 +40,6 @@ class StoreRequest extends FormRequest
                 'numeric',
                 'min:1'
             ],
-            'category_id' => [
-                'required',
-                Rule::exists('product_categories', 'id'),
-            ],
-            'unit' => [
-                'required',
-            ],
             'weight' => [
                 'nullable',
                 'min:1'
@@ -85,9 +78,6 @@ class StoreRequest extends FormRequest
             'price.required' => 'Harga produk harus diisi',
             'price.numeric' => 'Harga produk harus angka',
             'price.min' => 'Harga produk minimal 1',
-            'category_id.required' => 'Kategori produk harus diisi',
-            'category_id.exists' => 'Kategori produk tidak ditemukan',
-            'unit.required' => 'Unit harus diisi',
             'weight.min' => 'Berat minimal 1 gram',
             'user_id.required' => 'User harus diisi',
             'user_id.exists' => 'User tidak ditemukan',

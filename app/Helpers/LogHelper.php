@@ -51,6 +51,12 @@ class LogHelper
             }
         }
 
+        if(is_array($connect) && count($connect) <= 0){
+            $data["IsError"] = TRUE;
+            $data["Message"] = "Data tidak ditemukan";
+            goto ResultData;
+        }
+
         $data["IsError"] = FALSE;
         $data["Message"] = "Success without error";
         $data["Data"] = $connect;

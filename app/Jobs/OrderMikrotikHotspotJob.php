@@ -68,7 +68,7 @@ class OrderMikrotikHotspotJob implements ShouldQueue
 
                             if(!empty($row->order_mikrotik->mikrotik_id)){
                                 $connect = $connect->comm('/ip/hotspot/user/remove',[
-                                    '.id' => $row->order_mikrotik->mirkotik_id ?? null,
+                                    '.id' => $row->order_mikrotik->mikrotik_id ?? null,
                                 ]);
     
                                 $connectLog = LogHelper::mikrotikLog($connect);

@@ -85,14 +85,7 @@
                                                     <td>Quantity</td>
                                                     <td class="text-center">:</td>
                                                     <td>
-                                                        <div class="input-group">
-                                                            <input type="number" class="form-control code" placeholder="Quantity" name="repeater[0][qty]" value="1">
-                                                            <div class="input-group-append">
-                                                                <div class="d-flex">
-                                                                    <span class="input-group-text">{{$result->unit}}</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                        <input type="number" class="form-control code" placeholder="Quantity" name="repeater[0][qty]" value="1">
                                                     </td>
                                                 </tr>
                                             </tbody>

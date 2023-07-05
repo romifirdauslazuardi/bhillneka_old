@@ -212,6 +212,12 @@
                                                                             </select>
                                                                         </div>
                                                                     </div>
+
+                                                                    <div class="form-group mb-3">
+                                                                        <label>Mikrotik ID</label>
+                                                                        <input type="text" class="form-control" placeholder="Mikrotik ID" value="{{$row->order_mikrotik->mikrotik_id ?? null}}" readonly disabled>
+                                                                    </div>
+                                                                    
                                                                     <div class="modal-footer">
                                                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                                                                     </div>
@@ -263,6 +269,10 @@
                                                                                 <option value="yes" @if(!empty($row->order_mikrotik) && $row->order_mikrotik->disabled == "yes") selected @endif>Disabled</option>
                                                                                 <option value="no" @if(!empty($row->order_mikrotik) && $row->order_mikrotik->disabled == "no") selected @endif>Enabled</option>
                                                                             </select>
+                                                                        </div>
+                                                                        <div class="form-group mb-3">
+                                                                            <label>Mikrotik ID</label>
+                                                                            <input type="text" class="form-control" placeholder="Mikrotik ID" value="{{$row->order_mikrotik->mikrotik_id ?? null}}" readonly disabled>
                                                                         </div>
                                                                         
                                                                     </div>

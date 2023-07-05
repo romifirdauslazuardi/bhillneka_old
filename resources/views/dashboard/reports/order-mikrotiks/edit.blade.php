@@ -68,18 +68,26 @@
                             </div>
                         </div>
                         @if($result->type == \App\Enums\OrderMikrotikEnum::TYPE_PPPOE)
-                        <div class="form-group row mb-3">
-                            <label class="col-md-3 col-form-label">Local Address<span class="text-danger">*</span></label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" name="local_address" placeholder="Local Address" value="{{old('local_address',$result->local_address)}}" >
+                            <div class="form-group row mb-3">
+                                <label class="col-md-3 col-form-label">Local Address<span class="text-danger">*</span></label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" name="local_address" placeholder="Local Address" value="{{old('local_address',$result->local_address)}}" >
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group row mb-3">
-                            <label class="col-md-3 col-form-label">Remote Address<span class="text-danger">*</span></label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" name="remote_address" placeholder="Remote Address" value="{{old('remote_address',$result->remote_address)}}" >
+                            <div class="form-group row mb-3">
+                                <label class="col-md-3 col-form-label">Remote Address<span class="text-danger">*</span></label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" name="remote_address" placeholder="Remote Address" value="{{old('remote_address',$result->remote_address)}}" >
+                                </div>
                             </div>
-                        </div>
+                            @if($result->order_item->order->type == \App\Enums\OrderEnum::TYPE_ON_TIME_PAY)
+                            <div class="form-group row mb-3">
+                                <label class="col-md-3 col-form-label">Berakhir Pada</label>
+                                <div class="col-md-9">
+                                    <input type="date" class="form-control" name="expired_date" placeholder="Berakhir Pada" value="{{old('expired_date',$result->expired_date)}}" >
+                                </div>
+                            </div>
+                            @endif
                         @endif
                         @if($result->type == \App\Enums\OrderMikrotikEnum::TYPE_HOTSPOT)
                         <div class="form-group row mb-3">

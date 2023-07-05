@@ -43,6 +43,10 @@ class UpdateOrderMikrotikRequest extends FormRequest
             'profile' => [
                 'required',
             ],
+            'expired_date' => [
+                "nullable",
+                "date"
+            ],
             'disabled' => [
                 'required',
             ],
@@ -57,6 +61,7 @@ class UpdateOrderMikrotikRequest extends FormRequest
             'server.required' => 'Server harus diisi',
             'service.required' => 'Service harus diisi',
             'profile.required' => 'Profile harus diisi',
+            'expired_date.date' => 'Tanggal expired mikrotik tidak valid',
             'disabled.required' => 'Status disabled yes/no harus diisi',
         ];
     }

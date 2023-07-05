@@ -82,7 +82,6 @@ class PaymentNotification extends Notification implements ShouldQueue
     private function sendWhatsapp($order){
         $message = "";
         $message .= "\r\n";
-        $message .= "\r\n";
         $message .= $order->business->name;
         $message .= "\r\n";
         $message .= $order->business->location;

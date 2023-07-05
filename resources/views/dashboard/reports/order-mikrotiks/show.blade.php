@@ -94,6 +94,17 @@
                                 : {{$result->remote_address}}
                             </div>
                         </div>
+                        
+                        @if($result->order_item->order->type == \App\Enums\OrderEnum::TYPE_ON_TIME_PAY)
+                        <div class="row mb-2">
+                            <div class="col-md-3">
+                                Berlaku Sampai
+                            </div>
+                            <div class="col-md-8">
+                                : {{(!empty($result->expired_date)) ? date("d-m-Y",strtotime($result->expired_date)) : null}}
+                            </div>
+                        </div>
+                        @endif
                         @endif
 
                         @if($result->type == \App\Enums\OrderMikrotikEnum::TYPE_HOTSPOT)
@@ -135,7 +146,16 @@
 
                         <div class="row mb-2">
                             <div class="col-md-3">
-                                Disabled
+                                Tipe
+                            </div>
+                            <div class="col-md-8">
+                                : {{$result->type() ?? null}}
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-3">
+                                Disabled (Database)
                             </div>
                             <div class="col-md-8">
                                 : {{$result->disabled}}
@@ -144,10 +164,10 @@
 
                         <div class="row mb-2">
                             <div class="col-md-3">
-                                Tipe
+                                Disabled (Mikrotik)
                             </div>
                             <div class="col-md-8">
-                                : {{$result->type() ?? null}}
+                                : {{$result->disabled_mikrotik}}
                             </div>
                         </div>
 

@@ -107,7 +107,6 @@
                     <ul>
                         <li><a href="{{route('dashboard.business-categories.index')}}">Kategori Bisnis</a></li>
                         <li><a href="{{route('dashboard.banks.index')}}">Bank</a></li>
-                        <li><a href="{{route('dashboard.product-categories.index')}}">Kategori Produk</a></li>
                     </ul>
                 </div>
             </li>

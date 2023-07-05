@@ -35,14 +35,6 @@
                         </div>
                         @endif
                         <div class="form-group row mb-3">
-                            <label class="col-md-3 col-form-label">Kategori<span class="text-danger">*</span></label>
-                            <div class="col-md-9">
-                                <select class="form-control select2 select-category" name="category_id" >
-                                    <option value="">==Pilih Kategori==</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">
                                 Kode 
                                 @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
@@ -118,12 +110,6 @@
                             </div>
                         </div>
                         @endif
-                        <div class="form-group row mb-3">
-                            <label class="col-md-3 col-form-label">Satuan<span class="text-danger">*</span></label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" placeholder="Satuan" name="unit" value="{{old('unit')}}">
-                            </div>
-                        </div>
                         @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG]))
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">
@@ -187,8 +173,6 @@
     $(function(){
 
         $('button[type="submit"]').attr("disabled",false);
-
-        getProductCategory('.select-category','{{Auth::user()->business->category_id ?? null}}',null);
 
         $(document).on('submit','#frmStore',function(e){
             e.preventDefault();

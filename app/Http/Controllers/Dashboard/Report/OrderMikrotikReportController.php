@@ -91,4 +91,23 @@ class OrderMikrotikReportController extends Controller
             return ResponseHelper::apiResponse(false, $th->getMessage() , null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function destroy($id)
+    {
+        try {
+            $response = $this->orderMikrotikReportService->delete($id);
+            if (!$response->success) {
+                alert()->error('Gagal', $response->message);
+                return redirect()->route($this->route . 'index')->withInput();
+            }
+
+            alert()->html('Berhasil', $response->message, 'success');
+            return redirect()->route($this->route . 'index');
+        } catch (\Throwable $th) {
+            Log::emergency($th->getMessage());
+
+            alert()->error('Gagal', $th->getMessage());
+            return redirect()->route($this->route . 'index')->withInput();
+        }
+    }
 }

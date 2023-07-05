@@ -9,9 +9,9 @@
                 <div class="modal-body">
                     <div class="form-group mb-3">
                         <label>Search</label>
-                        <input type="text" class="form-control" placeholder="Search (Nama,Email)" value="{{request()->get('search')}}" name="search">
+                        <input type="text" class="form-control" placeholder="Search (Nama,Email,Phone)" value="{{request()->get('search')}}" name="search">
                     </div>
-                    @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
+                    @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN]))
                     <div class="form-group mb-3">
                         <label>Role</label>
                         <select class="form-control select2" name="role" style="width:100%;">

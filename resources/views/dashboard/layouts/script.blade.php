@@ -383,49 +383,6 @@
         })
     }
 
-    function getProductCategory(selector,business_category_id,selectedId=null){
-        $.ajax({
-            url : '{{route("base.product-categories.index")}}',
-            method : "GET",
-            dataType : "JSON",
-            data : {
-                business_category_id : business_category_id    
-            },
-            beforeSend : function(){
-                return openLoader();
-            },
-            success : function(resp){
-                if(resp.success == false){
-                    responseFailed(resp.message);       
-                    $(selector+'').html("");            
-                }
-                else{
-                    let html = "";
-                    $.each(resp.data,function(index,element){
-                        if(selectedId != null && element.id == selectedId){
-                            html += '<option value="'+element.id+'" selected>'+element.name+'</option>';
-                        }
-                        else{
-                            html += '<option value="'+element.id+'">'+element.name+'</option>';
-                        }
-                    });
-                    $(selector+'').append(html);
-                }
-            },
-            error: function (request, status, error) {
-                if(request.status == 422){
-                    responseFailed(request.responseJSON.message);
-                }
-                else{
-                    responseInternalServerError();
-                }
-            },
-            complete :function(){
-                return closeLoader();
-            }
-        })
-    }
-
     function getTable(selector,business_id,selectedId=null){
         $.ajax({
             url : '{{route("base.tables.index")}}',

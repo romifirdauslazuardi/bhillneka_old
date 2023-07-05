@@ -37,22 +37,12 @@
                         </div>
                         @endif
                         <div class="form-group row mb-3">
-                            <label class="col-md-3 col-form-label">Kategori<span class="text-danger">*</span></label>
-                            <div class="col-md-9">
-                                <select class="form-control select2 select-category" name="category_id" >
-                                    <option value="">==Pilih Kategori==</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">
                                 Kode 
-                                @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
+                                @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB,\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                                     {{" Produk "}}
                                 @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
                                     {{" Jasa "}}
-                                @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
-                                    {{" Mikrotik "}}
                                 @endif
                                 <span class="text-danger">*</span>
                             </label>
@@ -63,12 +53,10 @@
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">
                                 Nama 
-                                @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
+                                @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB,\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                                     {{" Produk "}}
                                 @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
                                     {{" Jasa "}}
-                                @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
-                                    {{" Mikrotik "}}
                                 @endif
                                 <span class="text-danger">*</span>
                             </label>
@@ -79,12 +67,10 @@
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">
                                 Harga 
-                                @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
+                                @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB,\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                                     {{" Produk "}}
                                 @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
                                     {{" Jasa "}}
-                                @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
-                                    {{" Mikrotik "}}
                                 @endif
                                 <span class="text-danger">*</span>
                             </label>
@@ -95,12 +81,10 @@
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">
                                 Deskripsi 
-                                @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
+                                @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB,\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                                     {{" Produk "}}
                                 @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
                                     {{" Jasa "}}
-                                @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
-                                    {{" Mikrotik "}}
                                 @endif
                             </label>
                             <div class="col-md-9">
@@ -120,12 +104,6 @@
                             </div>
                         </div>
                         @endif
-                        <div class="form-group row mb-3">
-                            <label class="col-md-3 col-form-label">Satuan<span class="text-danger">*</span></label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" placeholder="Satuan" name="unit" value="{{old('unit')}}">
-                            </div>
-                        </div>
                         @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG]))
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">
@@ -154,7 +132,7 @@
                                 </select>
                             </div>
                         </div>
-                        @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB,\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                        @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB,\App\Enums\BusinessCategoryEnum::MIKROTIK,\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Apakah Produk Stok ? <span class="text-danger">*</span></label>
                             <div class="col-md-9">
@@ -188,10 +166,6 @@
     $(function(){
 
         $('button[type="submit"]').attr("disabled",false);
-
-        @if(!empty($result->business_id))
-            getProductCategory('.select-category','{{$result->business->category_id ?? null}}','{{$result->business_category_id}}');
-        @endif
 
         $(document).on('submit','#frmUpdate',function(e){
             e.preventDefault();

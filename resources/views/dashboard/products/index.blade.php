@@ -39,9 +39,9 @@
                                 <thead>
                                     <th>Aksi</th>
                                     <th>No</th>
+                                    <th>Kode Produk</th>
                                     <th>Nama Produk</th>
                                     <th>Harga Produk</th>
-                                    <th>Unit</th>
                                     @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
                                     <th>Pemilik Usaha</th>
                                     @endif
@@ -66,9 +66,9 @@
                                             </div>
                                         </td>
                                         <td>{{$table->firstItem() + $index}}</td>
+                                        <td>{{$row->code}}</td>
                                         <td>{{$row->name}}</td>
                                         <td>{{number_format($row->price,0,',','.')}}</td>
-                                        <td>{{$row->unit}}</td>
                                         @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
                                         <td>{{$row->user->name ?? null}}</td>
                                         @endif

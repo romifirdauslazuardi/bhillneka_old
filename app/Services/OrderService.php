@@ -288,18 +288,25 @@ class OrderService extends BaseService
                 $auto_userpassword = $row["auto_userpassword"] ?? null;
                 $address = $row["address"] ?? null;
                 $mac_address = $row["mac_address"] ?? null;
+                $expired_date = $row["expired_date"] ?? null;
 
                 if(empty($product_id)){
                     DB::rollBack();
                     return $this->response(false, "Produk ID tidak boleh kosong");
                 }
+
                 if(empty($qty)){
                     DB::rollBack();
                     return $this->response(false, "Qty produk tidak boleh kosong");
                 }
+
                 if($qty <= 0){
                     DB::rollBack();
                     return $this->response(false, "Qty produk tidak boleh kosong");
+                }
+
+                if($type == OrderEnum::TYPE_DUE_DATE){
+                    $expired_date = null;
                 }
 
                 $productResult = $this->product;
@@ -452,6 +459,7 @@ class OrderService extends BaseService
                         'mac_address' => $mac_address,
                         'password' => $password,
                         'type' => $type,
+                        'expired_date' => $expired_date,
                         'time_limit' => $time_limit,
                         'comment' => $comment,
                         'local_address' => $local_address,
@@ -595,6 +603,7 @@ class OrderService extends BaseService
                 $time_limit = $row["time_limit"] ?? null;
                 $disabled = $row["disabled"] ?? null;
                 $auto_userpassword = $row["auto_userpassword"] ?? null;
+                $expired_date = $row["expired_date"] ?? null;
 
                 $stockReady = 0;
 
@@ -602,13 +611,19 @@ class OrderService extends BaseService
                     DB::rollBack();
                     return $this->response(false, "Produk ID tidak boleh kosong");
                 }
+
                 if(empty($qty)){
                     DB::rollBack();
                     return $this->response(false, "Qty produk tidak boleh kosong");
                 }
+
                 if($qty <= 0){
                     DB::rollBack();
                     return $this->response(false, "Qty produk tidak boleh kosong");
+                }
+
+                if($type == OrderEnum::TYPE_DUE_DATE){
+                    $expired_date = null;
                 }
 
                 $productResult = $this->product;
@@ -766,6 +781,7 @@ class OrderService extends BaseService
                         'server' => $server,
                         'password' => $password,
                         'type' => $type,
+                        'expired_date' => $expired_date,
                         'time_limit' => $time_limit,
                         'comment' => $comment,
                         'local_address' => $local_address,
@@ -959,13 +975,14 @@ class OrderService extends BaseService
         if($type == "pesanan"){
             if($order->status == OrderEnum::STATUS_WAITING_PAYMENT){
                 $message .= "Selesaikan Pembayaran Anda sebelum ".date("d F Y H:i:s",strtotime($order->expired_date))." WIB";
+                $message .= "\r\n";
             }
         }
         else if($type == "progress"){
             $message = "Progress pesanan anda diubah menjadi *".$order->progress()->msg."*";
+            $message .= "\r\n";
         }
         
-        $message .= "\r\n";
         $message .= "\r\n";
         $message .= $order->business->name;
         $message .= "\r\n";
@@ -1036,11 +1053,11 @@ class OrderService extends BaseService
         $message .= "\r\n";
 
         if(!empty($order->customer_id)){
-            return WhatsappHelper::send($order->customer->phone,$order->customer->name,["title" => "Notifikasi Pesanan" ,"message" => $message],false);
+            return WhatsappHelper::send($order->customer->phone,$order->customer->name,["title" => "Notifikasi Pesanan" ,"message" => $message],true);
         }
         else{
             if(!empty($order->customer_name) && !empty($order->customer_phone)){
-                return WhatsappHelper::send($order->customer_phone,$order->customer_name,["title" => "Notifikasi Pesanan" ,"message" => $message],false);
+                return WhatsappHelper::send($order->customer_phone,$order->customer_name,["title" => "Notifikasi Pesanan" ,"message" => $message],true);
             }
         }
     }

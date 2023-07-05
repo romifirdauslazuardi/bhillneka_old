@@ -29,7 +29,6 @@ class ProductService extends BaseService
     {
         $search = (empty($request->search)) ? null : trim(strip_tags($request->search));
         $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
-        $category_id = (empty($request->category_id)) ? null : trim(strip_tags($request->category_id));
         $status = (!isset($request->status)) ? null : trim(strip_tags($request->status));
         $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
         $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
@@ -54,14 +53,10 @@ class ProductService extends BaseService
                 $query2->where('name', 'like', '%' . $search . '%');
                 $query2->orWhere('price', 'like', '%' . $search . '%');
                 $query2->orWhere('description', 'like', '%' . $search . '%');
-                $query2->orWhere('unit', 'like', '%' . $search . '%');
             });
         }
         if(!empty($user_id)){
             $table = $table->where("user_id",$user_id);
-        }
-        if(!empty($category_id)){
-            $table = $table->where("category_id",$category_id);
         }
         if(isset($status)){
             $table = $table->where("status",$status);
@@ -168,8 +163,6 @@ class ProductService extends BaseService
             $price = (empty($request->price)) ? 0 : trim(strip_tags($request->price));
             $description = (empty($request->description)) ? null : trim(strip_tags($request->description));;
             $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
-            $category_id = (empty($request->category_id)) ? null : trim(strip_tags($request->category_id));
-            $unit = (empty($request->unit)) ? null : trim(strip_tags($request->unit));
             $weight = (empty($request->weight)) ? null : trim(strip_tags($request->weight));
             $status = (empty($request->status)) ? ProductEnum::STATUS_FALSE : trim(strip_tags($request->status));
             $is_using_stock = (empty($request->is_using_stock)) ? ProductEnum::IS_USING_STOCK_FALSE : trim(strip_tags($request->is_using_stock));
@@ -199,8 +192,6 @@ class ProductService extends BaseService
                 'image' => $image,
                 'description' => $description,
                 'user_id' => $user_id,
-                'category_id' => $category_id,
-                'unit' => $unit,
                 'weight' => $weight,
                 'status' => $status,
                 'is_using_stock' => $is_using_stock,
@@ -225,8 +216,6 @@ class ProductService extends BaseService
             $price = (empty($request->price)) ? 0 : trim(strip_tags($request->price));
             $description = (empty($request->description)) ? null : trim(strip_tags($request->description));;
             $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
-            $category_id = (empty($request->category_id)) ? null : trim(strip_tags($request->category_id));
-            $unit = (empty($request->unit)) ? null : trim(strip_tags($request->unit));
             $weight = (empty($request->weight)) ? null : trim(strip_tags($request->weight));
             $status = (empty($request->status)) ? ProductEnum::STATUS_FALSE : trim(strip_tags($request->status));
             $is_using_stock = (empty($request->is_using_stock)) ? ProductEnum::IS_USING_STOCK_FALSE : trim(strip_tags($request->is_using_stock));
@@ -266,8 +255,6 @@ class ProductService extends BaseService
                 'image' => $image,
                 'description' => $description,
                 'user_id' => $user_id,
-                'category_id' => $category_id,
-                'unit' => $unit,
                 'weight' => $weight,
                 'status' => $status,
                 'is_using_stock' => $is_using_stock,

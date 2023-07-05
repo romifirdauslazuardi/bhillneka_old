@@ -23,21 +23,21 @@ use App\Models\RouterosAPI;
 use DB;
 use Log;
 
-class OrderMikrotikExpiredCommand extends Command
+class OrderOnTimePayMikrotikExpiredCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'order:expired-mikrotik';
+    protected $signature = 'order-on-time-pay:expired-mikrotik';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Order Expired Mikrotik';
+    protected $description = 'Order On Time Pay Expired Mikrotik';
 
     /**
      * Execute the console command.
@@ -47,8 +47,8 @@ class OrderMikrotikExpiredCommand extends Command
         DB::beginTransaction();
         try {
             $orders = new Order();
-            $orders = $orders->where("type",OrderEnum::TYPE_DUE_DATE);
-            $orders = $orders->where("repeat_order_status",OrderEnum::REPEAT_ORDER_STATUS_TRUE);
+            $orders = $orders->where("type",OrderEnum::TYPE_ON_TIME_PAY);
+            $orders = $orders->where("status",OrderEnum::STATUS_SUCCESS);
             $orders = $orders->whereHas("business",function($query2){
                 $query2->whereHas("category",function($query3){
                     $query3->where("name",BusinessCategoryEnum::MIKROTIK);
@@ -59,42 +59,19 @@ class OrderMikrotikExpiredCommand extends Command
 
             foreach($orders as $index => $order){
                 
-                $checkOtherOrder = new Order();
-                $checkOtherOrder = $checkOtherOrder->where("order_id",$order->id);
-                $checkOtherOrder = $checkOtherOrder->where("status",OrderEnum::STATUS_SUCCESS);
-                $checkOtherOrder = $checkOtherOrder->orderBy("created_at","DESC");
-                $checkOtherOrder = $checkOtherOrder->first();
-
-                $ifOrderAgainSuccess = false;
-                
-                if($checkOtherOrder){
-                    $dateCustomPlusDay = date("Y-m-d",strtotime(date($order->created_at)." + ".($order->repeat_order_at)." day"));
-
-                    if(date("Y-m-d") <= $dateCustomPlusDay){
-                        $ifOrderAgainSuccess = true;
-                    }
-                }
-
-                if(!empty($order->repeat_order_at) && $ifOrderAgainSuccess == false){
-                    $dateExpired = date("Y-m-d",strtotime(date($order->created_at)." + ".($order->repeat_order_at+1)." day"));
-
-                    if($dateExpired <= date("Y-m-d")){
-                        foreach($order->items as $i => $value){
-                            self::disabledMikrotik($value);
-                        }
-                    }
-
-                }
-                
-                if(empty($order->repeat_order_at) && $ifOrderAgainSuccess == false){
-                    $dateExpired = date("Y-m-d",strtotime(date($order->created_at)." + 31 day"));
-
-                    if($dateExpired <= date("Y-m-d")){
-                        foreach($order->items as $i => $value){
-                            self::disabledMikrotik($value);
+                foreach($order->items as $i => $value){
+                    if(!empty($value->order_mikrotik->mikrotik_id)){
+                        if(!empty($value->order_mikrotik->expired_date)){
+                            if(date("Y-m-d",strtotime($value->order_mikrotik->expired_date." + 1 day")) == date("Y-m-d")){
+                                if($value->order_mikrotik->type == OrderMikrotikEnum::TYPE_PPPOE){
+                                    self::disabledMikrotik($value);
+                                }
+                            }
                         }
                     }
                 }
+                
+                
             }
 
             DB::commit();
@@ -127,13 +104,13 @@ class OrderMikrotikExpiredCommand extends Command
         if(!empty($orderItem->order_mikrotik->mikrotik_id)){
             if($orderItem->order_mikrotik->type == OrderMikrotikEnum::TYPE_PPPOE){
                 $connect = $connect->comm('/ppp/secret/remove',[
-                    '.id' => $orderItem->order_mikrotik->mirkotik_id ?? null,
+                    '.id' => $orderItem->order_mikrotik->mikrotik_id ?? null,
                 ]);
 
                 $connectLog = LogHelper::mikrotikLog($connect);
 
                 if($connectLog["IsError"] == TRUE){
-                    Log::emergency("OrderMikrotikExpiredCommand : ".$connectLog["Message"]. " #". $orderItem->order->code);
+                    Log::emergency("OrderOnTimePayMikrotikExpiredCommand : ".$connectLog["Message"]. " #". $orderItem->order->code);
                 }
 
                 $orderItem->order_mikrotik()->update([
@@ -146,28 +123,6 @@ class OrderMikrotikExpiredCommand extends Command
                     ]);
                 }
 
-            }
-            else{
-
-                $connect = $connect->comm('/ip/hotspot/user/remove',[
-                    '.id' => $orderItem->order_mikrotik->mirkotik_id ?? null,
-                ]);
-
-                $connectLog = LogHelper::mikrotikLog($connect);
-
-                if($connectLog["IsError"] == TRUE){
-                    Log::emergency("OrderMikrotikExpiredCommand : ".$connectLog["Message"]. " #". $orderItem->order->code);
-                }
-
-                $orderItem->order_mikrotik()->update([
-                    'disabled' => OrderMikrotikEnum::DISABLED_TRUE,
-                ]);
-
-                if($connectLog["IsError"] == FALSE){
-                    $orderItem->order_mikrotik()->update([
-                        'mikrotik_id' => null
-                    ]);
-                }
             }
         }
     }

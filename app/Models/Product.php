@@ -20,8 +20,6 @@ class Product extends Model
         'image',
         'description',
         'user_id',
-        'category_id',
-        'unit',
         'weight',
         'status',
         'is_using_stock',
@@ -33,11 +31,6 @@ class Product extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
-    }
-
-    public function category()
-    {
-        return $this->belongsTo(ProductCategory::class, 'category_id', 'id');
     }
 
     public function stocks()

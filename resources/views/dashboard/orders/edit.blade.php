@@ -200,17 +200,17 @@
                                                                         <input type="hidden" name="repeater[{{$index}}][mikrotik_id]" value="{{$row->order_mikrotik->mikrotik_id ?? null}}" class="mikrotik_id">
                                                                         <input type="hidden" name="repeater[{{$index}}][auto_userpassword]" value="{{$row->order_mikrotik->auto_userpassword ?? null}}" class="auto_userpassword">
                                                                         <div class="form-group mb-3">
-                                                                            <label>Username</label>
+                                                                            <label>Username<span class="text-danger">*</span></label>
                                                                             <input type="text" class="form-control username" placeholder="Username" name="repeater[{{$index}}][username]" value="{{$row->order_mikrotik->username ?? null}}">
                                                                         </div>
                                                                         <div class="form-group mb-3">
-                                                                            <label>Password</label>
+                                                                            <label>Password<span class="text-danger">*</span></label>
                                                                             <input type="text" class="form-control password" placeholder="Password" name="repeater[{{$index}}][password]" value="{{$row->order_mikrotik->password ?? null}}">
                                                                         </div>
                                                                         <div class="row">
                                                                             <div class="col-lg-6">
                                                                                 <div class="form-group mb-3">
-                                                                                    <label>Service</label>
+                                                                                    <label>Service<span class="text-danger">*</span></label>
                                                                                     <select class="form-control service" name="repeater[{{$index}}][service]" style="width:100%">
                                                                                         <option value="pppoe">PPPOE</option>
                                                                                     </select>
@@ -218,7 +218,7 @@
                                                                             </div>
                                                                             <div class="col-lg-6">
                                                                                 <div class="form-group mb-3">
-                                                                                    <label>Profile</label>
+                                                                                    <label>Profile<span class="text-danger">*</span></label>
                                                                                     <select class="form-control profile-{{$index}}" style="width:100%" name="repeater[{{$index}}][profile]">
                                                                                         <option value="">==Pilih Profile</option>
                                                                                         @foreach($profilePppoe as $i => $v)
@@ -231,18 +231,27 @@
                                                                         <div class="row">
                                                                             <div class="col-lg-6">
                                                                                 <div class="form-group mb-3">
-                                                                                    <label>Local Address</label>
+                                                                                    <label>Local Address<span class="text-danger">*</span></label>
                                                                                     <input type="text" class="form-control local-address" placeholder="Local Address" name="repeater[{{$index}}][local_address]" value="{{$row->order_mikrotik->local_address ?? null}}">
                                                                                 </div>
                                                                             </div>
 
                                                                             <div class="col-lg-6">
                                                                                 <div class="form-group mb-3">
-                                                                                    <label>Remote Address</label>
+                                                                                    <label>Remote Address<span class="text-danger">*</span></label>
                                                                                     <input type="text" class="form-control remote-address" placeholder="Remote Address" name="repeater[{{$index}}][remote_address]" value="{{$row->order_mikrotik->remote_address ?? null}}">
                                                                                 </div>
                                                                             </div>
                                                                         </div>
+
+                                                                        @if($result->type == \App\Enums\OrderEnum::TYPE_ON_TIME_PAY)
+                                                                        <div class="display-expired-date">
+                                                                            <div class="form-group mb-3">
+                                                                                <label>Berlaku Sampai Tanggal</label>
+                                                                                <input type="date" class="form-control expired-date" placeholder="Berlaku Sampai Tanggal" name="repeater[{{$index}}][expired_date]" value="{{$row->order_mikrotik->expired_date ?? null}}">
+                                                                            </div>
+                                                                        </div>
+                                                                        @endif
                                                                         
                                                                         <div class="form-group mb-3">
                                                                             <label>Comment</label>
@@ -250,7 +259,7 @@
                                                                         </div>
 
                                                                         <div class="form-group mb-3">
-                                                                            <label>Status</label>
+                                                                            <label>Status<span class="text-danger">*</span></label>
                                                                             <select class="form-control disabled" name="repeater[{{$index}}][disabled]" style="width:100%">
                                                                                 <option value="yes" @if(isset($row->order_mikrotik) && $row->order_mikrotik->disabled == "yes") selected @endif>Disabled</option>
                                                                                 <option value="no" @if(isset($row->order_mikrotik) && $row->order_mikrotik->disabled == "no") selected @endif>Enabled</option>
@@ -277,15 +286,15 @@
                                                                         <input type="hidden" name="repeater[{{$index}}][mikrotik_id]" value="{{$row->order_mikrotik->mikrotik_id ?? null}}" class="mikrotik_id">
                                                                         <input type="hidden" name="repeater[{{$index}}][auto_userpassword]" value="{{$row->order_mikrotik->auto_userpassword ?? null}}" class="auto_userpassword">
                                                                         <div class="form-group mb-3">
-                                                                            <label>Username</label>
+                                                                            <label>Username<span class="text-danger">*</span></label>
                                                                             <input type="text" class="form-control username" placeholder="Username" name="repeater[{{$index}}][username]" value="{{$row->order_mikrotik->username ?? null}}">
                                                                         </div>
                                                                         <div class="form-group mb-3">
-                                                                            <label>Password</label>
+                                                                            <label>Password<span class="text-danger">*</span></label>
                                                                             <input type="text" class="form-control password" placeholder="Password" name="repeater[{{$index}}][password]" value="{{$row->order_mikrotik->password ?? null}}">
                                                                         </div>
                                                                         <div class="form-group mb-3">
-                                                                            <label>Server</label>
+                                                                            <label>Server<span class="text-danger">*</span></label>
                                                                             <select class="form-control select2 server server-{{$index}}" style="width:100%" name="repeater[{{$index}}][server]">
                                                                                 <option value="">==Pilih Server</option>
                                                                                 @foreach($serverHotspot as $i => $v)
@@ -295,7 +304,7 @@
                                                                             <p class="text-info" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;"><small><i>Nama server akan ditampikan sebagai SSID</i></small></p>
                                                                         </div>
                                                                         <div class="form-group mb-3">
-                                                                            <label>Profile</label>
+                                                                            <label>Profile<span class="text-danger">*</span></label>
                                                                             <select class="form-control select2 profile profile-{{$index}}" style="width:100%" name="repeater[{{$index}}][profile]">
                                                                                 <option value="">==Pilih Profile</option>
                                                                                 @foreach($profileHotspot as $i => $v)
@@ -304,7 +313,7 @@
                                                                             </select>
                                                                         </div>
                                                                         <div class="form-group mb-3">
-                                                                            <label>Time Limit</label>
+                                                                            <label>Time Limit<span class="text-danger">*</span></label>
                                                                             <input type="text" class="form-control time-limit" placeholder="Contoh : 1d4h30m20s" name="repeater[{{$index}}][time_limit]" value="{{$row->order_mikrotik->time_limit ?? null}}">
                                                                         </div>
                                                                         <div class="form-group mb-3">
@@ -312,7 +321,7 @@
                                                                             <input type="text" class="form-control comment" placeholder="Comment" name="repeater[{{$index}}][comment]" value="{{$row->order_mikrotik->comment ?? null}}">
                                                                         </div>
                                                                         <div class="form-group mb-3">
-                                                                            <label>Status</label>
+                                                                            <label>Status<span class="text-danger">*</span></label>
                                                                             <select class="form-control disabled" name="repeater[{{$index}}][disabled]" style="width:100%">
                                                                                 <option value="yes" @if(isset($row->order_mikrotik) && $row->order_mikrotik->disabled == "yes") selected @endif>Disabled</option>
                                                                                 <option value="no" @if(isset($row->order_mikrotik) && $row->order_mikrotik->disabled == "no") selected @endif>Enabled</option>
@@ -506,10 +515,12 @@
             if(val == '{{\App\Enums\OrderEnum::TYPE_ON_TIME_PAY}}'){
                 $('.display-due-date').removeClass("d-none").addClass("d-none");
                 $('.display-due-date-status').removeClass("d-none").addClass("d-none");
+                $('.display-expired-date').removeClass("d-none");
             }
             else{
                 $('.display-due-date').removeClass("d-none");
                 $('.display-due-date-status').removeClass("d-none");
+                $('.display-expired-date').removeClass("d-none").addClass("d-none");
             }
             
         });
@@ -763,17 +774,17 @@
                                                 <input type="hidden" name="repeater[${index}][mikrotik_id]" class="mikrotik_id">
                                                 <input type="hidden" name="repeater[${index}][auto_userpassword]" value="`+'{{\App\Enums\OrderMikrotikEnum::AUTO_USERPASSWORD_FALSE}}'+`" class="auto_userpassword"/>
                                                 <div class="form-group mb-3">
-                                                    <label>Username</label>
+                                                    <label>Username<span class="text-danger">*</span></label>
                                                     <input type="text" class="form-control username" placeholder="Username" name="repeater[${index}][username]">
                                                 </div>
                                                 <div class="form-group mb-3">
-                                                    <label>Password</label>
+                                                    <label>Password<span class="text-danger">*</span></label>
                                                     <input type="text" class="form-control password" placeholder="Password" name="repeater[${index}][password]">
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-lg-6">
                                                         <div class="form-group mb-3">
-                                                            <label>Service</label>
+                                                            <label>Service<span class="text-danger">*</span></label>
                                                             <select class="form-control service" name="repeater[${index}][service]" style="width:100%">
                                                                 <option value="pppoe">PPPOE</option>
                                                             </select>
@@ -781,7 +792,7 @@
                                                     </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group mb-3">
-                                                            <label>Profile</label>
+                                                            <label>Profile<span class="text-danger">*</span></label>
                                                             <select class="form-control profile-${index}" style="width:100%" name="repeater[${index}][profile]">
                                                                 <option value="">==Pilih Profile</option>
                                                             </select>
@@ -791,26 +802,36 @@
                                                 <div class="row">
                                                     <div class="col-lg-6">
                                                         <div class="form-group mb-3">
-                                                            <label>Local Address</label>
+                                                            <label>Local Address<span class="text-danger">*</span></label>
                                                             <input type="text" class="form-control local-address" placeholder="Local Address" name="repeater[${index}][local_address]">
                                                         </div>
                                                     </div>
 
                                                     <div class="col-lg-6">
                                                         <div class="form-group mb-3">
-                                                            <label>Remote Address</label>
+                                                            <label>Remote Address<span class="text-danger">*</span></label>
                                                             <input type="text" class="form-control remote-address" placeholder="Remote Address" name="repeater[${index}][remote_address]">
                                                         </div>
                                                     </div>
-                                                </div>
-                                                
+                                                </div>`;
+                                                if($('select[name="type"]').val() == '{{App\Enums\OrderEnum::TYPE_ON_TIME_PAY}}'){
+                                                    config += `
+                                                        <div class="display-expired-date">
+                                                            <div class="form-group mb-3">
+                                                                <label>Berlaku Sampai Tanggal</label>
+                                                                <input type="date" class="form-control expired-date" placeholder="Berlaku Sampai Tanggal" name="repeater[${index}][expired_date]">
+                                                            </div>
+                                                        </div>
+                                                    `;
+                                                }
+                                                config += `
                                                 <div class="form-group mb-3">
                                                     <label>Comment</label>
                                                     <input type="text" class="form-control comment" placeholder="Comment" name="repeater[${index}][comment]">
                                                 </div>
 
                                                 <div class="form-group mb-3">
-                                                    <label>Status</label>
+                                                    <label>Status<span class="text-danger">*</span></label>
                                                     <select class="form-control disabled" name="repeater[${index}][disabled]" style="width:100%">
                                                         <option value="yes">Disabled</option>
                                                         <option value="no">Enabled</option>
@@ -839,7 +860,7 @@
                                             <div class="modal-body">
                                                 <input type="hidden" name="repeater[${index}][mikrotik_id]" class="mikrotik_id">
                                                 <div class="form-group mb-3">
-                                                    <label>Jenis Pengisian</label>
+                                                    <label>Jenis Pengisian<span class="text-danger">*</span></label>
                                                     <select class="form-control name="repeater[${index}][auto_userpassword]">
                                                         <option value="">==Pilih Jenis Pengisian==</option>
                                                         <option value="`+'{{\App\Enums\OrderMikrotikEnum::AUTO_USERPASSWORD_TRUE}}'+`">Otomatis</option>
@@ -847,28 +868,28 @@
                                                     </select>
                                                 </div>
                                                 <div class="form-group mb-3 display-username d-none">
-                                                    <label>Username</label>
+                                                    <label>Username<span class="text-danger">*</span></label>
                                                     <input type="text" class="form-control username" placeholder="Username" name="repeater[${index}][username]">
                                                 </div>
                                                 <div class="form-group mb-3 display-password d-none">
-                                                    <label>Password</label>
+                                                    <label>Password<span class="text-danger">*</span></label>
                                                     <input type="text" class="form-control password" placeholder="Password" name="repeater[${index}][password]">
                                                 </div>
                                                 <div class="form-group mb-3">
-                                                    <label>Server</label>
+                                                    <label>Server<span class="text-danger">*</span></label>
                                                     <select class="form-control select2 server server-${index}" style="width:100%" name="repeater[${index}][server]">
                                                         <option value="">==Pilih Server</option>
                                                     </select>
                                                     <p class="text-info" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;"><small><i>Nama server akan ditampikan sebagai SSID</i></small></p>
                                                 </div>
                                                 <div class="form-group mb-3">
-                                                    <label>Profile</label>
+                                                    <label>Profile<span class="text-danger">*</span></label>
                                                     <select class="form-control select2 profile profile-${index}" style="width:100%" name="repeater[${index}][profile]">
                                                         <option value="">==Pilih Profile</option>
                                                     </select>
                                                 </div>
                                                 <div class="form-group mb-3">
-                                                    <label>Time Limit</label>
+                                                    <label>Time Limit<span class="text-danger">*</span></label>
                                                     <input type="text" class="form-control time-limit" placeholder="Contoh : 1d4h30m20s" name="repeater[${index}][time_limit]">
                                                 </div>
                                                 <div class="form-group mb-3">
@@ -876,7 +897,7 @@
                                                     <input type="text" class="form-control comment" placeholder="Comment" name="repeater[${index}][comment]">
                                                 </div>
                                                 <div class="form-group mb-3">
-                                                    <label>Status</label>
+                                                    <label>Status<span class="text-danger">*</span></label>
                                                     <select class="form-control disabled" name="repeater[${index}][disabled]" style="width:100%">
                                                         <option value="yes">Disabled</option>
                                                         <option value="no">Enabled</option>
@@ -1047,6 +1068,7 @@
             $('.repeater-product').eq(index).find(".profile").attr("name","repeater["+index+"][profile]");
             $('.repeater-product').eq(index).find(".local-address").attr("name","repeater["+index+"][local_address]");
             $('.repeater-product').eq(index).find(".remote-address").attr("name","repeater["+index+"][remote_address]");
+            $('.repeater-product').eq(index).find(".expired-date").attr("name","repeater["+index+"][expired_date]");
             $('.repeater-product').eq(index).find(".time-limit").attr("name","repeater["+index+"][time_limit]");
             $('.repeater-product').eq(index).find(".comment").attr("name","repeater["+index+"][comment]");
             $('.repeater-product').eq(index).find(".disabled").attr("name","repeater["+index+"][disabled]");

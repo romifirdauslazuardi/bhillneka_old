@@ -273,13 +273,14 @@ class CallbackService extends BaseService
         if($type == "pesanan"){
             if($order->status == OrderEnum::STATUS_WAITING_PAYMENT){
                 $message .= "Selesaikan Pembayaran Anda sebelum ".date("d F Y H:i:s",strtotime($order->expired_date))." WIB";
+                $message .= "\r\n";
             }
         }
         else if($type == "progress"){
             $message = "Progress pesanan anda diubah menjadi *".$order->progress()->msg."*";
+            $message .= "\r\n";
         }
         
-        $message .= "\r\n";
         $message .= "\r\n";
         $message .= $order->business->name;
         $message .= "\r\n";
@@ -295,8 +296,6 @@ class CallbackService extends BaseService
         $message .= "\r\n";
 
         foreach($order->items as $index => $row){
-            Log::info($order->status);
-            Log::info($row->order_mikrotik);
             $message .= $row->product_name;
             $message .= "\r\n";
             $message .= $row->qty." x ".number_format($row->product_price,0,',','.')." = ".number_format($row->totalNeto(),0,',','.');
@@ -355,11 +354,11 @@ class CallbackService extends BaseService
         $message .= "\r\n";
 
         if(!empty($order->customer_id)){
-            return WhatsappHelper::send($order->customer->phone,$order->customer->name,["title" => "Notifikasi Pesanan" ,"message" => $message],false);
+            return WhatsappHelper::send($order->customer->phone,$order->customer->name,["title" => "Notifikasi Pesanan" ,"message" => $message],true);
         }
         else{
             if(!empty($order->customer_name) && !empty($order->customer_phone)){
-                return WhatsappHelper::send($order->customer_phone,$order->customer_name,["title" => "Notifikasi Pesanan" ,"message" => $message],false);
+                return WhatsappHelper::send($order->customer_phone,$order->customer_name,["title" => "Notifikasi Pesanan" ,"message" => $message],true);
             }
         }
     }

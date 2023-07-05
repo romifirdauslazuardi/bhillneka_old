@@ -28,10 +28,6 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
         Route::get('/', 'BusinessController@index')->name('index');
     });
     
-    Route::group(["as" => "product-categories.", "prefix" => "product-categories"], function () {
-        Route::get('/', 'ProductCategoryController@index')->name('index');
-    });
-    
     Route::group(["as" => "units.", "prefix" => "units"], function () {
         Route::get('/', 'UnitController@index')->name('index');
     });
