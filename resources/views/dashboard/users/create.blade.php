@@ -144,7 +144,7 @@
             let val = $(this).val();
             let agen = false;
             
-            if(val == '{{\App\Enums\RoleEnum::USER}}' || val == '{{\App\Enums\RoleEnum::ADMIN_AGEN}}'){
+            if(val == '{{\App\Enums\RoleEnum::CUSTOMER}}' || val == '{{\App\Enums\RoleEnum::ADMIN_AGEN}}'){
                 agen = true;
             }
 
@@ -157,7 +157,7 @@
 
             $(".display-business").removeClass("d-none").addClass("d-none");
 
-            if(val == '{{\App\Enums\RoleEnum::USER}}'){
+            if(val == '{{\App\Enums\RoleEnum::CUSTOMER}}'){
                 $(".display-business").removeClass("d-none");
             }
         });

@@ -56,16 +56,16 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
 
 	Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
 
-	Route::get('/', 'DashboardController@index')->name('index')->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::USER, RoleEnum::ADMIN_AGEN])]);
+	Route::get('/', 'DashboardController@index')->name('index')->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::CUSTOMER, RoleEnum::ADMIN_AGEN])]);
 
-	Route::get('notification', 'NotificationController@notification')->name('notification')->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::USER])]);
-	Route::get('notification/read/{id}', 'NotificationController@notificationRead')->name('notification.read')->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::USER])]);
-	Route::get('notification/markAsRead', 'NotificationController@markAsRead')->name('notification.markAsRead')->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::USER])]);
+	Route::get('notification', 'NotificationController@notification')->name('notification')->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::CUSTOMER])]);
+	Route::get('notification/read/{id}', 'NotificationController@notificationRead')->name('notification.read')->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::CUSTOMER])]);
+	Route::get('notification/markAsRead', 'NotificationController@markAsRead')->name('notification.markAsRead')->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::CUSTOMER])]);
 
 	Route::group(["as" => "profile.", "prefix" => "profile"], function () {
-		Route::get('/', 'ProfileController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::USER])]);
-		Route::put('/', 'ProfileController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::USER])]);
-		Route::put('/updateBusinessPage', 'ProfileController@updateBusinessPage')->name("updateBusinessPage")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::USER])]);
+		Route::get('/', 'ProfileController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::CUSTOMER])]);
+		Route::put('/', 'ProfileController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::CUSTOMER])]);
+		Route::put('/updateBusinessPage', 'ProfileController@updateBusinessPage')->name("updateBusinessPage")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::CUSTOMER])]);
 	});
 
 	Route::group(["as" => "users.", "prefix" => "users"], function () {
@@ -156,9 +156,9 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
 	});
 
 	Route::group(["as" => "orders.", "prefix" => "orders"], function () {
-		Route::get('/', 'OrderController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::USER])]);
+		Route::get('/', 'OrderController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::CUSTOMER])]);
 		Route::get('/create', 'OrderController@create')->name("create")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-		Route::get('/{id}', 'OrderController@show')->name("show")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::USER])]);
+		Route::get('/{id}', 'OrderController@show')->name("show")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::CUSTOMER])]);
 		Route::get('/{id}/edit', 'OrderController@edit')->name("edit")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
 		Route::post('/', 'OrderController@store')->name("store")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 		Route::put('/{id}', 'OrderController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);

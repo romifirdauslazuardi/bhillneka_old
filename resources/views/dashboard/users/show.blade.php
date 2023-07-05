@@ -76,7 +76,7 @@
                     <h6 class="">{{ $result->email }}</h6>
                 </div>
 
-                @if($result->hasRole([\App\Enums\RoleEnum::USER,\App\Enums\RoleEnum::ADMIN_AGEN]))
+                @if($result->hasRole([\App\Enums\RoleEnum::CUSTOMER,\App\Enums\RoleEnum::ADMIN_AGEN]))
                 <div class="mt-3">
                     <p class="font-size-12 text-muted mb-1">Agen</p>
                     <h6 class="">{{ $result->user->name ?? null }}</h6>

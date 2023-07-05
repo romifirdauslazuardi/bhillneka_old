@@ -30,7 +30,7 @@ class LoginService extends BaseService
                 if (!Auth::user()->hasRole([
                     RoleEnum::OWNER,
                     RoleEnum::AGEN,
-                    RoleEnum::USER,
+                    RoleEnum::CUSTOMER,
                     RoleEnum::ADMIN_AGEN,
                 ])) {
                     Auth::logout();

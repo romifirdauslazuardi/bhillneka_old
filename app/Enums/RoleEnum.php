@@ -16,7 +16,7 @@ final class RoleEnum extends Enum
 {
     const OWNER = "Owner";
     const AGEN = "Agen";
-    const USER = "User";
+    const CUSTOMER = "Customer";
     const ADMIN_AGEN = "Admin Agen";
 
     public static function roles()
@@ -24,7 +24,7 @@ final class RoleEnum extends Enum
         $roles = [
             self::OWNER,
             self::AGEN,
-            self::USER,
+            self::CUSTOMER,
             self::ADMIN_AGEN,
         ];
 

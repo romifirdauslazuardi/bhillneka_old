@@ -88,7 +88,7 @@ class OrderService extends BaseService
         if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
             $user_id = Auth::user()->user_id;
         }
-        if(Auth::user()->hasRole([RoleEnum::USER])){
+        if(Auth::user()->hasRole([RoleEnum::CUSTOMER])){
             $customer_id = Auth::user()->id;
         }
         if(!empty(Auth::user()->business_id)){
@@ -150,7 +150,7 @@ class OrderService extends BaseService
             if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
                 $result = $result->where("user_id",Auth::user()->user_id);
             }
-            if(Auth::user()->hasRole([RoleEnum::USER])){
+            if(Auth::user()->hasRole([RoleEnum::CUSTOMER])){
                 $result = $result->where("customer_id",Auth::user()->id);
             }
             if(!empty(Auth::user()->business_id)){

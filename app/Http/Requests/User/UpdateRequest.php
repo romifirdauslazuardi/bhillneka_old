@@ -19,12 +19,12 @@ class UpdateRequest extends FormRequest
         }
         if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
             $merge["user_id"] = Auth::user()->user_id;
-            $merge["roles"] = [RoleEnum::USER];
+            $merge["roles"] = [RoleEnum::CUSTOMER];
         }
         
         $this->merge($merge);
 
-        if($this->roles == RoleEnum::USER){
+        if($this->roles == RoleEnum::CUSTOMER){
             if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
                 $this->merge(["business_id" => Auth::user()->business_id]);
             }
@@ -67,11 +67,11 @@ class UpdateRequest extends FormRequest
                 'date_format:Y-m-d H:i:s'
             ],
             'user_id' => [
-                (in_array($this->roles,[RoleEnum::USER])) ? "required" : "nullable",
+                (in_array($this->roles,[RoleEnum::CUSTOMER])) ? "required" : "nullable",
                 Rule::exists('users', 'id'),
             ],
             'business_id' => [
-                (in_array($this->roles,[RoleEnum::USER])) ? "required" : "nullable",
+                (in_array($this->roles,[RoleEnum::CUSTOMER])) ? "required" : "nullable",
                 Rule::exists('business', 'id'),
             ],
         ];

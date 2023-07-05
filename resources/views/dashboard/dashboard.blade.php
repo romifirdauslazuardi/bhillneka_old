@@ -74,7 +74,7 @@
     @endif
 </div>
 
-@if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN,\App\Enums\RoleEnum::USER]))
+@if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN,\App\Enums\RoleEnum::CUSTOMER]))
 
 @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
 <div class="row mt-4">

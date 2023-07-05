@@ -189,7 +189,7 @@ class DashboardService extends BaseService
         if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
             $user_id = Auth::user()->user_id;
         }
-        if(Auth::user()->hasRole([RoleEnum::USER])){
+        if(Auth::user()->hasRole([RoleEnum::CUSTOMER])){
             $customer_id = Auth::user()->id;
         }
         if(!empty(Auth::user()->business_id)){

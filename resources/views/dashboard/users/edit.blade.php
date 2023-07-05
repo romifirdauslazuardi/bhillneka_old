@@ -88,7 +88,7 @@
                         </div>
                         @endif
                         @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]) && !empty(Auth::user()->business_id))
-                        <div class="form-group row mb-3 display-agen @if(!$result->hasRole([\App\Enums\RoleEnum::USER])) d-none @endif">
+                        <div class="form-group row mb-3 display-agen @if(!$result->hasRole([\App\Enums\RoleEnum::CUSTOMER])) d-none @endif">
                             <label class="col-md-3 col-form-label">Agen<span class="text-danger">*</span></label>
                             <div class="col-md-9">
                                 <select class="form-control select2" name="user_id" >
@@ -99,7 +99,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group row mb-3 display-business @if(!$result->hasRole([\App\Enums\RoleEnum::USER])) d-none @endif">
+                        <div class="form-group row mb-3 display-business @if(!$result->hasRole([\App\Enums\RoleEnum::CUSTOMER])) d-none @endif">
                             <label class="col-md-3 col-form-label">Bisnis<span class="text-danger">*</span></label>
                             <div class="col-md-9">
                                 <select class="form-control select2 select-business" name="business_id" >
@@ -140,7 +140,7 @@
               formatDate:'YYYY-MM-DD'
         });
 
-        @if($result->hasRole([\App\Enums\RoleEnum::USER]))
+        @if($result->hasRole([\App\Enums\RoleEnum::CUSTOMER]))
             getBusiness('.select-business','{{$result->user_id}}','{{$result->business->id ?? null}}');
         @endif
 
@@ -151,7 +151,7 @@
             let val = $(this).val();
             let agen = false;
             
-            if(val == '{{\App\Enums\RoleEnum::USER}}' || val == '{{\App\Enums\RoleEnum::ADMIN_AGEN}}'){
+            if(val == '{{\App\Enums\RoleEnum::CUSTOMER}}' || val == '{{\App\Enums\RoleEnum::ADMIN_AGEN}}'){
                 agen = true;
             }
 

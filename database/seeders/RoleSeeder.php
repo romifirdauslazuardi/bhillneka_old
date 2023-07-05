@@ -30,9 +30,9 @@ class RoleSeeder extends Seeder
         ]);
 
         Role::firstOrCreate([
-            'name' => RoleEnum::USER,
+            'name' => RoleEnum::CUSTOMER,
         ], [
-            'name' => RoleEnum::USER,
+            'name' => RoleEnum::CUSTOMER,
             'guard_name' => 'web'
         ]);
 

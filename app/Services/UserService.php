@@ -62,7 +62,7 @@ class UserService extends BaseService
             $table = $table->where(function($query2){
                 $query2->role([RoleEnum::ADMIN_AGEN]);
                 $query2->orWhere(function($query3){
-                    $query3->role([RoleEnum::USER]);
+                    $query3->role([RoleEnum::CUSTOMER]);
                     $query3->where("business_id",Auth::user()->business_id);
                 });
             });
@@ -72,7 +72,7 @@ class UserService extends BaseService
         ])) {
             $table = $table->where(function($query2){
                 $query2->where(function($query3){
-                    $query3->role([RoleEnum::USER]);
+                    $query3->role([RoleEnum::CUSTOMER]);
                     $query3->where("business_id",Auth::user()->business_id);
                 });
             });
@@ -104,13 +104,13 @@ class UserService extends BaseService
             if (Auth::user()->hasRole([
                 RoleEnum::AGEN
             ])) {
-                $result = $result->role([RoleEnum::USER,RoleEnum::ADMIN_AGEN]);
+                $result = $result->role([RoleEnum::CUSTOMER,RoleEnum::ADMIN_AGEN]);
                 $result = $result->where('user_id',Auth::user()->id);
             }
             if (Auth::user()->hasRole([
                 RoleEnum::ADMIN_AGEN
             ])) {
-                $result = $result->role([RoleEnum::USER]);
+                $result = $result->role([RoleEnum::CUSTOMER]);
                 $result = $result->where('user_id',Auth::user()->user_id);
             }
             $result = $result->where("id",$id);
@@ -315,7 +315,7 @@ class UserService extends BaseService
             if(!empty($user_id)){
                 $table = $table->where("user_id",$user_id);
             }
-            $table = $table->role([RoleEnum::USER]);
+            $table = $table->role([RoleEnum::CUSTOMER]);
             $table = $table->orderBy('created_at', 'DESC');
             $table = $table->get();            
 
