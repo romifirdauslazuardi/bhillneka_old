@@ -16,10 +16,10 @@
                         @csrf
                         @include("dashboard.auth.layouts.logo")
                         <h5 class="mb-3 text-center">Reset Password</h5>
-
+                        <input type="hidden" name="token" value="{{request()->get('token')}}">
                         <div class="form-group mb-2">
                             <label>Email <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" name="email" placeholder="Email">
+                            <input type="email" class="form-control" name="email" placeholder="Email" value="{{request()->get('email')}}" readonly>
                         </div>
 
                         <div class="form-group mb-2">
