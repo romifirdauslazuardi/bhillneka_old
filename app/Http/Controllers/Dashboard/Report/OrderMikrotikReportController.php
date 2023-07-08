@@ -15,6 +15,7 @@ use Illuminate\Support\Collection;
 use Excel;
 use Illuminate\Http\Response;
 use Log;
+use Auth;
 
 class OrderMikrotikReportController extends Controller
 {
