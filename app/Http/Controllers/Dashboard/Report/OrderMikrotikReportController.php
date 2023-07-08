@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Dashboard\Report;
 
+use App\Enums\BusinessCategoryEnum;
 use App\Enums\OrderMikrotikEnum;
+use App\Enums\RoleEnum;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Report\UpdateOrderMikrotikRequest;
@@ -27,6 +29,25 @@ class OrderMikrotikReportController extends Controller
         $this->view = "dashboard.reports.order-mikrotiks.";
         $this->orderMikrotikReportService = new OrderMikrotikReportService();
         $this->mikrotikConfigService = new MikrotikConfigService();
+
+        $this->middleware(function ($request, $next) {
+            if(Auth::user()->hasRole([
+                RoleEnum::AGEN,
+                RoleEnum::ADMIN_AGEN]) 
+            && empty(Auth::user()->business_id)){
+                alert()->error('Gagal', "Bisnis page belum diaktifkan");
+                return redirect()->route("dashboard.index");
+            }
+
+            if(Auth::user()->hasRole([
+                RoleEnum::AGEN,
+                RoleEnum::ADMIN_AGEN]) 
+            && !empty(Auth::user()->business_id) && Auth::user()->business->category->name != BusinessCategoryEnum::MIKROTIK){
+                return redirect()->route("dashboard.index");
+            }
+
+            return $next($request);
+        },['only' => ['index','show','edit']]);
     }
 
     public function index(Request $request)

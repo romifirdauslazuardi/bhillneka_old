@@ -478,6 +478,40 @@ class OrderService extends BaseService
                     $this->orderMikrotik->updateOrCreate([
                         'order_item_id' => $orderItem->id,
                     ],$dataOrderMikrotik);
+
+                    $mikrotikConfig = SettingHelper::mikrotikConfig($order->business_id,$order->business->user_id);
+                    $ip = $mikrotikConfig->ip ?? null;
+                    $username = $mikrotikConfig->username ?? null;
+                    $password = $mikrotikConfig->password ?? null;
+                    $port = $mikrotikConfig->port ?? null;
+                    
+                    $connect = $this->routerosApi;
+                    $connect->debug("false");
+
+                    if(!$connect->connect($ip,$username,$password,$port)){
+                        return $this->response(false,'Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda');
+                    }
+
+                    if($dataOrderMikrotik["type"] == OrderMikrotikEnum::TYPE_PPPOE){
+                        $connect = $connect->comm('/ppp/secret/print');
+                    }
+                    else{
+                        $connect = $connect->comm('/ip/hotspot/user/print');
+                    }
+
+                    Log::info($connect);
+
+                    $connectLog = LogHelper::mikrotikLog($connect);
+
+                    if($connectLog["IsError"] == TRUE){
+                        return $this->response(false, $connectLog["Message"]);
+                    }
+
+                    foreach($connect as $i => $v){
+                        if($v["name"] == $dataOrderMikrotik["username"]){
+                            return $this->response(false, "Username ". $dataOrderMikrotik["username"]. " sudah terdaftar dimikrotik");
+                        }
+                    }
                 }
             }
             

@@ -142,10 +142,6 @@ class OrderMikrotikReportService extends BaseService
 
                 $connectLog = LogHelper::mikrotikLog($connect);
 
-                if($connectLog["IsError"] == TRUE){
-                    return $this->response(false, $connectLog["Message"]);
-                }
-
                 if(isset($connect[0]["disabled"])){
                     if($connect[0]["disabled"] == "false"){
                         $result->disabled_mikrotik = "no";
@@ -184,6 +180,8 @@ class OrderMikrotikReportService extends BaseService
 
             $result = $this->orderMikrotik->findOrFail($id);
 
+            $oldUsername = $result->username;
+
             $result->update([
                 'username' => $username,
                 'password' => $password,
@@ -201,20 +199,61 @@ class OrderMikrotikReportService extends BaseService
             ]);
 
             $mikrotikConfig = SettingHelper::mikrotikConfig($result->order_item->order->business_id ?? null,$result->order_item->order->business->user_id ?? null);
-            $ip = $mikrotikConfig->ip ?? null;
-            $username = $mikrotikConfig->username ?? null;
-            $password = $mikrotikConfig->password ?? null;
-            $port = $mikrotikConfig->port ?? null;
+            $ipConfig = $mikrotikConfig->ip ?? null;
+            $usernameConfig = $mikrotikConfig->username ?? null;
+            $passwordConfig = $mikrotikConfig->password ?? null;
+            $portConfig = $mikrotikConfig->port ?? null;
 
             $connect = $this->routerosApi;
             $connect->debug("false");
 
-            if(!$connect->connect($ip,$username,$password,$port)){
+            if(!$connect->connect($ipConfig,$usernameConfig,$passwordConfig,$portConfig)){
                 DB::rollback();
                 return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
             }
 
             if($result->type == OrderMikrotikEnum::TYPE_PPPOE){
+                
+                if($oldUsername != $username){
+                    $checkExistMikrotik = $connect->comm('/ppp/secret/print');
+
+                    Log::info($checkExistMikrotik);
+
+                    $connectLog = LogHelper::mikrotikLog($checkExistMikrotik);
+
+                    if($connectLog["IsError"] == TRUE){
+                        return $this->response(false, $connectLog["Message"]);
+                    }
+
+                    foreach($checkExistMikrotik as $i => $v){
+                        if($v["name"] == $username){
+                            return $this->response(false, "Username ". $username. " sudah terdaftar dimikrotik");
+                        }
+                    }
+                }
+                else{
+                    $checkExistMikrotik = $connect->comm('/ppp/secret/print');
+
+                    Log::info($checkExistMikrotik);
+
+                    $connectLog = LogHelper::mikrotikLog($checkExistMikrotik);
+
+                    if($connectLog["IsError"] == TRUE){
+                        return $this->response(false, $connectLog["Message"]);
+                    }
+
+                    $checkExistMikrotikNumber = false;
+                    foreach($checkExistMikrotik as $i => $v){
+                        if($v["name"] == $username){
+                           $checkExistMikrotikNumber = true;
+                        }
+                    }
+
+                    if($checkExistMikrotikNumber == false){
+                        return $this->response(false, 'Username '.$username." tidak ditemukan pada mikrotik");
+                    }
+                }
+
                 $connectData = [
                     '.id' => $result->mikrotik_id,
                     'name' => $username,
@@ -229,6 +268,45 @@ class OrderMikrotikReportService extends BaseService
                 $connect = $connect->comm('/ppp/secret/set',$connectData);
             }
             else{
+                if($oldUsername != $username){
+                    $checkExistMikrotik = $connect->comm('/ip/hotspot/user/print');
+
+                    Log::info($checkExistMikrotik);
+
+                    $connectLog = LogHelper::mikrotikLog($checkExistMikrotik);
+
+                    if($connectLog["IsError"] == TRUE){
+                        return $this->response(false, $connectLog["Message"]);
+                    }
+
+                    foreach($checkExistMikrotik as $i => $v){
+                        if($v["name"] == $username){
+                            return $this->response(false, "Username ". $username. " sudah terdaftar dimikrotik");
+                        }
+                    }
+                }else{
+                    $checkExistMikrotik = $connect->comm('/ip/hotspot/user/print');
+
+                    Log::info($checkExistMikrotik);
+
+                    $connectLog = LogHelper::mikrotikLog($checkExistMikrotik);
+
+                    if($connectLog["IsError"] == TRUE){
+                        return $this->response(false, $connectLog["Message"]);
+                    }
+
+                    $checkExistMikrotikNumber = false;
+                    foreach($checkExistMikrotik as $i => $v){
+                        if($v["name"] == $username){
+                           $checkExistMikrotikNumber = true;
+                        }
+                    }
+
+                    if($checkExistMikrotikNumber == false){
+                        return $this->response(false, 'Username '.$username." tidak ditemukan pada mikrotik");
+                    }
+                }
+                
                 $connectData = [
                     '.id' => $result->mikrotik_id,
                     'name' => $username,
