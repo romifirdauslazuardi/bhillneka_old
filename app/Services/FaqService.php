@@ -32,12 +32,13 @@ class FaqService extends BaseService
                 $query2->orWhere('answer', 'like', '%' . $search . '%');
             });
         }
-        $table = $table->orderBy('created_at', 'DESC');
 
         if ($paginate) {
+            $table = $table->orderBy('created_at', 'DESC');
             $table = $table->paginate(10);
             $table = $table->withQueryString();
         } else {
+            $table = $table->orderBy('created_at', 'ASC');
             $table = $table->get();
         }
 

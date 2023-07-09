@@ -22,8 +22,8 @@ class WhatsappHelper
 
             $send = Http::timeout(60)->connectTimeout(60)->withHeaders([
                 'Content-Type' => 'application/json',
-            ])->post(env("WHATSAPP_URL")."/send-message",[
-                'number' => $phone,
+            ])->post(env("WHATSAPP_URL")."/message",[
+                'phoneNumber' => $phone,
                 'message' => $message,
             ]);
 
