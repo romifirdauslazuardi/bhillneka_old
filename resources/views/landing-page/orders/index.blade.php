@@ -72,7 +72,7 @@
                                             <tr>
                                                 <td style="width:25%;">Customer</td>
                                                 <td class="text-center">:</td>
-                                                <td>@if(empty($result->customer_id)) $result->customer_name @else {{$result->customer->name ?? null}} @endif</td>
+                                                <td>@if(empty($result->customer_id)) {{$result->customer_name}} @else {{$result->customer->name ?? null}} @endif</td>
                                             </tr>
                                             <tr>
                                                 <td style="width:25%;">Metode Pembayaran</td>
