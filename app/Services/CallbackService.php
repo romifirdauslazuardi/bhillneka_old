@@ -87,7 +87,7 @@ class CallbackService extends BaseService
                     $doku_fee = 0;
 
                     if($findOrder->doku_service_id == DokuEnum::SERVICE_EMONEY){
-                        $doku_fee = round(2 * $findOrder->totalNeto());
+                        $doku_fee = round((2 * $findOrder->totalNeto())/100);
                     }
                     else if($findOrder->doku_service_id == DokuEnum::SERVICE_VIRTUAL_ACCOUNT){
                         $doku_fee = 4500 + round((11*4500)/100);
