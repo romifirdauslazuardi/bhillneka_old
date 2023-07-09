@@ -1007,10 +1007,10 @@ class OrderService extends BaseService
         $order = $order->first();
 
         if($type == "pesanan"){
-            if($order->status == OrderEnum::STATUS_WAITING_PAYMENT){
-                $message .= "Selesaikan Pembayaran Anda sebelum ".date("d F Y H:i:s",strtotime($order->expired_date))." WIB";
-                $message .= "\r\n";
-            }
+            // if($order->status == OrderEnum::STATUS_WAITING_PAYMENT){
+            //     $message .= "Selesaikan Pembayaran Anda sebelum ".date("d F Y H:i:s",strtotime($order->expired_date))." WIB";
+            //     $message .= "\r\n";
+            // }
         }
         else if($type == "progress"){
             $message = "Progress pesanan anda diubah menjadi *".$order->progress()->msg."*";
