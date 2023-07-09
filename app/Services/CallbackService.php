@@ -95,6 +95,9 @@ class CallbackService extends BaseService
                     else if($findOrder->doku_service_id == DokuEnum::SERVICE_ONLINE_TO_OFFLINE){
                         $doku_fee = 5000 + round((11*5000)/100);
                     }
+                    else if($findOrder->doku_service_id == DokuEnum::CHANNEL_CREDIT_CARD){
+                        $doku_fee = round((3 * $findOrder->totalNeto())/100) + 2500;
+                    }
 
                     $findOrder->update([
                         'paid_date' => date("Y-m-d H:i:s"),

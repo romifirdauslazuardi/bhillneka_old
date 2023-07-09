@@ -99,8 +99,8 @@ class PaymentNotification extends Notification implements ShouldQueue
             $message .= "\r\n";
             $message .= $row->qty." x ".number_format($row->product_price,0,',','.')." = ".number_format($row->totalNeto(),0,',','.');
             if($order->status == OrderEnum::STATUS_SUCCESS){
-                $message .= "\r\n";
                 if(!empty($row->order_mikrotik->mikrotik_id)){
+                    $message .= "\r\n";
                     if($row->order_mikrotik->type == OrderMikrotikEnum::TYPE_HOTSPOT){
                         $message .= "SSID : ".$row->order_mikrotik->server;
                         $message .= "\r\n";
