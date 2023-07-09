@@ -286,6 +286,7 @@ class OrderController extends Controller
                     $row->totalNeto(),
                     $row->provider->name ?? null,
                     $row->status()->msg ?? null,
+                    $row->progress()->msg ?? null,
                     date('d-m-Y H:i:s',strtotime($row->created_at))
                 ]);
 

@@ -35,7 +35,7 @@ class DashboardController extends Controller
         $chart_income_agen = $this->dashboardService->chartIncomeAgen();
         $chart_income_agen = $chart_income_agen->data;
 
-        $chart_income_owner = $this->dashboardService->chartIncomeOwnerNeto();
+        $chart_income_owner = $this->dashboardService->chartIncomeOwnerBruto();
         $chart_income_owner = $chart_income_owner->data;
 
         $orders = $this->dashboardService->orderLatest();

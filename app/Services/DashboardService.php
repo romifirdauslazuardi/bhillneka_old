@@ -100,7 +100,7 @@ class DashboardService extends BaseService
         return $this->response(true, 'Berhasil mendapatkan data', $data);
     }
 
-    public function chartIncomeOwnerNeto(){
+    public function chartIncomeOwnerBruto(){
         $orders = $this->orderSuccess();
 
         $labels = [];
@@ -112,15 +112,15 @@ class DashboardService extends BaseService
         foreach($orders as $index => $row){
             if($index == 0){
                 $labels[date('d-m-Y',strtotime($row->created_at))] = date('d F Y',strtotime($row->created_at));
-                $value[date('d-m-Y',strtotime($row->created_at))] = $row->incomeOwnerNeto();
+                $value[date('d-m-Y',strtotime($row->created_at))] = $row->incomeOwnerBruto();
             }
             else{
                 if(!isset($labels[date('d-m-Y',strtotime($row->created_at))])){
                     $labels[date('d-m-Y',strtotime($row->created_at))] = date('d F Y',strtotime($row->created_at));
-                    $value[date('d-m-Y',strtotime($row->created_at))] = $row->incomeOwnerNeto();
+                    $value[date('d-m-Y',strtotime($row->created_at))] = $row->incomeOwnerBruto();
                 }
                 else{
-                    $value[date('d-m-Y',strtotime($row->created_at))] += $row->incomeOwnerNeto();
+                    $value[date('d-m-Y',strtotime($row->created_at))] += $row->incomeOwnerBruto();
                 }
             }
         }

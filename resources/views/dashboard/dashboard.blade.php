@@ -65,7 +65,7 @@
                     <i class="fa fa-dollar fs-5 mb-0"></i>
                 </div>
                 <div class="flex-1 ms-3">
-                    <p class="mb-0 text-muted p-total">Pendapatan Owner {{date("F Y")}}</p>
+                    <p class="mb-0 text-muted p-total">Jasa Aplikasi & Layanan {{date("F Y")}}</p>
                     <p class="fs-5 text-dark fw-bold mb-0">{{number_format($total_income_owner,0,',','.')}}</p>
                 </div>
             </div>
@@ -108,12 +108,7 @@
                             <th>Kode Transaksi</th>
                             @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
                                 <th>Pendapatan Agen</th>
-                                @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-                                <th>Pendapatan Owner</th>
-                                <th>Biaya Penanganan</th>
-                                @else
                                 <th>Jasa Aplikasi & Layanan</th>
-                                @endif
                             @endif
                             <th>Total</th>
                             <th>Progress</th>
@@ -127,12 +122,7 @@
                                 <td>{{$row->code}}</td>
                                 @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
                                     <td>{{number_format($row->incomeAgen(),0,',','.')}}</td>
-                                    @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-                                    <td>{{number_format($row->incomeOwnerNeto(),0,',','.')}}</td>
-                                    <td>{{number_format($row->doku_fee,0,',','.')}}</td>
-                                    @else
                                     <td>{{number_format($row->incomeOwnerBruto(),0,',','.')}}</td>
-                                    @endif
                                 @endif
                                 <td>{{number_format($row->totalNeto(),0,',','.')}}</td>
                                 <td>
@@ -225,7 +215,7 @@
             //membuat label chart
                 labels: JSON.parse('<?php echo json_encode($chart_income_owner["labels"]); ?>'),
                 datasets: [{
-                    label: 'Pendapatan Owner {{date("F Y")}}',
+                    label: 'Jasa Aplikasi & Layanan {{date("F Y")}}',
                     data: JSON.parse('<?php echo json_encode($chart_income_owner["value"]); ?>'),
                     borderColor: 'rgb(75, 192, 192)',
                     borderWidth: 1

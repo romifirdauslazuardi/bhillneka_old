@@ -31,15 +31,7 @@ class IncomeReportExport implements FromCollection, WithHeadings, ShouldAutoSize
         $data[] = "Kode Transaksi";
         $data[] = "Customer";
         $data[] = "Pendapatan Agen";
-
-        if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER])){
-            $data[] = "Pendapatan Owner";
-            $data[] = "Biaya Penanganan";
-        }
-        else{
-            $data[] = "Jasa Aplikasi & Layanan";
-        }
-
+        $data[] = "Jasa Aplikasi & Layanan";
         $data[] = "Total Transaksi";
         $data[] = "Progress";
         $data[] = "Status";

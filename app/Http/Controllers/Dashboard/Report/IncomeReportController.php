@@ -65,15 +65,7 @@ class IncomeReportController extends Controller
                 $pushData[] = $row->code;
                 $pushData[] = $customer;
                 $pushData[] = $row->incomeAgen();
-
-                if(Auth::user()->hasRole([RoleEnum::OWNER])){
-                    $pushData[] = $row->incomeOwnerNeto();
-                    $pushData[] = $row->doku_fee;
-                }
-                else{
-                    $pushData[] = $row->incomeOwnerBruto();
-                }
-
+                $pushData[] = $row->incomeOwnerBruto();
                 $pushData[] = $row->totalNeto();
                 $pushData[] = $row->progress()->msg ?? null;
                 $pushData[] = $row->status()->msg ?? null;
@@ -91,34 +83,20 @@ class IncomeReportController extends Controller
                 null,
                 null,
                 null,
-                null,
             ]);
 
-            if(Auth::user()->hasRole([RoleEnum::OWNER])){
-                $collection->push([
-                    null,
-                    "Total",
-                    $total_agen,
-                    $total_owner,
-                    $total_doku_fee,
-                    $total,
-                    null,
-                    null,
-                    null,
-                ]);
-            }
-            else{
-                $collection->push([
-                    null,
-                    "Total",
-                    $total_agen,
-                    $total_owner + $total_doku_fee,
-                    $total,
-                    null,
-                    null,
-                    null,
-                ]);
-            }
+            $collection->push([
+                null,
+                null,
+                "Total",
+                $total_agen,
+                $total_owner,
+                $total,
+                null,
+                null,
+                null,
+            ]);
+            
 
             return Excel::download(new IncomeReportExport($collection), 'incomes-report-'.time().'.xlsx');
         } catch (\Throwable $th) {
