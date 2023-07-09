@@ -14,7 +14,7 @@
                 <div class="title-heading me-lg-4 wow animate__animated animate__fadeInUp" data-wow-delay=".1s">
                     <h1 class="heading fw-bold mb-3">{{ \SettingHelper::settings('landing_page', 'title')}}</h1>
                     <p class="para-desc text-muted">{{ \SettingHelper::settings('landing_page', 'description')}}</p>
-                    <a href="{{route('landing-page.pages.index','about-us')}}" class="btn btn-primary text-uppercase">Tentang Kami</a>
+                    <a href="{{route('landing-page.pages.index','tentang-kami')}}" class="btn btn-primary text-uppercase">GET STARTED</a>
                 </div>
             </div><!--end col-->
 
@@ -142,7 +142,6 @@
             <div class="col-12">
                 <div class="section-title text-center mb-4 pb-2 wow animate__animated animate__fadeInUp" data-wow-delay=".1s">
                     <h4 class="title mb-4">Frequently Asked Questions</h4>
-                    <p class="text-muted para-desc mb-0 mx-auto">Start working with <span class="text-primary fw-bold">Landrick</span> that can provide everything you need to generate awareness, drive traffic, connect.</p>
                 </div>
             </div><!--end col-->
         </div><!--end row-->
