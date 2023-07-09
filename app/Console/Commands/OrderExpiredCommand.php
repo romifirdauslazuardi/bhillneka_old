@@ -3,8 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Enums\OrderEnum;
+use App\Enums\ProductEnum;
 use Illuminate\Console\Command;
 use App\Models\Order;
+use App\Models\ProductStock;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 use DB;
 use Log;
@@ -42,6 +44,16 @@ class OrderExpiredCommand extends Command
                         'status' => OrderEnum::STATUS_EXPIRED,
                         'progress' => OrderEnum::PROGRESS_EXPIRED,
                     ]);
+                }
+
+                foreach($row->items as $i => $orderItem){
+                    if($orderItem->product->is_using_stock == ProductEnum::IS_USING_STOCK_TRUE){
+                        ProductStock::create([
+                            'product_id' => $orderItem->product_id,
+                            'qty' => $orderItem->qty,
+                            'note' => 'Stok masuk order #'.$row->code,
+                        ]);
+                    }
                 }
             }
 
