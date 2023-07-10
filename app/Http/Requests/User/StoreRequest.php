@@ -57,7 +57,7 @@ class StoreRequest extends FormRequest
                 'nullable',
                 'image',
                 'max:2048',
-                'mimes:jpeg,png,jpg',
+                'mimes:jpeg,png,jpg,svg',
             ],
             'password' => [
                 'required',
@@ -94,7 +94,7 @@ class StoreRequest extends FormRequest
             'email.max' => 'Email tidak boleh lebih dari 255 karakter',
             'email.unique' => 'Email sudah terdaftar',
             'avatar.image' => 'Foto harus berupa gambar',
-            'avatar.mimes' => 'Foto harus berupa jpeg,png,jpg',
+            'avatar.mimes' => 'Foto harus berupa jpeg,png,jpg,svg',
             'avatar.max' => 'Foto tidak boleh lebih dari 2MB',
             'password.required' => 'Password tidak boleh kosong',
             'password.min' => 'Password minimal 8 karakter',

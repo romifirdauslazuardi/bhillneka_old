@@ -21,7 +21,7 @@ final class ProductEnum extends Enum
     const MIKROTIK_PPPOE = 1;
     const MIKROTIK_HOTSPOT = 2;
 
-    const IMAGE_EXT = ['jpeg','jpg','png'];
+    const IMAGE_EXT = ['jpeg','jpg','png','svg'];
 
     public static function status()
     {

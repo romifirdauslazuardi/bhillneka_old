@@ -11,5 +11,5 @@ use BenSampo\Enum\Enum;
  */
 final class LandingPageSettingEnum extends Enum
 {
-    const LOGO_EXT = ['jpeg','jpg','png'];
+    const LOGO_EXT = ['jpeg','jpg','png','svg'];
 }

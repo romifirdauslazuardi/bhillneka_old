@@ -37,7 +37,7 @@ class ProofOrderRequest extends FormRequest
                 'required',
                 'image',
                 'max:2048',
-                'mimes:jpeg,png,jpg',
+                'mimes:jpeg,png,jpg,svg',
             ],
             'payment_note' => [
                 'required'
@@ -54,7 +54,7 @@ class ProofOrderRequest extends FormRequest
         return [
             'proof_order.required' => 'Bukti pembayaran tidak boleh kosong',
             'proof_order.image' => 'Bukti pembayaran harus berupa gambar',
-            'proof_order.mimes' => 'Bukti pembayaran harus berupa jpeg,png,jpg',
+            'proof_order.mimes' => 'Bukti pembayaran harus berupa jpeg,png,jpg,svg',
             'proof_order.max' => 'Bukti pembayaran tidak boleh lebih dari 2MB',
             'payment_note.required' => 'Catatan pembayaran harus diisi',
             'status.required' => 'Status order harus diisi',

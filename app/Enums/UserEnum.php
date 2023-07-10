@@ -11,7 +11,7 @@ use BenSampo\Enum\Enum;
  */
 final class UserEnum extends Enum
 {
-    const AVATAR_EXT = ['jpeg','jpg','png'];
+    const AVATAR_EXT = ['jpeg','jpg','png','svg'];
 
     const PROVIDER_MANUAL = 1;
     const PROVIDER_GOOGLE = 2;

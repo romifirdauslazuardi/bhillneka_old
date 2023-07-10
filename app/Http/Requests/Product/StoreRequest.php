@@ -68,6 +68,12 @@ class StoreRequest extends FormRequest
                 'required',
                 'in:'.implode(",",[ProductEnum::MIKROTIK_NONE,ProductEnum::MIKROTIK_HOTSPOT,ProductEnum::MIKROTIK_PPPOE])
             ],
+            'image' => [
+                'nullable',
+                'image',
+                'max:2048',
+                'mimes:jpeg,png,jpg,svg',
+            ],
         ];
     }
 
@@ -91,6 +97,9 @@ class StoreRequest extends FormRequest
             'business_id.exists' => 'Bisnis tidak ditemukan',
             'mikrotik.required' => 'Jenis mikrotik harus diisi',
             'mikrotik.in' => 'Jenis mikrotik tidak valid',
+            'image.image' => 'Gambar harus berupa gambar',
+            'image.mimes' => 'Gambar harus berupa jpeg,png,jpg,svg',
+            'image.max' => 'Gambar tidak boleh lebih dari 2MB',
         ];
     }
 
