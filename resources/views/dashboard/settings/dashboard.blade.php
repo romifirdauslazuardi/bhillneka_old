@@ -42,6 +42,7 @@
                                 </div>
                                 @endif
                                 <input type="file" class="form-control" name="logo">
+                                <p class="text-success" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;"><small><i>Ukuran direkomendasikan 134px x 24px</i></small></p>
                                 <p class="text-info" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;"><small><i>Kosongkan jika tidak diubah</i></small></p>
                             </div>
                         </div>
@@ -54,6 +55,7 @@
                                 </div>
                                 @endif
                                 <input type="file" class="form-control" name="logo_icon">
+                                <p class="text-success" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;"><small><i>Ukuran direkomendasikan 200px x 200px</i></small></p>
                                 <p class="text-info" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;"><small><i>Kosongkan jika tidak diubah</i></small></p>
                             </div>
                         </div>
