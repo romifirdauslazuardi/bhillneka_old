@@ -6,6 +6,7 @@ use App\Enums\RoleEnum;
 use App\Models\SettingFee;
 use App\Models\MikrotikConfig;
 use App\Services\UserService;
+use App\Services\BusinessCategoryService;
 use App\Settings\DashboardSetting;
 use App\Settings\LandingPageSetting;
 use Illuminate\Http\Request;
@@ -72,11 +73,11 @@ class SettingHelper
     }
 
     public static function userAgen(){
-        $users = new UserService();
-        $users = $users->index(new Request(['role' => RoleEnum::AGEN]),false);
-        $users = $users->data;
+        $data = new UserService();
+        $data = $data->index(new Request(['role' => RoleEnum::AGEN]),false);
+        $data = $data->data;
 
-        return $users;
+        return $data;
     }
 
     public static function mikrotikConfig($business_id=null,$user_id=null){
@@ -91,6 +92,14 @@ class SettingHelper
         $data = $data->where("user_id",$user_id);
         $data = $data->orderBy("created_at","DESC");
         $data = $data->first();
+
+        return $data;
+    }
+
+    public static function businessCategories(){
+        $data = new BusinessCategoryService();
+        $data = $data->index(new Request([]),false);
+        $data = $data->data;
 
         return $data;
     }

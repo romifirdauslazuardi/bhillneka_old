@@ -59,7 +59,7 @@
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Provinsi<span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <select class="form-control select2 select-province" name="province_address_code" style="width: 100%;">
+                                <select class="form-control select2 select-province" style="width: 100%;">
                                     <option value="">==Pilih Provinsi==</option>
                                 </select>
                             </div>
@@ -67,7 +67,7 @@
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Kota/Kabupaten<span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <select class="form-control select2 select-city" name="city_address_code" style="width: 100%;">
+                                <select class="form-control select2 select-city" style="width: 100%;">
                                     <option value="">==Pilih Kota/Kabupaten==</option>
                                 </select>
                             </div>
@@ -75,7 +75,7 @@
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Kecamatan<span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <select class="form-control select2 select-district" name="district_address_code" style="width: 100%;">
+                                <select class="form-control select2 select-district" style="width: 100%;">
                                     <option value="">==Pilih Kecamatan==</option>
                                 </select>
                             </div>
@@ -83,7 +83,7 @@
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Desa<span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <select class="form-control select2 select-village" name="village_address_code" style="width: 100%;">
+                                <select class="form-control select2 select-village" name="village_code" style="width: 100%;">
                                     <option value="">==Pilih Desa==</option>
                                 </select>
                             </div>

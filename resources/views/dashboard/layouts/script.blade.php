@@ -49,6 +49,8 @@
             });
         })
 
+        getProvince('.select-province-business-setting',null);
+
         @if(Auth::check())
             @if(!empty(Auth::user()->business_id))
                 getBusiness(".select-business-setting",'{{Auth::user()->business->user_id ?? null}}','{{Auth::user()->business_id}}');
@@ -86,6 +88,48 @@
             }
         });
 
+        $(document).on("click",".btn-add-business-setting",function(e){
+            e.preventDefault();
+
+            $("#modalStoreBusinessSetting").modal("show");
+        });
+
+        $(document).on("change", ".select-province-business-setting", function(e) {
+            e.preventDefault();
+            let val = $(this).val();
+
+            $('.select-city-business-setting').html('<option value="">==Pilih Kota/Kabupaten==</option>');
+            $('.select-district-business-setting').html('<option value="">==Pilih Kecamatan==</option>');
+            $('.select-village-business-setting').html('<option value="">==Pilih Desa==</option>');
+
+            if(val != "" && val != undefined && val != null){
+                getCity('.select-city-business-setting',val,null);
+            }
+        });
+
+        $(document).on("change", ".select-city-business-setting", function(e) {
+            e.preventDefault();
+            let val = $(this).val();
+
+            $('.select-district-business-setting').html('<option value="">==Pilih Kecamatan==</option>');
+            $('.select-village-business-setting').html('<option value="">==Pilih Desa==</option>');
+
+            if(val != "" && val != undefined && val != null){
+                getDistrict('.select-district-business-setting',val,null);
+            }
+        });
+
+        $(document).on("change", ".select-district-business-setting", function(e) {
+            e.preventDefault();
+            let val = $(this).val();
+
+            $('.select-village-business-setting').html('<option value="">==Pilih Desa==</option>');
+
+            if(val != "" && val != undefined && val != null){
+                getVillage('.select-village-business-setting',val,null);
+            }
+        });
+
         $(document).on('submit','#frmUpdateBusinessPage',function(e){
             e.preventDefault();
             if(confirm("Apakah anda yakin ingin menyimpan data ini ?")){
@@ -106,6 +150,45 @@
                         }
                         else{
                             responseSuccess(resp.message,"{{url()->current()}}");
+                        }
+                    },
+                    error: function (request, status, error) {
+                        if(request.status == 422){
+                            responseFailed(request.responseJSON.message);
+                        }
+                        else{
+                            responseInternalServerError();
+                        }
+                    },
+                    complete :function(){
+                        return closeLoader();
+                    }
+                })
+            }
+        })
+
+        $(document).on('submit','#frmStoreBusinessSetting',function(e){
+            e.preventDefault();
+            if(confirm("Apakah anda yakin ingin menyimpan data ini ?")){
+                $.ajax({
+                    url : $("#frmStoreBusinessSetting").attr("action"),
+                    method : "POST",
+                    data : new FormData($('#frmStoreBusinessSetting')[0]),
+                    contentType:false,
+                    cache:false,
+                    processData:false,
+                    dataType : "JSON",
+                    beforeSend : function(){
+                        return openLoader();
+                    },
+                    success : function(resp){
+                        if(resp.success == false){
+                            responseFailed(resp.message);                   
+                        }
+                        else{
+                            responseSuccess(resp.message,null);
+                            $("#modalBusinessPage").find('select[name="business_id"]').append('<option value="'+resp.data.id+'">'+resp.data.name+'</option>');
+                            $("#modalStoreBusinessSetting").modal("hide");
                         }
                     },
                     error: function (request, status, error) {
