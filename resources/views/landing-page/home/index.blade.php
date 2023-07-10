@@ -14,7 +14,7 @@
                 <div class="title-heading me-lg-4 wow animate__animated animate__fadeInUp" data-wow-delay=".1s">
                     <h1 class="heading fw-bold mb-3">{{ \SettingHelper::settings('landing_page', 'title')}}</h1>
                     <p class="para-desc text-muted">{{ \SettingHelper::settings('landing_page', 'description')}}</p>
-                    <a href="{{route('landing-page.pages.index','tentang-kami')}}" class="btn btn-primary text-uppercase">GET STARTED</a>
+                    <a href="{{route('dashboard.auth.login.index')}}" class="btn btn-primary text-uppercase">GET STARTED</a>
                 </div>
             </div><!--end col-->
 
