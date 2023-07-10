@@ -11,9 +11,9 @@
                 <div class="modal-body">
                     @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
                     <div class="form-group mb-3">
-                        <label>Pengguna</label>
+                        <label>Agen</label>
                         <select class="form-control select2 select-user-setting" name="user_id" style="width:100%;">
-                            <option value="">==Semua Pengguna==</option>
+                            <option value="">==Semua Agen==</option>
                             @foreach(\SettingHelper::userAgen() as $index => $row)
                             <option value="{{$row->id}}" @if(!empty(Auth::user()->business_id) && Auth::user()->business->user_id == $row->id) selected @endif>{{$row->name}}</option>
                             @endforeach

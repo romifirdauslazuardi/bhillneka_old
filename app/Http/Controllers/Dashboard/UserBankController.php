@@ -35,8 +35,7 @@ class UserBankController extends Controller
 
         $this->middleware(function ($request, $next) {
             if(Auth::user()->hasRole([
-                RoleEnum::AGEN,
-                RoleEnum::ADMIN_AGEN]) 
+                RoleEnum::AGEN]) 
             && empty(Auth::user()->business_id)){
                 alert()->error('Gagal', "Bisnis page belum diaktifkan");
                 return redirect()->route("dashboard.index");

@@ -24,9 +24,9 @@
                         </div>
                         @endif
                     <div class="form-group mb-3">
-                        <label>Bisniss</label>
+                        <label>Bisnis</label>
                         <select class="form-control select2 select-business" name="business_id" style="width:100%;">
-                            <option value="">==Semua Bisniss==</option>
+                            <option value="">==Semua Bisnis==</option>
                         </select>
                     </div>
                     <div class="form-group mb-3">

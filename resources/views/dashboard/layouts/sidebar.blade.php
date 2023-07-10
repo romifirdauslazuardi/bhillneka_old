@@ -91,7 +91,7 @@
             </li>
             @endif
 
-            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]) || (Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]) && !empty(Auth::user()->business_id)))
+            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]) || (Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN]) && !empty(Auth::user()->business_id)))
             <li>
                 <li><a href="{{route('dashboard.user-banks.index')}}"><i class="fa fa-bank"></i>Rekening Bank</a></li>
             </li>

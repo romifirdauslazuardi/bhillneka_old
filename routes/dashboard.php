@@ -102,13 +102,13 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
 	});
 
 	Route::group(["as" => "user-banks.", "prefix" => "user-banks"], function () {
-		Route::get('/', 'UserBankController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-		Route::get('/create', 'UserBankController@create')->name("create")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-		Route::get('/{id}', 'UserBankController@show')->name("show")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-		Route::get('/{id}/edit', 'UserBankController@edit')->name("edit")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-		Route::post('/', 'UserBankController@store')->name("store")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-		Route::put('/{id}', 'UserBankController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-		Route::delete('/{id}', 'UserBankController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::get('/', 'UserBankController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN])]);
+		Route::get('/create', 'UserBankController@create')->name("create")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN])]);
+		Route::get('/{id}', 'UserBankController@show')->name("show")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN])]);
+		Route::get('/{id}/edit', 'UserBankController@edit')->name("edit")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN])]);
+		Route::post('/', 'UserBankController@store')->name("store")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN])]);
+		Route::put('/{id}', 'UserBankController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN])]);
+		Route::delete('/{id}', 'UserBankController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN])]);
 	});
 
 	Route::group(["as" => "products.", "prefix" => "products"], function () {
