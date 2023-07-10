@@ -3,7 +3,7 @@
 <html lang="en" dir="ltr">
 
     <head>
-        @include("dashboard.layouts.head")
+        @include("dashboard.auth.layouts.head")
     </head>
 
     <body oncontextmenu="return false;">
@@ -13,7 +13,7 @@
         @yield("content")
         <!-- Hero End -->
         
-        @include("dashboard.layouts.script")
+        @include("dashboard.auth.layouts.script")
         
     </body>
 

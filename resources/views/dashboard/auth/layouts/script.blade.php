@@ -5,7 +5,7 @@
 <script src="{{URL::to('/')}}/templates/dashboard/assets/libs/simplebar/simplebar.min.js"></script>
 <!-- Main Js -->
 <script src="{{URL::to('/')}}/templates/dashboard/assets/js/plugins.init.js"></script>
-<script src="{{URL::to('/')}}/templates/dashboard/assets/js/app.js"></script>>
+<script src="{{URL::to('/')}}/templates/dashboard/assets/js/app.js"></script>
 <script>
 
     document.onkeydown = function (e) {
