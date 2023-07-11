@@ -15,7 +15,7 @@ class WhatsappHelper
             $message = "";
             if($header == true){
                 $message .= 'Hi *'.$name."*,\r\n";
-                $message .= "Ada pemberitahuan baru di *".config('app.name')."*\r\n\r\n";
+                $message .= "Pesan otomatis dari *".config('app.name')."*\r\n\r\n";
             }
             $message .= $content['title'].".\r\n";
             $message .= self::convertHtml($content['message']);

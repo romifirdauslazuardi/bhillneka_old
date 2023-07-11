@@ -32,7 +32,7 @@
 <link href="{{URL::to('/')}}/templates/dashboard/assets/css/font-awesome.css" type="text/css" rel="stylesheet" />
 <style>
   .bg-half-170 {
-    padding: 100px 0 !important;
+    padding: 50px 0 !important;
   }
 </style>
 @yield("css")

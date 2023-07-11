@@ -19,11 +19,14 @@ class StoreRequest extends FormRequest
         if(!request()->routeIs("landing-page.buy-products.store")){
             $merge["user_id"] = Auth::user()->business->user_id ?? null;
             $merge["business_id"] = Auth::user()->business_id;
-            $merge["type"] = OrderEnum::TYPE_ON_TIME_PAY;
             
             if(!in_array(Auth::user()->business->category->name,[BusinessCategoryEnum::FNB])){
                 $merge["fnb_type"] = OrderEnum::FNB_NONE;
             }
+        }
+        else{
+            $merge["type"] = OrderEnum::TYPE_ON_TIME_PAY;
+            $merge["fnb_type"] = OrderEnum::FNB_NONE;
         }
         $this->merge($merge);
     }
@@ -50,10 +53,6 @@ class StoreRequest extends FormRequest
             'repeater' => [
                 'required',
                 'array',
-            ],
-            'expired_date' => [
-                ($this->type == OrderEnum::TYPE_DUE_DATE) ? "required" : "nullable",
-                'date_format:Y-m-d H:i:s'
             ],
             'business_id' => [
                 'required',
@@ -84,8 +83,6 @@ class StoreRequest extends FormRequest
             'type.in' => 'Tipe transaksi tidak valid',
             'repeater.required' => 'Produk belum dipilih',
             'repeater.array' => 'Produk tidak valid',
-            'expired_date.required' => 'Tanggal jatuh tempo harus diisi', 
-            'expired_date.date_format' => 'Format tanggal jatuh tempo tidak valid',
             'business_id.required' => 'Bisnis harus diisi',
             'business_id.exists' => 'Bisnis tidak ditemukan',
             'fnb_type.required' => 'Tipe FNB harus diisi',

@@ -34,6 +34,7 @@
                 <form action="{{route('landing-page.buy-products.store',$result->id)}}" onsubmit="return confirm('Apakah anda yakin ingin mengirim data ini?')" method="POST" enctype='multipart/form-data'>
                     @csrf
                     <input type="hidden" name="user_id" value="{{$result->user_id}}">
+                    <input type="hidden" name="business_id" value="{{$result->business_id}}">
                     <input type="hidden" name="repeater[0][product_id]" value="{{$result->id}}">
                     <div class="row mb-3">
                         <div class="col-12">

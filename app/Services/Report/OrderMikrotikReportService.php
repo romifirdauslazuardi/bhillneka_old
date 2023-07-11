@@ -217,8 +217,6 @@ class OrderMikrotikReportService extends BaseService
                 if($oldUsername != $username){
                     $checkExistMikrotik = $connect->comm('/ppp/secret/print');
 
-                    Log::info($checkExistMikrotik);
-
                     $connectLog = LogHelper::mikrotikLog($checkExistMikrotik);
 
                     if($connectLog["IsError"] == TRUE){

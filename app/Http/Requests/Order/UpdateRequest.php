@@ -76,8 +76,6 @@ class UpdateRequest extends FormRequest
             'repeater.array' => 'Produk tidak valid',
             'status.required' => 'Status order harus diisi',
             'status.in' => 'Status order tidak valid',
-            'expired_date.required' => 'Tanggal jatuh tempo harus diisi',
-            'expired_date.date_format' => 'Format tanggal jatuh tempo tidak valid',
             'business_id.required' => 'Bisnis harus diisi',
             'business_id.exists' => 'Bisnis tidak ditemukan',
             'fnb_type.required' => 'Tipe FNB tharis diisi',

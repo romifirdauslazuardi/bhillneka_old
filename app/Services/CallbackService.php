@@ -87,16 +87,33 @@ class CallbackService extends BaseService
                     $doku_fee = 0;
 
                     if($findOrder->doku_service_id == DokuEnum::SERVICE_EMONEY){
-                        $doku_fee = round((2 * $findOrder->totalNeto())/100);
+                        if($findOrder->doku_channel_id == DokuEnum::CHANNEL_EMONEY_OVO){
+                            $doku_fee = (1.5*$findOrder->totalNeto())/100;
+                            $doku_fee = $doku_fee + ((11*$doku_fee)/100);
+                            $doku_fee = round($doku_fee);
+                        }
+                        else if($findOrder->doku_channel_id == DokuEnum::CHANNEL_EMONEY_SHOPEEPAY){
+                            $doku_fee = (2*$findOrder->totalNeto())/100;
+                            $doku_fee = $doku_fee + ((11*$doku_fee)/100);
+                            $doku_fee = round($doku_fee);
+                        }
+                        else if($findOrder->doku_channel_id == DokuEnum::CHANNEL_EMONEY_DOKU){
+                            $doku_fee = (1.5*$findOrder->totalNeto())/100;
+                            $doku_fee = $doku_fee + ((11*$doku_fee)/100);
+                            $doku_fee = round($doku_fee);
+                        }
                     }
                     else if($findOrder->doku_service_id == DokuEnum::SERVICE_VIRTUAL_ACCOUNT){
-                        $doku_fee = 4500 + round((11*4500)/100);
+                        $doku_fee = 4500 + ((11*4500)/100);
+                        $doku_fee = round($doku_fee);
                     }
                     else if($findOrder->doku_service_id == DokuEnum::SERVICE_ONLINE_TO_OFFLINE){
-                        $doku_fee = 5000 + round((11*5000)/100);
+                        $doku_fee = 5000 + ((11*5000)/100);
+                        $doku_fee = round($doku_fee);
                     }
                     else if($findOrder->doku_service_id == DokuEnum::CHANNEL_CREDIT_CARD){
-                        $doku_fee = round((3 * $findOrder->totalNeto())/100) + 2500;
+                        $doku_fee = ((3 * $findOrder->totalNeto())/100) + 2500;
+                        $doku_fee = round($doku_fee);
                     }
 
                     $findOrder->update([
@@ -249,9 +266,9 @@ class CallbackService extends BaseService
 
                 Notification::send($received,new PaymentNotification(route('dashboard.orders.show',$findOrder->id),'Pembayaran Pesanan','Pembayaran dengan kode transaksi '.$findOrder->code." sebesar <b>".number_format($findOrder->totalNeto(),0,',','.')."</b> telah <b>[".$decode["transaction"]["status"]."</b>] dilakukan.",$findOrder));
 
-                DB::commit();
-
                 self::sendWhatsapp($findOrder->id);
+
+                DB::commit();
                 
                 return $this->response(true, "Callback berhasil",null,Response::HTTP_OK);
             } else {
@@ -303,16 +320,14 @@ class CallbackService extends BaseService
             $message .= "\r\n";
             $message .= $row->qty." x ".number_format($row->product_price,0,',','.')." = ".number_format($row->totalNeto(),0,',','.');
             if($order->status == OrderEnum::STATUS_SUCCESS){
-                if(!empty($row->order_mikrotik->mikrotik_id)){
+                $message .= "\r\n";
+                if($row->order_mikrotik->type == OrderMikrotikEnum::TYPE_HOTSPOT){
+                    $message .= "SSID : ".$row->order_mikrotik->server ?? null;
                     $message .= "\r\n";
-                    if($row->order_mikrotik->type == OrderMikrotikEnum::TYPE_HOTSPOT){
-                        $message .= "SSID : ".$row->order_mikrotik->server;
-                        $message .= "\r\n";
-                    }
-                    $message .= "Username : ".$row->order_mikrotik->username;
-                    $message .= "\r\n";
-                    $message .= "Password : ".$row->order_mikrotik->password;
                 }
+                $message .= "Username : ".$row->order_mikrotik->username ?? null;
+                $message .= "\r\n";
+                $message .= "Password : ".$row->order_mikrotik->password ?? null;
             }
             $message .= "\r\n";
             $message .= "=====";
