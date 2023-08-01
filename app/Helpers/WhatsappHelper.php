@@ -2,6 +2,11 @@
 
 namespace App\Helpers;
 
+use App\Enums\BusinessCategoryEnum;
+use App\Enums\OrderEnum;
+use App\Enums\OrderMikrotikEnum;
+use App\Enums\ProviderEnum;
+use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -18,6 +23,7 @@ class WhatsappHelper
                 $message .= "Pesan otomatis dari *".config('app.name')."*\r\n\r\n";
             }
             $message .= $content['title'].".\r\n";
+            $message .= ".\r\n";
             $message .= self::convertHtml($content['message']);
 
             $send = Http::timeout(60)->connectTimeout(60)->withHeaders([
@@ -31,6 +37,109 @@ class WhatsappHelper
 
         } catch (\Throwable $th) {
             Log::emergency($th->getMessage());
+        }
+    }
+
+    public static function sendWhatsappOrderTemplate($orderId,string $type = "pesanan"){
+        $order = new Order();
+        $order = $order->where("id",$orderId);
+        $order = $order->first();
+
+        $message = "";
+        if($type == "pesanan"){
+            if($order->status == OrderEnum::STATUS_WAITING_PAYMENT){
+                $message .= "Selesaikan Pembayaran Anda sebelum ".date("d F Y H:i:s",strtotime($order->expired_date))." WIB";
+                $message .= "\r\n";
+            }
+            if($order->status == OrderEnum::STATUS_EXPIRED){
+                $message .= "Maaf, pesanan dibatalkan. Anda telah mencapai batas pembayaran yang sudah ditentukan pada ".date("d F Y H:i:s",strtotime($order->expired_date))." WIB";
+                $message .= "\r\n";
+            }
+        }
+        else if($type == "progress"){
+            $message = "Progress pesanan anda diubah menjadi *".$order->progress()->msg."*";
+            $message .= "\r\n";
+        }
+        
+        $message .= "\r\n";
+        $message .= $order->business->name;
+        $message .= "\r\n";
+        $message .= $order->business->location;
+        $message .= "\r\n";
+        $message .= $order->business->user->phone;
+        $message .= "\r\n";
+        $message .= "=====";
+        $message .= "\r\n";
+        $message .= $order->status()->msg." #".$order->code;
+        $message .= "\r\n";
+        $message .= "=====";
+        $message .= "\r\n";
+
+        foreach($order->items as $index => $row){
+            $message .= $row->product_name;
+            $message .= "\r\n";
+            $message .= $row->qty." x ".number_format($row->product_price,0,',','.')." = ".number_format($row->totalNeto(),0,',','.');
+            if(!empty($row->order_mikrotik) && $order->business->category->name == BusinessCategoryEnum::MIKROTIK){
+                if($order->status == OrderEnum::STATUS_SUCCESS){
+                    $message .= "\r\n";
+                    if($row->order_mikrotik->type == OrderMikrotikEnum::TYPE_HOTSPOT){
+                        $message .= "SSID : ".$row->order_mikrotik->server ?? null;
+                        $message .= "\r\n";
+                    }
+                    $message .= "Username : ".$row->order_mikrotik->username ?? null;
+                    $message .= "\r\n";
+                    $message .= "Password : ".$row->order_mikrotik->password ?? null;
+                }
+            }
+            $message .= "\r\n";
+            $message .= "=====";
+            $message .= "\r\n";
+        }
+        $message .= "Subtotal : ".number_format($order->totalNeto() + $order->discount,0,',','.');
+        $message .= "\r\n";
+        $message .= "Discount : ".number_format($order->discount,0,',','.');
+        $message .= "\r\n";
+        $message .= "Total : ".number_format($order->totalNeto(),0,',','.');
+        $message .= "\r\n";
+        if($order->status == OrderEnum::STATUS_SUCCESS){
+            $message .= "Bayar : ".number_format($order->totalNeto(),0,',','.');
+            $message .= "\r\n";
+        }
+        else{
+            $message .= "Bayar : ".number_format(0,0,',','.');
+            $message .= "\r\n";
+        }
+        $message .= "Kembalian : ".number_format(0,0,',','.');
+        $message .= "\r\n";
+        $message .= "\r\n";
+
+        if($order->status == OrderEnum::STATUS_WAITING_PAYMENT){
+            if($order->provider->type == ProviderEnum::TYPE_DOKU){
+                $message .= "Link Pembayaran : ".$order->payment_url;
+            }
+            else if($order->provider->type == ProviderEnum::TYPE_MANUAL_TRANSFER){
+                $message .= "Link Pembayaran : ".route('landing-page.manual-payments.index',$order->code);
+            }
+        }
+        else{
+            $message .= "Link Invoice : ".route('landing-page.orders.index',['code' => $order->code]);
+        }
+
+        $message .= "\r\n";
+        $message .= "\r\n";
+
+        $message .= "Penyedia Layanan / www.bhilnekka.com";
+        $message .= "\r\n";
+        $message .= "TERIMAKASIH";
+        $message .= "\r\n";
+
+        if(!empty($order->customer_id)){
+            return self::send($order->customer->phone,$order->customer->name,["title" => "Notifikasi Pesanan" ,"message" => $message],true);
+        }
+        else{
+            if(!empty($order->customer_name) && !empty($order->customer_phone)){
+                return self::send($order->customer_phone,$order->customer_name,["title" => "Notifikasi Pesanan" ,"message" => $message],true);
+            }
         }
     }
 

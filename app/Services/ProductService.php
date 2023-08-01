@@ -2,15 +2,21 @@
 
 namespace App\Services;
 
+use App\Enums\BusinessCategoryEnum;
 use App\Enums\ProductEnum;
+use App\Enums\ProductStockEnum;
 use App\Services\BaseService;
 use App\Http\Requests\Product\StoreRequest;
 use App\Http\Requests\Product\UpdateRequest;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Helpers\SlugHelper;
+use App\Helpers\SettingHelper;
 use App\Enums\RoleEnum;
+use App\Enums\SettingFeeEnum;
 use App\Helpers\UploadHelper;
+use App\Models\RouterosAPI;
+use App\Models\Business;
 use Auth;
 use DB;
 use Log;
@@ -19,10 +25,14 @@ use Throwable;
 class ProductService extends BaseService
 {
     protected $product;
+    protected $routerosApi;
+    protected $business;
 
     public function __construct()
     {
         $this->product = new Product();
+        $this->routerosApi = new RouterosAPI();
+        $this->business = new Business();
     }
 
     public function index(Request $request, bool $paginate = true)
@@ -31,7 +41,7 @@ class ProductService extends BaseService
         $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
         $status = (!isset($request->status)) ? null : trim(strip_tags($request->status));
         $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
-        $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
+        $is_using_stock = (empty($request->is_using_stock)) ? null : trim(strip_tags($request->is_using_stock));
 
         if(Auth::check()){
             if(Auth::user()->hasRole([RoleEnum::AGEN])){
@@ -63,14 +73,59 @@ class ProductService extends BaseService
         }
         if(!empty($business_id)){
             $table = $table->where("business_id",$business_id);
+            if(request()->routeIs("landing-page.shops.index")){
+                $business = $this->business;
+                $business = $business->where("id",$business_id);
+                $business = $business->first();
+
+                if($business){
+                    if($business->category->name == BusinessCategoryEnum::MIKROTIK){
+                        $table = $table->where("mikrotik",ProductEnum::MIKROTIK_HOTSPOT);
+                    }
+                }
+            }
         }
         $table = $table->orderBy('created_at', 'DESC');
+        
 
         if ($paginate) {
             $table = $table->paginate(10);
             $table = $table->withQueryString();
         } else {
             $table = $table->get();
+        }
+        
+        foreach($table as $index => $row){
+            $stock = $row->stocks()->where("type",ProductStockEnum::TYPE_MASUK)->sum("qty") - $row->stocks()->where("type",ProductStockEnum::TYPE_KELUAR)->sum("qty");
+            $row->stock = $stock;
+            
+            $estimationOwnerIncome = 0;
+            $estimationAgenIncome = 0;
+
+            $settingFee = SettingHelper::settingFee();
+
+            foreach($settingFee as $i => $value){
+                if($value->mark == SettingFeeEnum::MARK_KURANG_DARI){
+                    if($row->price <= $value->limit){
+                        $estimationOwnerIncome = ($value->owner_fee/100) * $row->price;
+                        $estimationOwnerIncome = round($estimationOwnerIncome) + 5000;
+
+                        $estimationAgenIncome = ($value->agen_fee/100) * $row->price;
+                        $estimationAgenIncome = round($estimationAgenIncome) - 5000;
+                    }
+                }else{
+                    if($row->price > $value->limit){
+                        $estimationOwnerIncome = ($value->owner_fee/100) * $row->price;
+                        $estimationOwnerIncome = round($estimationOwnerIncome) + 5000;
+
+                        $estimationAgenIncome = ($value->agen_fee/100) * $row->price;
+                        $estimationAgenIncome = round($estimationAgenIncome) - 5000;
+                    }
+                }
+            }
+
+            $row->estimationOwnerIncome = $estimationOwnerIncome;
+            $row->estimationAgenIncome = $estimationAgenIncome;
         }
 
         return $this->response(true, 'Berhasil mendapatkan data', $table);
@@ -95,6 +150,37 @@ class ProductService extends BaseService
             if(!$result){
                 return $this->response(false, "Data tidak ditemukan");
             }
+
+            $stock = $result->stocks()->where("type",ProductStockEnum::TYPE_MASUK)->sum("qty") - $result->stocks()->where("type",ProductStockEnum::TYPE_KELUAR)->sum("qty");
+            $result->stock = $stock;
+
+            $estimationOwnerIncome = 0;
+            $estimationAgenIncome = 0;
+
+            $settingFee = SettingHelper::settingFee();
+
+            foreach($settingFee as $i => $value){
+                if($value->mark == SettingFeeEnum::MARK_KURANG_DARI){
+                    if($result->price <= $value->limit){
+                        $estimationOwnerIncome = ($value->owner_fee/100) * $result->price;
+                        $estimationOwnerIncome = round($estimationOwnerIncome) + 5000;
+
+                        $estimationAgenIncome = ($value->agen_fee/100) * $result->price;
+                        $estimationAgenIncome = round($estimationAgenIncome) - 5000;
+                    }
+                }else{
+                    if($result->price > $value->limit){
+                        $estimationOwnerIncome = ($value->owner_fee/100) * $result->price;
+                        $estimationOwnerIncome = round($estimationOwnerIncome) + 5000;
+
+                        $estimationAgenIncome = ($value->agen_fee/100) * $result->price;
+                        $estimationAgenIncome = round($estimationAgenIncome) - 5000;
+                    }
+                }
+            }
+
+            $result->estimationOwnerIncome = $estimationOwnerIncome;
+            $result->estimationAgenIncome = $estimationAgenIncome;
 
             return $this->response(true, 'Berhasil mendapatkan data', $result);
         } catch (Throwable $th) {
@@ -168,6 +254,16 @@ class ProductService extends BaseService
             $is_using_stock = (empty($request->is_using_stock)) ? ProductEnum::IS_USING_STOCK_FALSE : trim(strip_tags($request->is_using_stock));
             $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
             $mikrotik = (!isset($request->mikrotik)) ? null : trim(strip_tags($request->mikrotik));
+            $profile = (empty($request->profile)) ? null : trim(strip_tags($request->profile));
+            $server = (empty($request->input("server"))) ? null : trim(strip_tags($request->input("server")));
+            $service = (empty($request->service)) ? null : trim(strip_tags($request->service));
+            $local_address = (empty($request->local_address)) ? null : trim(strip_tags($request->local_address));
+            $remote_address = (empty($request->remote_address)) ? null : trim(strip_tags($request->remote_address));
+            $time_limit = (empty($request->time_limit)) ? null : trim(strip_tags($request->time_limit));
+            $comment = (empty($request->comment)) ? null : trim(strip_tags($request->comment));
+            $address = (empty($request->address)) ? null : trim(strip_tags($request->address));
+            $mac_address = (empty($request->mac_address)) ? null : trim(strip_tags($request->mac_address));
+            $expired_date = (empty($request->expired_date)) ? null : trim(strip_tags($request->expired_date));
             $image = $request->file("image");
 
             $slug = SlugHelper::generate(Product::class,$name,"slug");
@@ -184,6 +280,49 @@ class ProductService extends BaseService
                 $image = $upload["Path"];
             }
 
+            if(in_array($mikrotik,[ProductEnum::MIKROTIK_PPPOE,ProductEnum::MIKROTIK_HOTSPOT])){
+                $mikrotikConfig = SettingHelper::mikrotikConfig();
+                $ipConfig = $mikrotikConfig->ip ?? null;
+                $usernameConfig = $mikrotikConfig->username ?? null;
+                $passwordConfig = $mikrotikConfig->password ?? null;
+                $portConfig = $mikrotikConfig->port ?? null;
+                
+                $connect = $this->routerosApi;
+                $connect->debug("false");
+
+                if(!$connect->connect($ipConfig,$usernameConfig,$passwordConfig,$portConfig)){
+                    return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
+                }
+            }
+
+            if($mikrotik == ProductEnum::MIKROTIK_HOTSPOT){
+                $service = null;
+                $local_address = null;
+                $remote_address = null;
+                $expired_date = null;
+
+                if(!empty($address)){
+                    $connect = $connect->comm('/ip/hotspot/user/print');
+
+                    Log::info($connect);
+
+                    foreach($connect as $index => $row){
+                        if(isset($row["address"])){
+                            if($address == $row["address"]){
+                                return $this->response(false, "Duplikat address pada mikrotik");
+                            }
+                        }
+                    }
+                }
+            }
+
+            if($mikrotik == ProductEnum::MIKROTIK_PPPOE){
+                $server = null;
+                $address = null;
+                $mac_address = null;
+                $time_limit = null; 
+            }
+
             $create = $this->product->create([
                 'slug' => $slug,
                 'name' => $name,
@@ -197,6 +336,16 @@ class ProductService extends BaseService
                 'is_using_stock' => $is_using_stock,
                 'business_id' => $business_id,
                 'mikrotik' => $mikrotik,
+                'profile' => $profile,
+                'server' => $server,
+                'service' => $service,
+                'local_address' => $local_address,
+                'remote_address' => $remote_address,
+                'time_limit' => $time_limit,
+                'comment' => $comment,
+                'address' => $address,
+                'mac_address' => $mac_address,
+                'expired_date' => $expired_date,
                 'author_id' => Auth::user()->id,
             ]);
 
@@ -221,6 +370,16 @@ class ProductService extends BaseService
             $is_using_stock = (empty($request->is_using_stock)) ? ProductEnum::IS_USING_STOCK_FALSE : trim(strip_tags($request->is_using_stock));
             $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
             $mikrotik = (!isset($request->mikrotik)) ? null : trim(strip_tags($request->mikrotik));
+            $profile = (empty($request->profile)) ? null : trim(strip_tags($request->profile));
+            $server = (empty($request->input("server"))) ? null : trim(strip_tags($request->input("server")));
+            $service = (empty($request->service)) ? null : trim(strip_tags($request->service));
+            $local_address = (empty($request->local_address)) ? null : trim(strip_tags($request->local_address));
+            $remote_address = (empty($request->remote_address)) ? null : trim(strip_tags($request->remote_address));
+            $time_limit = (empty($request->time_limit)) ? null : trim(strip_tags($request->time_limit));
+            $comment = (empty($request->comment)) ? null : trim(strip_tags($request->comment));
+            $address = (empty($request->address)) ? null : trim(strip_tags($request->address));
+            $mac_address = (empty($request->mac_address)) ? null : trim(strip_tags($request->mac_address));
+            $expired_date = (empty($request->expired_date)) ? null : trim(strip_tags($request->expired_date));
             $image = $request->file("image");
 
             $result = $this->product->findOrFail($id);
@@ -247,6 +406,20 @@ class ProductService extends BaseService
                 $image = $result->image;
             }
 
+            if($mikrotik == ProductEnum::MIKROTIK_HOTSPOT){
+                $service = null;
+                $local_address = null;
+                $remote_address = null;
+                $expired_date = null;
+            }
+
+            if($mikrotik == ProductEnum::MIKROTIK_PPPOE){
+                $server = null;
+                $address = null;
+                $mac_address = null;
+                $time_limit = null; 
+            }
+
             $result->update([
                 'slug' => $slug,
                 'name' => $name,
@@ -260,6 +433,16 @@ class ProductService extends BaseService
                 'is_using_stock' => $is_using_stock,
                 'business_id' => $business_id,
                 'mikrotik' => $mikrotik,
+                'profile' => $profile,
+                'server' => $server,
+                'service' => $service,
+                'local_address' => $local_address,
+                'remote_address' => $remote_address,
+                'time_limit' => $time_limit,
+                'comment' => $comment,
+                'address' => $address,
+                'mac_address' => $mac_address,
+                'expired_date' => $expired_date,
             ]);
 
             return $this->response(true, 'Berhasil mengubah data',$result);

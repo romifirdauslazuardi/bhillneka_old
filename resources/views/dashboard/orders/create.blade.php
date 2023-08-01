@@ -31,36 +31,6 @@
             <form action="{{route('dashboard.orders.store')}}" id="frmStore" autocomplete="off">
                 @csrf
                 <div class="row mb-3">
-                    <div class="col-md-12 mb-3">
-                        <div class="card border-0 rounded shadow p-4">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group row">
-                                        <label class="col-md-3 col-form-label">Biaya Layanan & Aplikasi</label>
-                                        <div class="col-md-9">
-                                            <div class="input-group">
-                                                <input type="text" class="form-control" placeholder="Biaya Layanan & Aplikasi" value="{{\SettingHelper::settingFee()->owner_fee ?? null}}" readonly disabled>
-                                                <button class="input-group-text btn btn-secondary" type="button" disabled>%</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group row">
-                                        <label class="col-md-3 col-form-label">Fee Agen</label>
-                                        <div class="col-md-9">
-                                            <div class="input-group">
-                                                <input type="text" class="form-control" placeholder="Fee Agen" value="{{\SettingHelper::settingFee()->agen_fee ?? null}}" readonly disabled>
-                                                <button class="input-group-text btn btn-secondary" type="button" disabled>%</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-3">
                     <div class="col-md-4 mb-3">
                         <div class="card border-0 rounded shadow p-4">
                             <div class="form-group row mb-3">
@@ -143,6 +113,7 @@
                         <div class="card border-0 rounded shadow p-4">
                             <h5 class="card-title"><b>Grand Total</b></h5>
                             <h1><b class="text-total">0</b></h1>
+                            <p><small><i><i class="fa fa-info-circle"></i> Grand total belum dipotongan biaya layanan & aplikasi</i></small></p>
                         </div>
                     </div>
                 </div>
@@ -336,11 +307,11 @@
 
             if(val == '{{\App\Enums\OrderEnum::TYPE_ON_TIME_PAY}}'){
                 $('.display-due-date').removeClass("d-none").addClass("d-none");
-                $('.display-expired-date').removeClass("d-none");
+                $('.display-expired-month').removeClass("d-none");
             }
             else{
                 $('.display-due-date').removeClass("d-none");
-                $('.display-expired-date').removeClass("d-none").addClass("d-none");
+                $('.display-expired-month').removeClass("d-none").addClass("d-none");
             }
             
         });
@@ -448,6 +419,44 @@
                 }
             }
         })
+
+        $(document).on("change",".select-profile-pppoe",function(e){
+            e.preventDefault();
+
+            let $this = $(this);
+            let val = $this.val();
+            
+            if(val != "" && val != null && val != undefined){
+                $.ajax({
+                    url : '{{route("base.mikrotik-configs.detailProfilePppoe","_name_")}}'.replace("_name_", val),
+                    method : "GET",
+                    dataType : "JSON",
+                    beforeSend : function(){
+                        return openLoader();
+                    },
+                    success : function(resp){
+                        if(resp.success == false){
+                            responseFailed(resp.message);         
+                        }
+                        else{
+                            $this.parent().parent().parent().parent().find(".local-address").val(resp.data.local_address);
+                            $this.parent().parent().parent().parent().find(".remote-address").val(resp.data.remote_address);
+                        }
+                    },
+                    error: function (request, status, error) {
+                        if(request.status == 422){
+                            responseFailed(request.responseJSON.message);
+                        }
+                        else{
+                            responseInternalServerError();
+                        }
+                    },
+                    complete :function(){
+                        return closeLoader();
+                    }
+                })
+            }
+        });
 
         $(document).on('submit','#frmStore',function(e){
             e.preventDefault();
@@ -612,7 +621,7 @@
                                                     <div class="col-lg-6">
                                                         <div class="form-group mb-3">
                                                             <label>Profile<span class="text-danger">*</span></label>
-                                                            <select class="form-control profile-${index}" style="width:100%" name="repeater[${index}][profile]">
+                                                            <select class="form-control profile-${index} select-profile-pppoe" style="width:100%" name="repeater[${index}][profile]">
                                                                 <option value="">==Pilih Profile</option>
                                                             </select>
                                                         </div>
@@ -622,23 +631,28 @@
                                                     <div class="col-lg-6">
                                                         <div class="form-group mb-3">
                                                             <label>Local Address<span class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control local-address" placeholder="Local Address" name="repeater[${index}][local_address]">
+                                                            <input type="text" class="form-control local-address" placeholder="Local Address" name="repeater[${index}][local_address]" value="`+echo(resp.data.local_address)+`">
                                                         </div>
                                                     </div>
 
                                                     <div class="col-lg-6">
                                                         <div class="form-group mb-3">
                                                             <label>Remote Address<span class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control remote-address" placeholder="Remote Address" name="repeater[${index}][remote_address]">
+                                                            <input type="text" class="form-control remote-address" placeholder="Remote Address" name="repeater[${index}][remote_address]" value="`+echo(resp.data.remote_address)+`">
                                                         </div>
                                                     </div>
                                                 </div>`;
                                                 if($('select[name="type"]').val() == '{{App\Enums\OrderEnum::TYPE_ON_TIME_PAY}}'){
                                                     config += `
-                                                        <div class="display-expired-date">
+                                                        <div class="display-expired-month">
                                                             <div class="form-group mb-3">
-                                                                <label>Berlaku Sampai Tanggal</label>
-                                                                <input type="date" class="form-control expired-date" placeholder="Berlaku Sampai Tanggal" name="repeater[${index}][expired_date]">
+                                                                <label>Berlaku Hingga</label>
+                                                                <div class="input-group">
+                                                                    <input type="number" class="form-control expired-month" placeholder="Berlaku Hingga" name="repeater[${index}][expired_month]" value="${echo(resp.data.expired_month)}">
+                                                                    <div class="input-group-append">
+                                                                        <span class="input-group-text">BULAN</span>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     `;
@@ -646,7 +660,7 @@
                                                 config += `
                                                 <div class="form-group mb-3">
                                                     <label>Comment</label>
-                                                    <input type="text" class="form-control comment" placeholder="Comment" name="repeater[${index}][comment]">
+                                                    <input type="text" class="form-control comment" placeholder="Comment" name="repeater[${index}][comment]" value="`+echo(resp.data.comment)+`">
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
@@ -670,9 +684,9 @@
                                             </div>
                                             <div class="modal-body">
                                                 <div class="form-group mb-3">
-                                                    <label>Jenis Pengisian<span class="text-danger">*</span></label>
+                                                    <label>Jenis Pengisian Username dan Password<span class="text-danger">*</span></label>
                                                     <select class="form-control autouserpassword" name="repeater[${index}][auto_userpassword]">
-                                                        <option value="">==Pilih Jenis Pengisian==</option>
+                                                        <option value="">==Pilih Jenis Pengisian Username dan Password==</option>
                                                         <option value="`+'{{\App\Enums\OrderMikrotikEnum::AUTO_USERPASSWORD_TRUE}}'+`">Otomatis</option>
                                                         <option value="`+'{{\App\Enums\OrderMikrotikEnum::AUTO_USERPASSWORD_FALSE}}'+`">Input Manual</option>
                                                     </select>
@@ -702,23 +716,23 @@
                                                     <div class="col-lg-6">
                                                         <div class="form-group mb-3">
                                                             <label>Address</label>
-                                                            <input type="text" class="form-control address" placeholder="Address" name="repeater[${index}][address]">
+                                                            <input type="text" class="form-control address" placeholder="Address" name="repeater[${index}][address]" value="`+echo(resp.data.address)+`">
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group mb-3">
                                                             <label>Mac Address</label>
-                                                            <input type="text" class="form-control mac-address" placeholder="Mac Address" name="repeater[${index}][mac_address]">
+                                                            <input type="text" class="form-control mac-address" placeholder="Mac Address" name="repeater[${index}][mac_address]" value="`+echo(resp.data.mac_address)+`">
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="form-group mb-3">
                                                     <label>Time Limit<span class="text-danger">*</span></label>
-                                                    <input type="text" class="form-control time-limit" placeholder="Contoh : 1d4h30m20s" name="repeater[${index}][time_limit]">
+                                                    <input type="text" class="form-control time-limit" placeholder="Contoh : 1d4h30m20s" name="repeater[${index}][time_limit]" value="`+echo(resp.data.time_limit)+`">
                                                 </div>
                                                 <div class="form-group mb-3">
                                                     <label>Comment</label>
-                                                    <input type="text" class="form-control comment" placeholder="Comment" name="repeater[${index}][comment]">
+                                                    <input type="text" class="form-control comment" placeholder="Comment" name="repeater[${index}][comment]" value="`+echo(resp.data.comment)+`">
                                                 </div>
                                                 
                                             </div>
@@ -754,11 +768,11 @@
                         $('.tbody-product').append(html);
 
                         if(resp.data.mikrotik == '{{App\Enums\ProductEnum::MIKROTIK_PPPOE}}'){
-                            getProfilePppoe('.profile-'+index,null);
+                            getProfilePppoe('.profile-'+index,resp.data.profile);
                         }
                         else if(resp.data.mikrotik == '{{App\Enums\ProductEnum::MIKROTIK_HOTSPOT}}'){
-                            getProfileHotspot('.profile-'+index,null);
-                            getServerHotspot('.server-'+index,null);
+                            getProfileHotspot('.profile-'+index,resp.data.profile);
+                            getServerHotspot('.server-'+index,resp.data.server);
                         }
                     }
 
@@ -932,7 +946,7 @@
             $('.repeater-product').eq(index).find(".profile").attr("name","repeater["+index+"][profile]");
             $('.repeater-product').eq(index).find(".local-address").attr("name","repeater["+index+"][local_address]");
             $('.repeater-product').eq(index).find(".remote-address").attr("name","repeater["+index+"][remote_address]");
-            $('.repeater-product').eq(index).find(".expired-date").attr("name","repeater["+index+"][expired_date]");
+            $('.repeater-product').eq(index).find(".expired-month").attr("name","repeater["+index+"][expired_month]");
             $('.repeater-product').eq(index).find(".address").attr("name","repeater["+index+"][address]");
             $('.repeater-product').eq(index).find(".mac-address").attr("name","repeater["+index+"][mac_address]");
             $('.repeater-product').eq(index).find(".time-limit").attr("name","repeater["+index+"][time_limit]");
@@ -942,6 +956,15 @@
 
     function clearTableLatestOrder(){
         $(".tbody-latest-order").html("");
+    }
+
+    function echo(val){
+        if(val != null && val != undefined && val != ""){
+            return val;
+        }
+        else{
+            return "";
+        }
     }
 </script>
 @endsection

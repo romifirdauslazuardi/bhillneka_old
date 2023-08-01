@@ -119,6 +119,7 @@
                         <div class="card border-0 rounded shadow p-4">
                             <h5 class="card-title"><b>Grand Total</b></h5>
                             <h1 style="margin-top: 0;"><b class="text-total">{{number_format($result->totalNeto(),0,',','.')}}</b></h1>
+                            <p><small><i><i class="fa fa-info-circle"></i> Grand total belum dipotongan biaya layanan & aplikasi</i></small></p>
                         </div>
                     </div>
                 </div>
@@ -198,24 +199,25 @@
                                                                                 </div>
                                                                             </div>
                                                                         </div>
+
+                                                                        @if($result->type == \App\Enums\OrderEnum::TYPE_ON_TIME_PAY)
+                                                                        <div class="display-expired-month">
+                                                                            <div class="form-group mb-3">
+                                                                                <label>Berlaku Hingga</label>
+                                                                                <div class="input-group">
+                                                                                    <input type="number" class="form-control expired-month" placeholder="Berlaku Hingga" value="{{$row->order_mikrotik->expired_month ?? null}}" readonly disabled>
+                                                                                    <div class="input-group-append">
+                                                                                        <span class="input-group-text">BULAN</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        @endif
                                                                         
                                                                         <div class="form-group mb-3">
                                                                             <label>Comment</label>
                                                                             <input type="text" class="form-control comment" placeholder="Comment" value="{{$row->order_mikrotik->comment ?? null}}" readonly disabled>
                                                                         </div>
-
-                                                                        <div class="form-group mb-3">
-                                                                            <label>Status</label>
-                                                                            <select class="form-control disabled" style="width:100%" disabled>
-                                                                                <option value="yes" @if(!empty($row->order_mikrotik) && $row->order_mikrotik->disabled == "yes") selected @endif>Disabled</option>
-                                                                                <option value="no" @if(!empty($row->order_mikrotik) && $row->order_mikrotik->disabled == "no") selected @endif>Enabled</option>
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <div class="form-group mb-3">
-                                                                        <label>Mikrotik ID</label>
-                                                                        <input type="text" class="form-control" placeholder="Mikrotik ID" value="{{$row->order_mikrotik->mikrotik_id ?? null}}" readonly disabled>
                                                                     </div>
                                                                     
                                                                     <div class="modal-footer">
@@ -236,8 +238,8 @@
                                                                     </div>
                                                                     <div class="modal-body">
                                                                         <div class="form-group mb-3">
-                                                                            <label>Jenis Pengisian</label>
-                                                                            <input type="text" class="form-control auto_username" placeholder="Jenis Pengisian" value="{{$row->order_mikrotik->auto_userpassword() ?? null}}" readonly disabled>
+                                                                            <label>Jenis Pengisian Username dan Password</label>
+                                                                            <input type="text" class="form-control auto_username" placeholder="Jenis Pengisian Username dan Password" value="{{$row->order_mikrotik->auto_userpassword() ?? null}}" readonly disabled>
                                                                         </div>
                                                                         <div class="form-group mb-3">
                                                                             <label>Username</label>
@@ -263,18 +265,6 @@
                                                                             <label>Comment</label>
                                                                             <input type="text" class="form-control comment" placeholder="Comment" value="{{$row->order_mikrotik->comment ?? null}}" readonly disabled>
                                                                         </div>
-                                                                        <div class="form-group mb-3">
-                                                                            <label>Status</label>
-                                                                            <select class="form-control disabled" style="width:100%" disabled>
-                                                                                <option value="yes" @if(!empty($row->order_mikrotik) && $row->order_mikrotik->disabled == "yes") selected @endif>Disabled</option>
-                                                                                <option value="no" @if(!empty($row->order_mikrotik) && $row->order_mikrotik->disabled == "no") selected @endif>Enabled</option>
-                                                                            </select>
-                                                                        </div>
-                                                                        <div class="form-group mb-3">
-                                                                            <label>Mikrotik ID</label>
-                                                                            <input type="text" class="form-control" placeholder="Mikrotik ID" value="{{$row->order_mikrotik->mikrotik_id ?? null}}" readonly disabled>
-                                                                        </div>
-                                                                        
                                                                     </div>
                                                                     <div class="modal-footer">
                                                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
@@ -341,6 +331,10 @@
                                     <div class="form-group row mb-3">
                                         <label>Metode Pembayaran</label>
                                         <input type="text" class="form-control" readonly disabled value="{{$result->provider->name ?? null}}">
+                                    </div>
+                                    <div class="form-group row mb-3">
+                                        <label>Status Progress</label>
+                                        <span class="badge bg-{{$result->progress()->class ?? null}}">{{$result->progress()->msg ?? null}}</span>
                                     </div>
                                     <div class="form-group row mb-3">
                                         <label>Status Transaksi</label>

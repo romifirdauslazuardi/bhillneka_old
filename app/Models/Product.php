@@ -25,6 +25,17 @@ class Product extends Model
         'is_using_stock',
         'business_id',
         'mikrotik',
+        'profile',
+        'server',
+        'service',
+        'comment',
+        'time_limit',
+        'author_id',
+        'local_address',
+        'remote_address',
+        'address',
+        'mac_address',
+        'expired_date',
         'author_id',
     ];
 

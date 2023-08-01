@@ -53,7 +53,7 @@
                                     <th>No</th>
                                     <th>Kode Transaksi</th>
                                     <th>Customer</th>
-                                    <th>Pendapatan Agen</th>
+                                    <th>Pendapatan</th>
                                     <th>Jasa Aplikasi & Layanan</th>
                                     <th>Status Pembayaran</th>
                                     <th>Dibuat Pada</th>
@@ -74,7 +74,7 @@
                                             {{$row->customer_phone}}
                                             @endif
                                         </td>
-                                        <td>{{number_format($row->incomeAgen(),0,',','.')}}</td>
+                                        <td>{{number_format($row->incomeAgenNeto(),0,',','.')}}</td>
                                         <td>{{number_format($row->incomeOwnerBruto(),0,',','.')}}</td>
                                         <td>
                                             <span class="badge bg-{{$row->status()->class ?? null}}">{{$row->status()->msg ?? null}}</span>

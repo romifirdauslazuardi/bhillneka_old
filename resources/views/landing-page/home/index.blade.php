@@ -63,11 +63,28 @@
 </section><!--end section-->
 <!-- End -->
 
+<!-- Partners start -->
+@if(count($partners) >= 1)
+<section class="pt-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            @foreach($partners as $index => $row)
+            <div class="col-lg-2 col-md-2 col-6 text-center py-4">
+                <img src="{{asset($row->image)}}" class="avatar avatar-ex-sm wow animate__animated animate__fadeInUp" data-wow-delay=".1s" alt="">
+            </div><!--end col-->
+            @endforeach
+        </div><!--end row-->
+    </div><!--end container-->
+</section><!--end section-->
+<!-- Partners End -->
+@endif
+
+@if(count($our_services) >= 1)
 <section class="section overflow-hidden">
     <div class="container">
         <div class="row d-flex justify-content-center">
             @foreach($our_services as $index => $row)
-            <div class="col-md-4 col-12 wow animate__animated animate__fadeInUp">
+            <div class="col-md-4 col-12 wow animate__animated animate__fadeInUp" style="margin-bottom: 80px;">
                 <div class="features feature-primary text-center">
                     <div class="image position-relative d-inline-block">
                         <i class="{{$row->icon}} h2 text-primary" style="font-size:40px;"></i>
@@ -83,11 +100,12 @@
         </div><!--end row-->
     </div><!--end container-->
 </section>
+@endif
 
 <!-- How It Work Start -->
 <section class="section">
+    @foreach($whyUs as $index => $row)
     <div class="container">
-        @foreach($whyUs as $index => $row)
         <div class="row mb-3">
             <div class="col-12">
                 <div class="section-title mb-4 pb-2 wow animate__animated animate__fadeInUp">
@@ -97,9 +115,9 @@
                 </div>
             </div>
         </div>
-        @endforeach
     </div><!--end container-->
-
+    @endforeach
+    
     @if(count($testimonials) >= 1)
     <div class="container mt-100 mt-60">
         <div class="row justify-content-center">
@@ -112,7 +130,7 @@
         </div><!--end row-->
 
         <div class="row justify-content-center">
-            <div class="col-lg-12 mt-4">
+            <div class="col-lg-12">
                 <div class="tiny-three-item">
                     @foreach($testimonials as $index => $row)
                     <div class="tiny-slide wow animate__animated animate__fadeInUp" data-wow-delay=".3s">
@@ -137,7 +155,7 @@
     @endif
 
     @if(count($faqs) >= 1)
-    <div class="container mt-100 mt-60">
+    <div class="container mt-100 mt-60" style="padding-bottom: 100px;">
         <div class="row justify-content-center">
             <div class="col-12">
                 <div class="section-title text-center mb-4 pb-2 wow animate__animated animate__fadeInUp" data-wow-delay=".1s">

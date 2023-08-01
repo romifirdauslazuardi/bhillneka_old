@@ -6,12 +6,13 @@ use App\Enums\BusinessCategoryEnum;
 use App\Enums\OrderEnum;
 use App\Enums\OrderMikrotikEnum;
 use App\Enums\ProductEnum;
+use App\Enums\ProductStockEnum;
 use App\Enums\ProviderEnum;
 use App\Helpers\CodeHelper;
 use App\Helpers\PaymentHelper;
 use App\Helpers\SettingHelper;
 use App\Helpers\WhatsappHelper;
-use App\Jobs\OrderJob;
+use App\Jobs\OrderExpiredJob;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 use App\Models\Order;
@@ -96,9 +97,16 @@ class RepeatOrderCommand extends Command
                         ],$dataOrderItem);
 
                         if($orderItem->product->is_using_stock == ProductEnum::IS_USING_STOCK_TRUE){
+
+                            $available = $orderItem->product->stocks()->where("type",ProductStockEnum::TYPE_MASUK)->sum("qty") - $orderItem->product->stocks()->where("type",ProductStockEnum::TYPE_KELUAR)->sum("qty");
+                            $available -= $orderItem->qty;
+
                             ProductStock::create([
+                                'date' => date("Y-m-d"),
+                                'type' => ProductStockEnum::TYPE_KELUAR,
                                 'product_id' => $orderItem->product_id,
-                                'qty' => -$orderItem->qty,
+                                'qty' => $orderItem->qty,
+                                'available' => $available,
                                 'note' => 'Stok keluar order #'.$generateOrder->code,
                                 'author_id' => $orderItem->author_id,
                             ]);
@@ -126,10 +134,10 @@ class RepeatOrderCommand extends Command
                             ];
 
                             if($orderItem->order_mikrotik->type == OrderMikrotikEnum::TYPE_PPPOE){
-                                $dataOrderMikrotik["type"] = OrderMikrotikEnum::TYPE_PPPOE;
+                                $dataOrderMikrotik = array_merge($dataOrderMikrotik,["type" => OrderMikrotikEnum::TYPE_PPPOE]);
                             }
                             else{
-                                $dataOrderMikrotik["type"] = OrderMikrotikEnum::TYPE_HOTSPOT;
+                                $dataOrderMikrotik = array_merge($dataOrderMikrotik,["type" => OrderMikrotikEnum::TYPE_HOTSPOT]);
                             }
 
                             OrderMikrotik::updateOrCreate([
@@ -138,15 +146,28 @@ class RepeatOrderCommand extends Command
                         }
                     }
 
-                    $settingFee = SettingHelper::settingFee();
+                    $settingFee = SettingHelper::checkSettingFee($generateOrder);
 
-                    $generateOrder->update([
-                        'owner_fee' => $settingFee->owner_fee ?? null,
-                        'agen_fee' => $settingFee->agen_fee ?? null,
-                    ]);
+                    if($settingFee["IsError"] == TRUE){
+                        Log::emergency("RepeatOrderCommand : ".$settingFee["Message"]);
+                    }
+                    else{
+                        $settingFee = $settingFee["Data"];
+
+                        $generateOrder->update([
+                            'doku_fee' => $settingFee["doku_fee"],
+                            'owner_fee' => $settingFee["owner_fee"],
+                            'agen_fee' => $settingFee["agen_fee"],
+                            'total_owner_fee' => $settingFee["total_owner_fee"],
+                            'total_agen_fee' => $settingFee["total_agen_fee"],
+                            'customer_type_fee' => $settingFee["customer_type_fee"],
+                            'customer_value_fee' => $settingFee["customer_value_fee"],
+                            'customer_total_fee' => $settingFee["customer_total_fee"],
+                        ]);
+                    }
 
                     if($generateOrder->provider->type == ProviderEnum::TYPE_DOKU){
-                        $checkoutDoku = PaymentHelper::checkoutDoku($generateOrder);
+                        $checkoutDoku = PaymentHelper::checkoutDoku($generateOrder->id);
 
                         if($checkoutDoku["IsError"] == TRUE){
                             DB::rollback();
@@ -154,9 +175,9 @@ class RepeatOrderCommand extends Command
                         }
                     }
 
-                    OrderJob::dispatch($generateOrder->id)->delay(now()->addMinutes(env("DOKU_DUE_DATE")));
+                    OrderExpiredJob::dispatch($generateOrder->id)->delay(now()->addMinutes(env("DOKU_DUE_DATE")));
 
-                    self::sendWhatsapp($generateOrder->id,"pesanan");
+                    WhatsappHelper::sendWhatsappOrderTemplate($generateOrder->id,"pesanan");
                 }
             }
 
@@ -198,89 +219,5 @@ class RepeatOrderCommand extends Command
         ]);
 
         return $create;
-    }
-
-    private function sendWhatsapp($orderId,string $type = "pesanan"){
-        $order = new Order();
-        $order = $order->where("id",$orderId);
-        $order = $order->first();
-        
-        $message = "";
-        if($type == "pesanan"){
-            $message .= "Selesaikan Pembayaran Anda sebelum ".date("d F Y H:i:s",strtotime($order->expired_date))." WIB";
-            $message .= "\r\n";
-        }
-        else if($type == "progress"){
-            $message = "Progress pesanan anda diubah menjadi *".$order->progress()->msg."*";
-            $message .= "\r\n";
-        }
-        
-        $message .= "\r\n";
-        $message .= $order->business->name;
-        $message .= "\r\n";
-        $message .= $order->business->location;
-        $message .= "\r\n";
-        $message .= $order->business->user->phone;
-        $message .= "\r\n";
-        $message .= "=====";
-        $message .= "\r\n";
-        $message .= $order->status()->msg." #".$order->code;
-        $message .= "\r\n";
-        $message .= "=====";
-        $message .= "\r\n";
-        foreach($order->items as $index => $row){
-            $message .= $row->product_name;
-            $message .= "\r\n";
-            $message .= $row->qty." x ".number_format($row->product_price,0,',','.')." = ".number_format($row->totalNeto(),0,',','.');
-            $message .= "\r\n";
-            $message .= "=====";
-            $message .= "\r\n";
-        }
-        $message .= "Subtotal : ".number_format($order->totalNeto() + $order->discount,0,',','.');
-        $message .= "\r\n";
-        $message .= "Discount : ".number_format($order->discount,0,',','.');
-        $message .= "\r\n";
-        $message .= "Total : ".number_format($order->totalNeto(),0,',','.');
-        $message .= "\r\n";
-        if($order->status == OrderEnum::STATUS_SUCCESS){
-            $message .= "Bayar : ".number_format($order->totalNeto(),0,',','.');
-            $message .= "\r\n";
-        }
-        else{
-            $message .= "Bayar : ".number_format(0,0,',','.');
-            $message .= "\r\n";
-        }
-        $message .= "Kembalian : ".number_format(0,0,',','.');
-        $message .= "\r\n";
-        $message .= "\r\n";
-
-        if($order->status == OrderEnum::STATUS_WAITING_PAYMENT){
-            if($order->provider->type == ProviderEnum::TYPE_DOKU){
-                $message .= "Link Pembayaran : ".$order->payment_url;
-            }
-            else if($order->provider->type == ProviderEnum::TYPE_MANUAL_TRANSFER){
-                $message .= "Link Pembayaran : ".route('landing-page.manual-payments.index',$order->code);
-            }
-        }
-        else{
-            $message .= "Link Invoice : ".route('landing-page.orders.index',['code' => $order->code]);
-        }
-
-        $message .= "\r\n";
-        $message .= "\r\n";
-
-        $message .= "Penyedia Layanan / www.bhilnekka.com";
-        $message .= "\r\n";
-        $message .= "TERIMAKASIH";
-        $message .= "\r\n";
-
-        if(!empty($order->customer_id)){
-            return WhatsappHelper::send($order->customer->phone,$order->customer->name,["title" => "Notifikasi Pesanan" ,"message" => $message],false);
-        }
-        else{
-            if(!empty($order->customer_name) && !empty($order->customer_phone)){
-                return WhatsappHelper::send($order->customer_phone,$order->customer_name,["title" => "Notifikasi Pesanan" ,"message" => $message],false);
-            }
-        }
     }
 }

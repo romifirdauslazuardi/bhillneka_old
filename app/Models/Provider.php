@@ -37,6 +37,9 @@ class Provider extends Model
         else if($this->type == ProviderEnum::TYPE_DOKU){
             $return = "Doku";
         }
+        else if($this->type == ProviderEnum::TYPE_PAY_LATER){
+            $return = "Bayar Nanti";
+        }
 
         return $return;
     }

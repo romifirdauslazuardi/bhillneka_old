@@ -13,6 +13,7 @@ final class ProviderEnum extends Enum
 {
     const TYPE_MANUAL_TRANSFER = 1;
     const TYPE_DOKU = 2;
+    const TYPE_PAY_LATER = 3;
 
     const STATUS_TRUE = 1;
     const STATUS_FALSE = 0;
@@ -32,6 +33,7 @@ final class ProviderEnum extends Enum
         $data = [
             self::TYPE_MANUAL_TRANSFER => 'Manual Transfer',
             self::TYPE_DOKU => 'Doku',
+            self::TYPE_PAY_LATER => 'Bayar Nanti'
         ];
 
         return $data;

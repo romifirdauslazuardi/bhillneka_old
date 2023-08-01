@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\RoleEnum;
+use App\Helpers\SlugHelper;
 use App\Services\BaseService;
 use App\Http\Requests\Business\StoreRequest;
 use App\Http\Requests\Business\UpdateRequest;
@@ -84,6 +85,33 @@ class BusinessService extends BaseService
         }
     }
 
+    public function showBySlug($slug)
+    {
+        try {
+            $result = $this->business;
+            if(Auth::check()){
+                if(Auth::user()->hasRole([RoleEnum::AGEN])){
+                    $result = $result->where("user_id",Auth::user()->id);
+                }
+                if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
+                    $result = $result->where("user_id",Auth::user()->user_id);
+                }
+            }
+            $result = $result->where('slug',$slug);
+            $result = $result->first();
+
+            if(!$result){
+                return $this->response(false, "Data tidak ditemukan");
+            }
+
+            return $this->response(true, 'Berhasil mendapatkan data', $result);
+        } catch (Throwable $th) {
+            Log::emergency($th->getMessage());
+
+            return $this->response(false, "Terjadi kesalahan saat memproses data");
+        }
+    }
+
     public function store(StoreRequest $request)
     {
         try {
@@ -94,8 +122,11 @@ class BusinessService extends BaseService
             $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
             $village_code = (empty($request->village_code)) ? null : trim(strip_tags($request->village_code));
 
+            $slug = SlugHelper::generate(Business::class,$name,'slug');
+
             $create = $this->business->create([
                 'name' => $name,
+                'slug' => $slug,
                 'location' => $location,
                 'description' => $description,
                 'category_id' => $category_id,
@@ -124,8 +155,16 @@ class BusinessService extends BaseService
 
             $result = $this->business->findOrFail($id);
 
+            if($name != $result->name){
+                $slug = SlugHelper::generate(Business::class,$name,'slug');
+            }
+            else{
+                $slug = $result->slug;
+            }
+
             $result->update([
-               'name' => $name,
+                'name' => $name,
+                'slug' => $slug,
                 'location' => $location,
                 'description' => $description,
                 'category_id' => $category_id,

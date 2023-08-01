@@ -42,7 +42,7 @@
         </a>
     </div>
     @endif
-    @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
+    @if(Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
     <div class="col-md-4 mt-4 col-xs-12">
         <a href="{{route('dashboard.reports.incomes.index')}}" class="features feature-primary d-flex justify-content-between align-items-center rounded shadow p-3 box-total">
             <div class="d-flex align-items-center">
@@ -50,7 +50,7 @@
                     <i class="fa fa-dollar fs-5 mb-0"></i>
                 </div>
                 <div class="flex-1 ms-3">
-                    <p class="mb-0 text-muted p-total">Pendapatan Agen {{date("F Y")}}</p>
+                    <p class="mb-0 text-muted p-total">Pendapatan {{date("F Y")}}</p>
                     <p class="fs-5 text-dark fw-bold mb-0">{{number_format($total_income_agen,0,',','.')}}</p>
                 </div>
             </div>
@@ -107,7 +107,7 @@
                             <th>No</th>
                             <th>Kode Transaksi</th>
                             @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
-                                <th>Pendapatan Agen</th>
+                                <th>Pendapatan</th>
                                 <th>Jasa Aplikasi & Layanan</th>
                             @endif
                             <th>Total</th>
@@ -121,7 +121,7 @@
                                 <td>{{$index + 1}}</td>
                                 <td>{{$row->code}}</td>
                                 @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
-                                    <td>{{number_format($row->incomeAgen(),0,',','.')}}</td>
+                                    <td>{{number_format($row->incomeAgenNeto(),0,',','.')}}</td>
                                     <td>{{number_format($row->incomeOwnerBruto(),0,',','.')}}</td>
                                 @endif
                                 <td>{{number_format($row->totalNeto(),0,',','.')}}</td>
@@ -179,7 +179,7 @@
             //membuat label chart
                 labels: JSON.parse('<?php echo json_encode($chart_income_agen["labels"]); ?>'),
                 datasets: [{
-                    label: 'Pendapatan Agen {{date("F Y")}}',
+                    label: 'Pendapatan {{date("F Y")}}',
                     data: JSON.parse('<?php echo json_encode($chart_income_agen["value"]); ?>'),
                     borderColor: 'rgb(75, 192, 192)',
                     borderWidth: 1

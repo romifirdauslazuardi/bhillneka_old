@@ -65,7 +65,7 @@
                                         <td>{{$table->firstItem() + $index}}</td>
                                         <td>
                                             <a href="{{route('dashboard.tables.qrcode',$row->id)}}">
-                                                {{\QrCode::size(50)->generate(route('landing-page.shops.index',["business_id" => $row->business_id,"table_id" => $row->id]))}}
+                                                {{\QrCode::size(50)->generate(route('landing-page.shops.index',["business_slug" => $row->business->slug,"table" => $row->code]))}}
                                             </a>
                                         </td>
                                         <td>{{$row->name}}</td>

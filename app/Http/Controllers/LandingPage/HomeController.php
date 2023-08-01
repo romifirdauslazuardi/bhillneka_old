@@ -9,6 +9,7 @@ use App\Services\TestimonialService;
 use App\Services\FaqService;
 use App\Services\OurServiceService;
 use App\Services\DashboardService;
+use App\Services\PartnerService;
 
 class HomeController extends Controller
 {
@@ -19,6 +20,7 @@ class HomeController extends Controller
     protected $faqService;
     protected $ourServiceService;
     protected $dashboardService;
+    protected $partnerService;
 
     public function __construct()
     {
@@ -29,6 +31,7 @@ class HomeController extends Controller
         $this->faqService = new FaqService();
         $this->ourServiceService = new OurServiceService();
         $this->dashboardService = new DashboardService();
+        $this->partnerService = new PartnerService();
     }
 
     public function index(Request $request){
@@ -44,6 +47,9 @@ class HomeController extends Controller
         $our_services = $this->ourServiceService->index($request,false);
         $our_services = $our_services->data;
 
+        $partners = $this->partnerService->index($request,false);
+        $partners = $partners->data;
+
         $totalVisitor = $this->dashboardService->totalVisitor();
         
         $totalPresentase = $this->dashboardService->totalPresentase();
@@ -53,6 +59,7 @@ class HomeController extends Controller
             'testimonials' => $testimonials,
             'faqs' => $faqs,
             'our_services' => $our_services,
+            'partners' => $partners,
             'totalVisitor' => $totalVisitor,
             'totalPresentase' => $totalPresentase,
         ];

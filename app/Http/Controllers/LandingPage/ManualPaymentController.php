@@ -30,7 +30,7 @@ class ManualPaymentController extends Controller
         }
         $result = $result->data;
 
-        if($result->provider_id != ProviderEnum::TYPE_MANUAL_TRANSFER){
+        if($result->provider->type != ProviderEnum::TYPE_MANUAL_TRANSFER){
             alert()->error('Gagal', "Metode pembayaran tidak valid");
             return redirect()->route('landing-page.home.index')->withInput();
         }

@@ -6,6 +6,7 @@ use App\Services\BaseService;
 use App\Http\Requests\Cart\StoreRequest;
 use App\Http\Requests\Cart\UpdateRequest;
 use Illuminate\Http\Request;
+use App\Models\Product;
 use Auth;
 use DB;
 use Log;
@@ -14,6 +15,12 @@ use Cart;
 
 class CartService extends BaseService
 {
+    protected $product;
+
+    public function __construct()
+    {
+        $this->product = new Product();
+    }
 
     public function index()
     {
@@ -31,6 +38,10 @@ class CartService extends BaseService
             $qty = (empty($request->qty)) ? 0 : trim(strip_tags($request->qty));
             $image = (empty($request->image)) ? null : trim(strip_tags($request->image));
 
+            $productResult = $this->product;
+            $productResult = $productResult->where("id",$product_id);
+            $productResult = $productResult->firstOrFail();
+
             $create = Cart::add([
                 'id' => $product_id,
                 'name' => $product_name,
@@ -38,6 +49,7 @@ class CartService extends BaseService
                 'quantity' => $qty,
                 'attributes' => array(
                     'image' => $image,
+                    'product' => $productResult,
                 )
             ]);
 

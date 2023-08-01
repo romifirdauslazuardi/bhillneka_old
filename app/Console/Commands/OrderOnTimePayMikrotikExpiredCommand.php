@@ -12,7 +12,6 @@ use App\Helpers\LogHelper;
 use App\Helpers\PaymentHelper;
 use App\Helpers\SettingHelper;
 use App\Helpers\WhatsappHelper;
-use App\Jobs\OrderJob;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 use App\Models\Order;
@@ -121,6 +120,26 @@ class OrderOnTimePayMikrotikExpiredCommand extends Command
                     $orderItem->order_mikrotik()->update([
                         'mikrotik_id' => null
                     ]);
+                    
+                    $message = "Maaf, penggunaan PPPOE sudah habis";
+                    $message .= "\r\n";
+                    $message .= "=====";
+                    $message .= "\r\n";
+                    $message .= "username = ".$orderItem->order_mikrotik->username ?? null;
+                    $message .= "\r\n";
+                    $message .= "password = ".$orderItem->order_mikrotik->password ?? null;
+                    $message .= "\r\n";
+                    $message .= "=====";
+                    $message .= "\r\n";
+
+                    if(!empty($orderItem->order->customer_id)){
+                        return WhatsappHelper::send($orderItem->order->customer->phone,$orderItem->order->customer->name,["title" => "Penggunaan PPPOE Habis" ,"message" => $message],true);
+                    }
+                    else{
+                        if(!empty($orderItem->order->customer_name) && !empty($orderItem->order->customer_phone)){
+                            return WhatsappHelper::send($orderItem->order->customer_phone,$orderItem->order->customer_name,["title" => "Penggunaan PPPOE Habis" ,"message" => $message],true);
+                        }
+                    }
                 }
 
             }

@@ -39,15 +39,13 @@
                                 <thead>
                                     <th>Aksi</th>
                                     <th>No</th>
-                                    <th>Kode Transaksi</th>
                                     <th>Customer</th>
                                     <th>Produk</th>
                                     <th>Harga</th>
                                     <th>Tipe</th>
                                     <th>Username</th>
                                     <th>Password</th>
-                                    <th>Disabled (Database)</th>
-                                    <th>Disabled (Mikrotik)</th>
+                                    <th>Status</th>
                                     <th>Dibuat Pada</th>
                                 </thead>
                                 <tbody>
@@ -66,7 +64,6 @@
                                             </div>
                                         </td>
                                         <td>{{$table->firstItem() + $index}}</td>
-                                        <td>{{$row->order_item->order->code ?? null}}</td>
                                         <td>
                                             @if(!empty($row->order_item->order->customer))
                                             {{$row->order_item->order->customer->name ?? null}}
@@ -83,8 +80,7 @@
                                         <td>{{$row->order_item->product->mikrotik() ?? null}} </td>
                                         <td>{{$row->username}}</td>
                                         <td>{{$row->password}}</td>
-                                        <td>{{$row->disabled}}</td>
-                                        <td>{{$row->disabled_mikrotik}}</td>
+                                        <td>{!!$row->disabled_mikrotik!!}</td>
                                         <td>{{date('d-m-Y H:i:s',strtotime($row->created_at))}}</td>
                                     </tr>
                                     @empty

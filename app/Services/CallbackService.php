@@ -84,41 +84,8 @@ class CallbackService extends BaseService
 
                 if($decode["transaction"]["status"] == OrderEnum::STATUS_SUCCESS){
 
-                    $doku_fee = 0;
-
-                    if($findOrder->doku_service_id == DokuEnum::SERVICE_EMONEY){
-                        if($findOrder->doku_channel_id == DokuEnum::CHANNEL_EMONEY_OVO){
-                            $doku_fee = (1.5*$findOrder->totalNeto())/100;
-                            $doku_fee = $doku_fee + ((11*$doku_fee)/100);
-                            $doku_fee = round($doku_fee);
-                        }
-                        else if($findOrder->doku_channel_id == DokuEnum::CHANNEL_EMONEY_SHOPEEPAY){
-                            $doku_fee = (2*$findOrder->totalNeto())/100;
-                            $doku_fee = $doku_fee + ((11*$doku_fee)/100);
-                            $doku_fee = round($doku_fee);
-                        }
-                        else if($findOrder->doku_channel_id == DokuEnum::CHANNEL_EMONEY_DOKU){
-                            $doku_fee = (1.5*$findOrder->totalNeto())/100;
-                            $doku_fee = $doku_fee + ((11*$doku_fee)/100);
-                            $doku_fee = round($doku_fee);
-                        }
-                    }
-                    else if($findOrder->doku_service_id == DokuEnum::SERVICE_VIRTUAL_ACCOUNT){
-                        $doku_fee = 4500 + ((11*4500)/100);
-                        $doku_fee = round($doku_fee);
-                    }
-                    else if($findOrder->doku_service_id == DokuEnum::SERVICE_ONLINE_TO_OFFLINE){
-                        $doku_fee = 5000 + ((11*5000)/100);
-                        $doku_fee = round($doku_fee);
-                    }
-                    else if($findOrder->doku_service_id == DokuEnum::CHANNEL_CREDIT_CARD){
-                        $doku_fee = ((3 * $findOrder->totalNeto())/100) + 2500;
-                        $doku_fee = round($doku_fee);
-                    }
-
                     $findOrder->update([
                         'paid_date' => date("Y-m-d H:i:s"),
-                        'doku_fee' => $doku_fee,
                     ]);
 
                     if($findOrder->business->category->name == BusinessCategoryEnum::MIKROTIK){
@@ -246,6 +213,26 @@ class CallbackService extends BaseService
                             }
                         }
                     }
+
+                    $settingFee = SettingHelper::checkSettingFee($findOrder->id);
+
+                    if($settingFee["IsError"] == TRUE){
+                        Log::emergency("CallbackService : ".$settingFee["Message"]);
+                    }
+                    else{
+                        $settingFee = $settingFee["Data"];
+
+                        $findOrder->update([
+                            'doku_fee' => $settingFee["doku_fee"],
+                            'owner_fee' => $settingFee["owner_fee"],
+                            'agen_fee' => $settingFee["agen_fee"],
+                            'total_owner_fee' => $settingFee["total_owner_fee"],
+                            'total_agen_fee' => $settingFee["total_agen_fee"],
+                            'customer_type_fee' => $settingFee["customer_type_fee"],
+                            'customer_value_fee' => $settingFee["customer_value_fee"],
+                            'customer_total_fee' => $settingFee["customer_total_fee"],
+                        ]);
+                    }
                     
                 }
 
@@ -266,7 +253,7 @@ class CallbackService extends BaseService
 
                 Notification::send($received,new PaymentNotification(route('dashboard.orders.show',$findOrder->id),'Pembayaran Pesanan','Pembayaran dengan kode transaksi '.$findOrder->code." sebesar <b>".number_format($findOrder->totalNeto(),0,',','.')."</b> telah <b>[".$decode["transaction"]["status"]."</b>] dilakukan.",$findOrder));
 
-                self::sendWhatsapp($findOrder->id);
+                WhatsappHelper::sendWhatsappOrderTemplate($findOrder->id);
 
                 DB::commit();
                 
@@ -281,103 +268,6 @@ class CallbackService extends BaseService
             DB::rollBack();
             Log::emergency($th->getMessage());
             return $this->response(false, "Terjadi kesalahan saat memproses data");
-        }
-    }
-
-    private function sendWhatsapp($orderId,string $type = "pesanan"){
-        $order = $this->order;
-        $order = $order->where("id",$orderId);
-        $order = $order->first();
-
-        $message = "";
-        if($type == "pesanan"){
-            if($order->status == OrderEnum::STATUS_WAITING_PAYMENT){
-                $message .= "Selesaikan Pembayaran Anda sebelum ".date("d F Y H:i:s",strtotime($order->expired_date))." WIB";
-                $message .= "\r\n";
-            }
-        }
-        else if($type == "progress"){
-            $message = "Progress pesanan anda diubah menjadi *".$order->progress()->msg."*";
-            $message .= "\r\n";
-        }
-        
-        $message .= "\r\n";
-        $message .= $order->business->name;
-        $message .= "\r\n";
-        $message .= $order->business->location;
-        $message .= "\r\n";
-        $message .= $order->business->user->phone;
-        $message .= "\r\n";
-        $message .= "=====";
-        $message .= "\r\n";
-        $message .= $order->status()->msg." #".$order->code;
-        $message .= "\r\n";
-        $message .= "=====";
-        $message .= "\r\n";
-
-        foreach($order->items as $index => $row){
-            $message .= $row->product_name;
-            $message .= "\r\n";
-            $message .= $row->qty." x ".number_format($row->product_price,0,',','.')." = ".number_format($row->totalNeto(),0,',','.');
-            if($order->status == OrderEnum::STATUS_SUCCESS){
-                $message .= "\r\n";
-                if($row->order_mikrotik->type == OrderMikrotikEnum::TYPE_HOTSPOT){
-                    $message .= "SSID : ".$row->order_mikrotik->server ?? null;
-                    $message .= "\r\n";
-                }
-                $message .= "Username : ".$row->order_mikrotik->username ?? null;
-                $message .= "\r\n";
-                $message .= "Password : ".$row->order_mikrotik->password ?? null;
-            }
-            $message .= "\r\n";
-            $message .= "=====";
-            $message .= "\r\n";
-        }
-        $message .= "Subtotal : ".number_format($order->totalNeto() + $order->discount,0,',','.');
-        $message .= "\r\n";
-        $message .= "Discount : ".number_format($order->discount,0,',','.');
-        $message .= "\r\n";
-        $message .= "Total : ".number_format($order->totalNeto(),0,',','.');
-        $message .= "\r\n";
-        if($order->status == OrderEnum::STATUS_SUCCESS){
-            $message .= "Bayar : ".number_format($order->totalNeto(),0,',','.');
-            $message .= "\r\n";
-        }
-        else{
-            $message .= "Bayar : ".number_format(0,0,',','.');
-            $message .= "\r\n";
-        }
-        $message .= "Kembalian : ".number_format(0,0,',','.');
-        $message .= "\r\n";
-        $message .= "\r\n";
-
-        if($order->status == OrderEnum::STATUS_WAITING_PAYMENT){
-            if($order->provider->type == ProviderEnum::TYPE_DOKU){
-                $message .= "Link Pembayaran : ".$order->payment_url;
-            }
-            else if($order->provider->type == ProviderEnum::TYPE_MANUAL_TRANSFER){
-                $message .= "Link Pembayaran : ".route('landing-page.manual-payments.index',$order->code);
-            }
-        }
-        else{
-            $message .= "Link Invoice : ".route('landing-page.orders.index',['code' => $order->code]);
-        }
-
-        $message .= "\r\n";
-        $message .= "\r\n";
-
-        $message .= "Penyedia Layanan / www.bhilnekka.com";
-        $message .= "\r\n";
-        $message .= "TERIMAKASIH";
-        $message .= "\r\n";
-
-        if(!empty($order->customer_id)){
-            return WhatsappHelper::send($order->customer->phone,$order->customer->name,["title" => "Notifikasi Pesanan" ,"message" => $message],true);
-        }
-        else{
-            if(!empty($order->customer_name) && !empty($order->customer_phone)){
-                return WhatsappHelper::send($order->customer_phone,$order->customer_name,["title" => "Notifikasi Pesanan" ,"message" => $message],true);
-            }
         }
     }
 

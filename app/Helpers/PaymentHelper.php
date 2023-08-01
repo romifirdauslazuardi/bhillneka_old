@@ -76,9 +76,12 @@ class PaymentHelper
         return $return;
     }
 
-    public static function checkoutDoku($order){
+    public static function checkoutDoku($orderId){
         $return = [];
         try{
+            $order = new Order();
+            $order = $order->where("id",$orderId);
+            $order = $order->first();
 
             $ownerBank = new UserBank();
             $ownerBank = $ownerBank->whereHas("user",function($query2){
@@ -137,6 +140,22 @@ class PaymentHelper
                 ),
                 "payment" => array (
                     "payment_due_date" => ($order->type == OrderEnum::TYPE_ON_TIME_PAY) ? env("DOKU_DUE_DATE") : DateHelper::differentMinute($order->created_at,date("Y-m-d H:i:s",strtotime($order->expired_date))),
+                    "payment_method_types" => [
+                        "VIRTUAL_ACCOUNT_BCA",
+                        "VIRTUAL_ACCOUNT_BANK_MANDIRI",
+                        "VIRTUAL_ACCOUNT_BANK_SYARIAH_MANDIRI",
+                        "VIRTUAL_ACCOUNT_DOKU",
+                        "VIRTUAL_ACCOUNT_BRI",
+                        "VIRTUAL_ACCOUNT_BNI",
+                        "VIRTUAL_ACCOUNT_BANK_PERMATA",
+                        "VIRTUAL_ACCOUNT_BANK_DANAMON",
+                        "VIRTUAL_ACCOUNT_BANK_DANAMON",
+                        "ONLINE_TO_OFFLINE_ALFA",
+                        "CREDIT_CARD",
+                        "EMONEY_OVO",
+                        "EMONEY_SHOPEE_PAY",
+                        "EMONEY_DOKU",
+                    ]
                 ),
                 "customer" => array (
                     "id" => $order->user->code ?? null,
@@ -150,13 +169,13 @@ class PaymentHelper
                     "settlement" => array (
                         array (
                             "bank_account_settlement_id" => $order->owner_bank_settlement_id,
-                            "value" => 0,
-                            "type" => "FIX"
+                            "value" => 10,
+                            "type" => "PERCENTAGE"
                         ),
                         array (
                             "bank_account_settlement_id" => $order->agen_bank_settlement_id,
-                            "value" => $order->incomeAgen(),
-                            "type" => "FIX"
+                            "value" => 90,
+                            "type" => "PERCENTAGE"
                         )
                     )
                 )

@@ -81,14 +81,14 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalExport" aria-labelledby="modalExport-title" aria-hidden="true">
+<div class="modal fade" id="modalExportExcel" aria-labelledby="modalExportExcel-title" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content rounded shadow border-0">
             <div class="modal-header border-bottom">
-                <h5 class="modal-title" id="modalExport-title">Export <span class="export-title"></span></h5>
+                <h5 class="modal-title" id="modalExportExcel-title">Export <span class="export-title"></span></h5>
                 <button type="button" class="btn btn-icon btn-close" data-bs-dismiss="modal" id="close-modal"><i class="uil uil-times fs-4 text-dark"></i></button>
             </div>
-            <form method="get" action="#" autocomplete="off" id="frmExport">
+            <form method="get" action="#" autocomplete="off" id="frmExportExcel">
                 <div class="modal-body">
                     <div class="form-group mb-3">
                         <label>Search</label>

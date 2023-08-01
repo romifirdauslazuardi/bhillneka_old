@@ -13,6 +13,7 @@ class Business extends Model
     protected $table = "business";
     protected $fillable = [
         'name',
+        'slug',
         'location',
         'description',
         'user_id',
@@ -44,5 +45,10 @@ class Business extends Model
     public function tables()
     {
         return $this->hasMany(Table::class, 'business_id');
+    }
+
+    public function user_pay_later()
+    {
+        return $this->hasOne(UserPayLater::class, 'business_id', 'id');
     }
 }

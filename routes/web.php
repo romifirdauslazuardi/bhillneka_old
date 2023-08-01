@@ -45,6 +45,7 @@ Route::group(["as" => "manual-payments.", "prefix" => "manual-payments"], functi
 
 Route::group(["as" => "orders.", "prefix" => "orders"], function () {
     Route::get('/', 'OrderController@index')->name('index');
+    Route::put('/{id}/updateProvider', 'OrderController@updateProvider')->name('updateProvider');
 });
 
 Route::group(["as" => "buy-products.", "prefix" => "buy-products"], function () {
@@ -53,7 +54,7 @@ Route::group(["as" => "buy-products.", "prefix" => "buy-products"], function () 
 });
 
 Route::group(["as" => "shops.", "prefix" => "shops"], function () {
-    Route::get('/{business_id}/{table_id}', 'ShopController@index')->name('index');
+    Route::get('/{business_slug}', 'ShopController@index')->name('index');
     Route::post('/addToCart', 'ShopController@addToCart')->name('addToCart');
     Route::put('/updateCart/{id}', 'ShopController@updateCart')->name('updateCart');
     Route::delete('/deleteCart/{id}', 'ShopController@deleteCart')->name('deleteCart');

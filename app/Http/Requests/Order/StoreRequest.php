@@ -58,6 +58,10 @@ class StoreRequest extends FormRequest
                 'required',
                 Rule::exists('business', 'id'),
             ],
+            'table_id' => [
+                'nullable',
+                Rule::exists('tables', 'id'),
+            ],
             'fnb_type' => [
                 'required',
                 'in:'.implode(",",[OrderEnum::FNB_NONE,OrderEnum::FNB_TAKEAWAY,OrderEnum::FNB_DINE_IN])
@@ -85,6 +89,7 @@ class StoreRequest extends FormRequest
             'repeater.array' => 'Produk tidak valid',
             'business_id.required' => 'Bisnis harus diisi',
             'business_id.exists' => 'Bisnis tidak ditemukan',
+            'table_id.exists' => 'Meja tidak ditemukan',
             'fnb_type.required' => 'Tipe FNB harus diisi',
             'fnb_type.in' => 'Tipe FNB tidak valid',
             'customer_name.required' => 'Nama customer harus diisi',

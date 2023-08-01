@@ -75,25 +75,38 @@
                                                 <td>@if(empty($result->customer_id)) {{$result->customer_name}} @else {{$result->customer->name ?? null}} @endif</td>
                                             </tr>
                                             <tr>
+                                                <td style="width:25%;">No.Hp Customer</td>
+                                                <td class="text-center">:</td>
+                                                <td>@if(empty($result->customer_id)) {{$result->customer_phone}} @else {{$result->customer->phone ?? null}} @endif</td>
+                                            </tr>
+                                            <tr>
                                                 <td style="width:25%;">Metode Pembayaran</td>
                                                 <td class="text-center">:</td>
                                                 <td>
                                                     @if($result->provider->type == \App\Enums\ProviderEnum::TYPE_MANUAL_TRANSFER)
                                                     {{$result->provider->name ?? null}}
-                                                    @else
+                                                    @elseif($result->provider->type == \App\Enums\ProviderEnum::TYPE_DOKU)
+                                                    {{$result->provider->name ?? null}}
                                                     {{$result->doku_channel_id}}
+                                                    @else
+                                                    {{$result->provider->name ?? null}}
                                                     @endif
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td style="width:25%;">SubTotal</td>
                                                 <td class="text-center">:</td>
-                                                <td>{{number_format($result->totalNeto()+$result->discount,0,',','.')}}</td>
+                                                <td>{{number_format($result->totalNetoWithoutCustomerFee()+$result->discount,0,',','.')}}</td>
                                             </tr>
                                             <tr>
                                                 <td style="width:25%;">Diskon</td>
                                                 <td class="text-center">:</td>
                                                 <td>{{number_format($result->discount,0,',','.')}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:25%;">Biaya Layanan</td>
+                                                <td class="text-center">:</td>
+                                                <td>{{number_format($result->customer_total_fee,0,',','.')}}</td>
                                             </tr>
                                             <tr>
                                                 <td style="width:25%;">Grand Total</td>
@@ -137,6 +150,13 @@
                                     </table>
                                 </div>
                             </div>
+                            @if($result->provider->type == \App\Enums\ProviderEnum::TYPE_PAY_LATER)
+                            <div class="row">
+                                <div class="col-12">
+                                    <button class="btn btn-success btn-sm btn-update-provider" type="button" style="width: 100%;">Bayar Sekarang</button>
+                                </div>
+                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -186,12 +206,23 @@
         @endif
     </div>
 </section>
+
+@if(!empty($result))
+    @include("landing-page.orders.modal.index")
+@endif
+
 @endsection
 
 @section("script")
 <script>
     $(function(){
-
+        @if(!empty($result))
+            $(document).on("click",".btn-update-provider",function(e){
+                e.preventDefault();
+                $("#frmUpdateProvider").attr("action","{{ route('landing-page.orders.updateProvider', '_id_') }}".replace("_id_", '{{$result->id}}'))
+                $("#modalUpdateProvider").modal("show");
+            });
+        @endif
     })
 </script>
 @endsection

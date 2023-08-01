@@ -31,7 +31,7 @@
     <div class="container">
         <div class="row d-flex justify-content-center">
             @foreach($table as $index => $row)
-            <div class="col-md-4 col-12">
+            <div class="col-md-4 col-12 wow animate__animated animate__fadeInUp" style="margin-bottom: 80px;">
                 <div class="features feature-primary text-center">
                     <div class="image position-relative d-inline-block">
                         <i class="{{$row->icon}} h2 text-primary" style="font-size:40px;"></i>

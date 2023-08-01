@@ -98,6 +98,12 @@ class OrderController extends Controller
         $providers = $this->providerService->index(new Request(['status' => ProviderEnum::STATUS_TRUE]),false);
         $providers = $providers->data;
 
+        foreach($providers as $index => $row){
+            if($row->type == ProviderEnum::TYPE_PAY_LATER){
+                unset($providers[$index]);
+            }
+        }
+
         $type = OrderEnum::type();
 
         $fnb_type = OrderEnum::fnb_type();

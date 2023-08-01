@@ -9,6 +9,7 @@ use App\Models\MikrotikConfig;
 use App\Models\RouterosAPI;
 use Illuminate\Http\Request;
 use App\Enums\RoleEnum;
+use App\Helpers\LogHelper;
 use App\Helpers\SettingHelper;
 use Auth;
 use DB;
@@ -270,6 +271,51 @@ class MikrotikConfigService extends BaseService
             }
 
             $data = $connect->comm('/ip/hotspot/print');
+
+            return $this->response(true, 'Berhasil medapatkan data',$data);
+        } catch (Throwable $th) {
+            Log::emergency($th->getMessage());
+
+            return $this->response(false, "Terjadi kesalahan saat memproses data");
+        }
+    }
+
+    public function detailProfilePppoe($name){
+        try {
+            $mikrotikConfig = SettingHelper::mikrotikConfig();
+            $ip = $mikrotikConfig->ip ?? null;
+            $username = $mikrotikConfig->username ?? null;
+            $password = $mikrotikConfig->password ?? null;
+            $port = $mikrotikConfig->port ?? null;
+
+            if(!$ip || !$username || !$password || !$port){
+                return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
+            }
+
+            $connect = $this->routerosApi;
+            $connect->debug("false");
+
+            if(!$connect->connect($ip,$username,$password,$port)){
+                return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
+            }
+
+            $connect = $connect->comm('/ppp/profile/print');
+
+            $connectLog = LogHelper::mikrotikLog($connect);
+
+            if($connectLog["IsError"] == TRUE){
+                return $this->response(false, $connectLog["Message"]);
+            }
+
+            $data = [];
+            foreach($connect as $index => $row){
+                if($row["name"] === $name){
+                    $data = [
+                        'local_address' => $row["local-address"] ?? null,
+                        'remote_address' => $row["remote-address"] ?? null,
+                    ];
+                }
+            }
 
             return $this->response(true, 'Berhasil medapatkan data',$data);
         } catch (Throwable $th) {

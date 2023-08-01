@@ -18,7 +18,7 @@ class UpdateRequest extends FormRequest
             ],
             'type' => [
                 'required',
-                'in:'.implode(",",[ProviderEnum::TYPE_MANUAL_TRANSFER,ProviderEnum::TYPE_DOKU])
+                'in:'.implode(",",[ProviderEnum::TYPE_MANUAL_TRANSFER,ProviderEnum::TYPE_DOKU,ProviderEnum::TYPE_PAY_LATER])
             ],
             'status' => [
                 'required',

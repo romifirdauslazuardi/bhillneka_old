@@ -63,7 +63,7 @@ class OrderMikrotikReportService extends BaseService
         }
 
         foreach($table as $index => $row){
-            $row->disabled_mikrotik = "Data tidak ditemukan didatabase/mikrotik";
+            $row->disabled_mikrotik = '<span class="badge bg-warning">Terputus</span>';
 
             if(!empty($row->mikrotik_id)){
                 $mikrotikConfig = SettingHelper::mikrotikConfig($row->order_item->order->business_id,$row->order_item->order->business->user_id);
@@ -89,10 +89,10 @@ class OrderMikrotikReportService extends BaseService
 
                     if(isset($connect[0]["disabled"])){
                         if($connect[0]["disabled"] == "false"){
-                            $row->disabled_mikrotik = "no";
+                            $row->disabled_mikrotik = '<span class="badge bg-success">Terhubung</span>';
                         }
                         else if($connect[0]["disabled"] == "true"){
-                            $row->disabled_mikrotik = "yes";
+                            $row->disabled_mikrotik = '<span class="badge bg-warning">Terputus</span>';
                         }
                     }
                 }
@@ -113,7 +113,7 @@ class OrderMikrotikReportService extends BaseService
                 return $this->response(false, "Data tidak ditemukan");
             }
 
-            $result->disabled_mikrotik = "Data tidak ditemukan didatabase/mikrotik";
+            $result->disabled_mikrotik = '<span class="badge bg-warning">Terputus</span>';
 
             if(!empty($result->mikrotik_id)){
                 $mikrotikConfig = SettingHelper::mikrotikConfig($result->order_item->order->business_id,$result->order_item->order->business->user_id);
@@ -142,13 +142,11 @@ class OrderMikrotikReportService extends BaseService
 
                 $connectLog = LogHelper::mikrotikLog($connect);
 
-                if(isset($connect[0]["disabled"])){
-                    if($connect[0]["disabled"] == "false"){
-                        $result->disabled_mikrotik = "no";
-                    }
-                    else if($connect[0]["disabled"] == "true"){
-                        $result->disabled_mikrotik = "yes";
-                    }
+                if($connect[0]["disabled"] == "false"){
+                    $result->disabled_mikrotik = '<span class="badge bg-success">Terhubung</span>';
+                }
+                else if($connect[0]["disabled"] == "true"){
+                    $result->disabled_mikrotik = '<span class="badge bg-warning">Terputus</span>';
                 }
             }
 
@@ -194,7 +192,7 @@ class OrderMikrotikReportService extends BaseService
                 'comment' => $comment,
                 'disabled' => $disabled,
                 'address' => $address,
-                'mac-address' => $mac_address,
+                'mac_address' => $mac_address,
                 'expired_date' => $expired_date,
             ]);
 
@@ -232,8 +230,6 @@ class OrderMikrotikReportService extends BaseService
                 else{
                     $checkExistMikrotik = $connect->comm('/ppp/secret/print');
 
-                    Log::info($checkExistMikrotik);
-
                     $connectLog = LogHelper::mikrotikLog($checkExistMikrotik);
 
                     if($connectLog["IsError"] == TRUE){
@@ -269,8 +265,6 @@ class OrderMikrotikReportService extends BaseService
                 if($oldUsername != $username){
                     $checkExistMikrotik = $connect->comm('/ip/hotspot/user/print');
 
-                    Log::info($checkExistMikrotik);
-
                     $connectLog = LogHelper::mikrotikLog($checkExistMikrotik);
 
                     if($connectLog["IsError"] == TRUE){
@@ -284,8 +278,6 @@ class OrderMikrotikReportService extends BaseService
                     }
                 }else{
                     $checkExistMikrotik = $connect->comm('/ip/hotspot/user/print');
-
-                    Log::info($checkExistMikrotik);
 
                     $connectLog = LogHelper::mikrotikLog($checkExistMikrotik);
 

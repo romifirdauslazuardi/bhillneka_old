@@ -65,9 +65,13 @@ class BuyProductController extends Controller
             if($response->data->provider->type == ProviderEnum::TYPE_DOKU){
                 return redirect($response->data->payment_url);
             }
-            else{
+            else if($response->data->provider->type == ProviderEnum::TYPE_MANUAL_TRANSFER){
+                return redirect($response->data->payment_url);
                 alert()->html('Berhasil',$response->message,'success'); 
                 return redirect()->route("landing-page.manual-payments.index",$response->data->code);
+            }
+            else{
+                return redirect()->route("landing-page.orders.index",["code" => $response->data->code]);
             }
         } catch (\Throwable $th) {
             Log::emergency($th->getMessage());

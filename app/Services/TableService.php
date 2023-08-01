@@ -7,6 +7,7 @@ use App\Http\Requests\Table\StoreRequest;
 use App\Http\Requests\Table\UpdateRequest;
 use App\Models\Table;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use App\Enums\RoleEnum;
 use Auth;
 use DB;
@@ -71,18 +72,26 @@ class TableService extends BaseService
     {
         try {
             $result = $this->table;
-            if(Auth::check()){
-                if(Auth::user()->hasRole([RoleEnum::AGEN])){
-                    $result = $result->where("user_id",Auth::user()->id);
-                }
-                if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
-                    $result = $result->where("user_id",Auth::user()->user_id);
-                }
-                if(!empty(Auth::user()->business_id)){
-                    $result = $result->where("business_id",Auth::user()->business_id);
-                }
-            }
             $result = $result->where('id',$id);
+            $result = $result->first();
+
+            if(!$result){
+                return $this->response(false, "Data tidak ditemukan");
+            }
+
+            return $this->response(true, 'Berhasil mendapatkan data', $result);
+        } catch (Throwable $th) {
+            Log::emergency($th->getMessage());
+
+            return $this->response(false, "Terjadi kesalahan saat memproses data");
+        }
+    }
+
+    public function showByCode($code)
+    {
+        try {
+            $result = $this->table;
+            $result = $result->where('code',$code);
             $result = $result->first();
 
             if(!$result){
@@ -104,7 +113,10 @@ class TableService extends BaseService
             $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
             $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
 
+            $code = Str::random(10);
+
             $create = $this->table->create([
+                'code' => $code,
                 'name' => $name,
                 'user_id' => $user_id,
                 'business_id' => $business_id,

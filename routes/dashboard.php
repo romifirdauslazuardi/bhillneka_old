@@ -68,7 +68,7 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
 		Route::put('/updateBusinessPage', 'ProfileController@updateBusinessPage')->name("updateBusinessPage")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::CUSTOMER])]);
 	});
 
-	Route::group(["as" => "users.", "prefix" => "users"], function () {
+	Route::group(["as" => "users.", "prefix" => "users","middleware" => ["hasBankActive"]], function () {
 		Route::get('/', 'UserController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 		Route::get('/create', 'UserController@create')->name("create")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 		Route::get('/{id}', 'UserController@show')->name("show")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
@@ -98,7 +98,7 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
 		Route::get('/', 'BankController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 		Route::post('/', 'BankController@store')->name("store")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 		Route::put('/{id}', 'BankController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-		Route::delete('/{id}', 'BankController@update')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::delete('/{id}', 'BankController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 	});
 
 	Route::group(["as" => "user-banks.", "prefix" => "user-banks"], function () {
@@ -111,7 +111,7 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
 		Route::delete('/{id}', 'UserBankController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN])]);
 	});
 
-	Route::group(["as" => "products.", "prefix" => "products"], function () {
+	Route::group(["as" => "products.", "prefix" => "products","middleware" => ["hasBankActive"]], function () {
 		Route::get('/', 'ProductController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 		Route::get('/create', 'ProductController@create')->name("create")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 		Route::get('/{id}', 'ProductController@show')->name("show")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
@@ -120,12 +120,6 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
 		Route::post('/', 'ProductController@store')->name("store")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 		Route::put('/{id}', 'ProductController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 		Route::delete('/{id}', 'ProductController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-
-		Route::group(["as" => "stocks.", "prefix" => "stocks"], function () {
-			Route::post('/', 'ProductStockController@store')->name("store")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-			Route::put('/{id}', 'ProductStockController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-			Route::delete('/{id}', 'ProductStockController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-		});
 	});
 
 	Route::group(["as" => "settings.", "prefix" => "settings","namespace" => "Setting"], function () {
@@ -141,7 +135,22 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
 
 		Route::group(["as" => "fee.", "prefix" => "fee"], function () {
 			Route::get('/', 'SettingFeeController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
-			Route::put('/', 'SettingFeeController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+			Route::get('/create', 'SettingFeeController@create')->name("create")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+			Route::get('/{id}', 'SettingFeeController@show')->name("show")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+			Route::get('/{id}/edit', 'SettingFeeController@edit')->name("edit")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+			Route::post('/', 'SettingFeeController@store')->name("store")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+			Route::put('/{id}', 'SettingFeeController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+			Route::delete('/{id}', 'SettingFeeController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+		});
+
+		Route::group(["as" => "customer-fee.", "prefix" => "customer-fee"], function () {
+			Route::get('/', 'SettingCustomerFeeController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+			Route::get('/create', 'SettingCustomerFeeController@create')->name("create")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+			Route::get('/{id}', 'SettingCustomerFeeController@show')->name("show")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+			Route::get('/{id}/edit', 'SettingCustomerFeeController@edit')->name("edit")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+			Route::post('/', 'SettingCustomerFeeController@store')->name("store")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+			Route::put('/{id}', 'SettingCustomerFeeController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+			Route::delete('/{id}', 'SettingCustomerFeeController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
 		});
 	});
 
@@ -155,7 +164,7 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
 		Route::delete('/{id}', 'ProviderController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
 	});
 
-	Route::group(["as" => "orders.", "prefix" => "orders"], function () {
+	Route::group(["as" => "orders.", "prefix" => "orders","middleware" => ["hasBankActive"]], function () {
 		Route::get('/', 'OrderController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::CUSTOMER])]);
 		Route::get('/create', 'OrderController@create')->name("create")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 		Route::get('/{id}', 'OrderController@show')->name("show")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::CUSTOMER])]);
@@ -165,8 +174,8 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
 		Route::delete('/{id}', 'OrderController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
 		Route::put('/proof_order/{id}', 'OrderController@proofOrder')->name("proofOrder")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
 		Route::get('/export/excel', 'OrderController@exportExcel')->name("exportExcel")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
-		Route::put('/update_progress/{id}', 'OrderController@updateProgress')->name("updateProgress")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
-		Route::put('/update_status/{id}', 'OrderController@updateStatus')->name("updateStatus")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+		Route::put('/update-progress/{id}', 'OrderController@updateProgress')->name("updateProgress")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
+		Route::put('/update-status/{id}', 'OrderController@updateStatus')->name("updateStatus")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
 		Route::get('/print/{id}', 'OrderController@print')->name("print")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
 	});
 
@@ -222,9 +231,19 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
 		Route::group(["as" => "google-analytics.", "prefix" => "google-analytics"], function () {
 			Route::get('/', 'GoogleAnalyticController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
 		});
+
+		Route::group(["as" => "partners.", "prefix" => "partners"], function () {
+			Route::get('/', 'PartnerController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+			Route::get('/create', 'PartnerController@create')->name("create")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+			Route::get('/{id}', 'PartnerController@show')->name("show")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+			Route::get('/{id}/edit', 'PartnerController@edit')->name("edit")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+			Route::post('/', 'PartnerController@store')->name("store")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+			Route::put('/{id}', 'PartnerController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+			Route::delete('/{id}', 'PartnerController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+		});
 	});
 
-	Route::group(["as" => "reports.", "prefix" => "reports","namespace" => "Report"], function () {
+	Route::group(["as" => "reports.", "prefix" => "reports","namespace" => "Report","middleware" => ["hasBankActive"]], function () {
 
 		Route::group(["as" => "incomes.", "prefix" => "incomes"], function () {
 			Route::get('/', 'IncomeReportController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
@@ -250,13 +269,50 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
 		Route::delete('/{id}', 'MikrotikConfigController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 	});
 
-	Route::group(["as" => "tables.", "prefix" => "tables"], function () {
+	Route::group(["as" => "tables.", "prefix" => "tables","middleware" => ["hasBankActive"]], function () {
 		Route::get('/', 'TableController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 		Route::get('/create', 'TableController@create')->name("create")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 		Route::get('/{id}/edit', 'TableController@edit')->name("edit")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 		Route::post('/', 'TableController@store')->name("store")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 		Route::put('/{id}', 'TableController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
-		Route::delete('/{id}', 'TableController@update')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::delete('/{id}', 'TableController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
 		Route::get('/qrcode/{id}', 'TableController@qrcode')->name("qrcode")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+	});
+
+	Route::group(["as" => "news.", "prefix" => "news","middleware" => ["hasBankActive"]], function () {
+		Route::get('/', 'NewsController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::get('/create', 'NewsController@create')->name("create")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::get('/{id}', 'NewsController@show')->name("show")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::get('/{id}/edit', 'NewsController@edit')->name("edit")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+		Route::post('/', 'NewsController@store')->name("store")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::put('/{id}', 'NewsController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+		Route::delete('/{id}', 'NewsController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+	});
+
+	Route::group(["as" => "cost-accountings.", "prefix" => "cost-accountings","middleware" => ["hasBankActive"]], function () {
+		Route::get('/', 'CostAccountingController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::get('/create', 'CostAccountingController@create')->name("create")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::get('/{id}', 'CostAccountingController@show')->name("show")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::get('/{id}/edit', 'CostAccountingController@edit')->name("edit")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::post('/', 'CostAccountingController@store')->name("store")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::put('/{id}', 'CostAccountingController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::delete('/{id}', 'CostAccountingController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::get('/export/excel', 'CostAccountingController@exportExcel')->name("exportExcel")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
+		Route::post('/import/excel', 'CostAccountingController@importExcel')->name("importExcel")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
+	});
+
+	Route::group(["as" => "product-stocks.", "prefix" => "product-stocks","middleware" => ["hasBankActive"]], function () {
+		Route::get('/', 'ProductStockController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::get('/create', 'ProductStockController@create')->name("create")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::get('/{id}', 'ProductStockController@show')->name("show")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::post('/', 'ProductStockController@store')->name("store")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::put('/{id}', 'ProductStockController@update')->name("update")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::delete('/{id}', 'ProductStockController@destroy')->name("destroy")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+		Route::get('/export/excel', 'ProductStockController@exportExcel')->name("exportExcel")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
+	});
+
+	Route::group(["as" => "user-pay-laters.", "prefix" => "user-pay-laters"], function () {
+		Route::get('/', 'UserPayLaterController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN])]);
+		Route::post('/', 'UserPayLaterController@store')->name("store")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN])]);
 	});
 });

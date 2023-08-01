@@ -26,16 +26,16 @@ class DashboardController extends Controller
         $total_product = $this->dashboardService->totalProduct();
         $total_product = $total_product->data;
 
-        $total_income_owner = $this->dashboardService->totalIncomeOwnerBruto();
+        $total_income_owner = $this->dashboardService->totalIncomeOwnerNeto();
         $total_income_owner = $total_income_owner->data;
 
-        $total_income_agen = $this->dashboardService->totalIncomeAgen();
+        $total_income_agen = $this->dashboardService->totalIncomeAgenNeto();
         $total_income_agen = $total_income_agen->data;
 
-        $chart_income_agen = $this->dashboardService->chartIncomeAgen();
+        $chart_income_agen = $this->dashboardService->chartIncomeAgenNeto();
         $chart_income_agen = $chart_income_agen->data;
 
-        $chart_income_owner = $this->dashboardService->chartIncomeOwnerBruto();
+        $chart_income_owner = $this->dashboardService->chartIncomeOwnerNeto();
         $chart_income_owner = $chart_income_owner->data;
 
         $orders = $this->dashboardService->orderLatest();

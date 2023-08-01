@@ -6,7 +6,12 @@ Selamat akun anda berhasil didaftarkan sebagai Agen. Silahkan cek pesan masuk pa
 @component('mail::table')
 | <!-- -->    | <!-- -->    |
 |-------------|-------------|
-| <b>Jasa Layanan & Aplikasi</b>         | {{ $settingFee->owner_fee ?? null }}%        |
-| <b>Pendapatan Agen</b>        | {{ $settingFee->agen_fee ?? null }}%       |
+@foreach($settingFee as $index => $row)
+| Penjualan {{$row->mark()}} {{number_format($row->limit,0,',','.')}}
+| Estimasi Jasa Layanan & Aplikasi         | {{ $row->owner_fee ?? null }}%        |
+| Estimasi Pendapatan Agen        | {{ $row->agen_fee ?? null }}%       |
+| <!-- -->    | <!-- -->    |
+|-------------|-------------|
+@endforeach
 @endcomponent
 @endcomponent

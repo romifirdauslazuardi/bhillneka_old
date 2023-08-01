@@ -34,6 +34,9 @@
   .bg-half-170 {
     padding: 50px 0 !important;
   }
+  .section {
+    padding-bottom: 0px;
+  }
 </style>
 @yield("css")
 

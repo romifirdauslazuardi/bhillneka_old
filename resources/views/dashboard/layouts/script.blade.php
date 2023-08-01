@@ -511,7 +511,7 @@
 
     function getCustomer(selector,business_id,selectedId=null){
         $.ajax({
-            url : '{{route("base.customers.index")}}',
+            url : '{{route("base.users.customer")}}',
             method : "GET",
             dataType : "JSON",
             data : {

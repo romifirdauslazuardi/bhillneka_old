@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Enums\BusinessCategoryEnum;
+use App\Enums\DokuEnum;
 use App\Enums\OrderEnum;
 use App\Enums\OrderMikrotikEnum;
 use App\Enums\ProductEnum;
+use App\Enums\ProductStockEnum;
 use App\Enums\ProviderEnum;
 use App\Enums\RoleEnum;
 use App\Helpers\CodeHelper;
@@ -21,6 +23,7 @@ use App\Http\Requests\Order\StoreRequest;
 use App\Http\Requests\Order\UpdateProgressRequest;
 use App\Http\Requests\Order\UpdateRequest;
 use App\Http\Requests\Order\UpdateStatusRequest;
+use App\Http\Requests\Order\UpdateProviderRequest;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderDoku;
@@ -35,7 +38,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
-use App\Jobs\OrderJob;
+use App\Jobs\OrderExpiredJob;
 use App\Models\Business;
 use Auth;
 use DB;
@@ -250,6 +253,21 @@ class OrderService extends BaseService
                 $repeat_order_status = OrderEnum::REPEAT_ORDER_STATUS_TRUE;
             }
 
+            if(request()->routeIs("landing-page.buy-products.store")){
+                $addItemOrder = self::addItemOrderPayLater($request);
+
+                if($addItemOrder["IsError"] == TRUE){
+                    DB::rollBack();
+                    return $this->response(false, $addItemOrder["Message"]);
+                }
+                else{
+                    if(!empty($addItemOrder["Data"])){
+                        DB::commit();
+                        return $this->response(true, $addItemOrder["Message"],$addItemOrder["Data"]);
+                    }
+                }
+            }
+
             $order = $this->order->create([
                 'code' => CodeHelper::generateOrder(),
                 'user_id' => $user_id,
@@ -271,6 +289,12 @@ class OrderService extends BaseService
                 'repeat_order_status' => $repeat_order_status,
             ]);
 
+            if($order->provider->type == ProviderEnum::TYPE_MANUAL_TRANSFER){
+                $order->update([
+                    "doku_service_id" => DokuEnum::SERVICE_MANUAL_PAYMENT,
+                ]);
+            }
+
             $total = 0;
             foreach($repeater as $index => $row){
                 $product_id = $row["product_id"] ?? null;
@@ -288,7 +312,8 @@ class OrderService extends BaseService
                 $auto_userpassword = $row["auto_userpassword"] ?? null;
                 $address = $row["address"] ?? null;
                 $mac_address = $row["mac_address"] ?? null;
-                $expired_date = $row["expired_date"] ?? null;
+                $expired_month = $row["expired_month"] ?? null;
+                $expired_date = null;
 
                 if(empty($product_id)){
                     DB::rollBack();
@@ -307,6 +332,7 @@ class OrderService extends BaseService
 
                 if($type == OrderEnum::TYPE_DUE_DATE){
                     $expired_date = null;
+                    $expired_month = null;
                 }
 
                 $productResult = $this->product;
@@ -324,14 +350,16 @@ class OrderService extends BaseService
                 }
 
                 if($business->category->name == BusinessCategoryEnum::MIKROTIK){
+
+                    if(empty($profile)){
+                        DB::rollBack();
+                        return $this->response(false, "Profile tidak boleh kosong");
+                    }
+
                     if($productResult->mikrotik == ProductEnum::MIKROTIK_PPPOE){
                         if(empty($service)){
                             DB::rollBack();
                             return $this->response(false, "Service tidak boleh kosong");
-                        }
-                        if(empty($profile)){
-                            DB::rollBack();
-                            return $this->response(false, "Profile tidak boleh kosong");
                         }
                         if(empty($local_address)){
                             DB::rollBack();
@@ -363,9 +391,7 @@ class OrderService extends BaseService
                             $password = $username;
                         }
                     }
-                }
 
-                if($business->category->name == BusinessCategoryEnum::MIKROTIK){
                     if(empty($username)){
                         DB::rollBack();
                         return $this->response(false, "Username tidak boleh kosong");
@@ -378,7 +404,7 @@ class OrderService extends BaseService
                 }
 
                 if($productResult->is_using_stock == ProductEnum::IS_USING_STOCK_TRUE){
-                    $stockReady = $productResult->stocks()->sum("qty");
+                    $stockReady = $productResult->stocks()->where("type",ProductStockEnum::TYPE_MASUK)->sum("qty") - $productResult->stocks()->where("type",ProductStockEnum::TYPE_KELUAR)->sum("qty");
 
                     if($stockReady <= 0){
                         DB::rollBack();
@@ -417,16 +443,25 @@ class OrderService extends BaseService
                     if($productResult->is_using_stock == ProductEnum::IS_USING_STOCK_TRUE){
 
                         if($oldQty != $orderItem->qty){
+
+                            $available = $orderItem->product->stocks()->where("type",ProductStockEnum::TYPE_MASUK)->sum("qty") - $orderItem->product->stocks()->where("type",ProductStockEnum::TYPE_KELUAR)->sum("qty");
+
                             $this->productStock->create([
+                                'date' => date("Y-m-d"),
+                                'type' => ProductStockEnum::TYPE_MASUK,
                                 'product_id' => $productResult->id,
                                 'qty' => $oldQty,
+                                'available' => $available + $oldQty,
                                 'note' => 'Stok masuk order #'.$order->code,
                                 'author_id' => $author_id,
                             ]);
     
                             $this->productStock->create([
+                                'date' => date("Y-m-d"),
+                                'type' => ProductStockEnum::TYPE_KELUAR,
                                 'product_id' => $productResult->id,
-                                'qty' => -$orderItem->qty,
+                                'qty' => $orderItem->qty,
+                                'available' => $available - $orderItem->qty,
                                 'note' => 'Stok keluar order #'.$order->code,
                                 'author_id' => $author_id,
                             ]);
@@ -437,18 +472,28 @@ class OrderService extends BaseService
                     $orderItem = $this->orderItem->create($dataOrderItem);
 
                     if($productResult->is_using_stock == ProductEnum::IS_USING_STOCK_TRUE){
+                        $available = $orderItem->product->stocks()->where("type",ProductStockEnum::TYPE_MASUK)->sum("qty") - $orderItem->product->stocks()->where("type",ProductStockEnum::TYPE_KELUAR)->sum("qty");
+
                         $this->productStock->create([
+                            'date' => date("Y-m-d"),
+                            'type' => ProductStockEnum::TYPE_KELUAR,
                             'product_id' => $productResult->id,
-                            'qty' => -$qty,
+                            'qty' => $qty,
+                            'available' => $available - $qty,
                             'note' => 'Stok keluar order #'.$order->code,
                             'author_id' => $author_id,
                         ]);
                     }
                 }
 
-                $total += ( $qty * $productResult->price ) - $disc; 
+                $total += ( $qty * $productResult->price ) - $disc;
                 
                 if($business->category->name == BusinessCategoryEnum::MIKROTIK){
+
+                    if(!empty($expired_month)){
+                        $expired_date = date("Y-m-d",strtotime(date("Y-m-d")." + ".$expired_month." month"));
+                    }
+
                     $dataOrderMikrotik = [
                         'order_item_id' => $orderItem->id,
                         'username' => $username,
@@ -458,8 +503,9 @@ class OrderService extends BaseService
                         'address' => $address,
                         'mac_address' => $mac_address,
                         'password' => $password,
-                        'type' => $type,
+                        'type' => $productResult->mikrotik,
                         'expired_date' => $expired_date,
+                        'expired_month' => $expired_month,
                         'time_limit' => $time_limit,
                         'comment' => $comment,
                         'local_address' => $local_address,
@@ -469,10 +515,10 @@ class OrderService extends BaseService
                     ];
 
                     if($productResult->mikrotik == ProductEnum::MIKROTIK_PPPOE){
-                        $dataOrderMikrotik["type"] = OrderMikrotikEnum::TYPE_PPPOE;
+                        $dataOrderMikrotik = array_merge($dataOrderMikrotik,["type" => OrderMikrotikEnum::TYPE_PPPOE]);
                     }
                     else{
-                        $dataOrderMikrotik["type"] = OrderMikrotikEnum::TYPE_HOTSPOT;
+                        $dataOrderMikrotik = array_merge($dataOrderMikrotik,["type" => OrderMikrotikEnum::TYPE_HOTSPOT]);
                     }
 
                     $this->orderMikrotik->updateOrCreate([
@@ -499,8 +545,6 @@ class OrderService extends BaseService
                         $connect = $connect->comm('/ip/hotspot/user/print');
                     }
 
-                    Log::info($connect);
-
                     $connectLog = LogHelper::mikrotikLog($connect);
 
                     if($connectLog["IsError"] == TRUE){
@@ -522,7 +566,7 @@ class OrderService extends BaseService
                 return $this->response(false, "Total transaksi tidak boleh kurang dari samadengan 0");
             }
 
-            $settingFee = SettingHelper::checkSettingFee();
+            $settingFee = SettingHelper::checkSettingFee($order->id);
 
             if($settingFee["IsError"] == TRUE){
                 DB::rollBack();
@@ -533,12 +577,28 @@ class OrderService extends BaseService
             }
 
             $order->update([
-                'owner_fee' => $settingFee->owner_fee,
-                'agen_fee' => $settingFee->agen_fee,
+                'owner_fee' => $settingFee["owner_fee"],
+                'agen_fee' => $settingFee["agen_fee"],
+                'total_owner_fee' => $settingFee["total_owner_fee"],
+                'total_agen_fee' => $settingFee["total_agen_fee"],
+                'customer_type_fee' => $settingFee["customer_type_fee"],
+                'customer_value_fee' => $settingFee["customer_value_fee"],
+                'customer_total_fee' => $settingFee["customer_total_fee"],
             ]);
 
+            if($order->provider->type == ProviderEnum::TYPE_PAY_LATER){
+                if(empty($business->user_pay_later->status)){
+                    DB::rollBack();
+                    return $this->response(false, "Pengaturan bayar nanti bisnis ".$business->name." tidak aktif");
+                }
+
+                $order->update([
+                    'status' => OrderEnum::STATUS_PAY_LATER
+                ]);
+            }
+
             if($order->provider->type == ProviderEnum::TYPE_DOKU){
-                $checkoutDoku = PaymentHelper::checkoutDoku($order);
+                $checkoutDoku = PaymentHelper::checkoutDoku($order->id);
 
                 if($checkoutDoku["IsError"] == TRUE){
                     DB::rollBack();
@@ -546,9 +606,12 @@ class OrderService extends BaseService
                 }
             }
 
-            OrderJob::dispatch($order->id)->delay(now()->addMinutes((env("DOKU_DUE_DATE")+1)));
+            if($order->provider->type != ProviderEnum::TYPE_PAY_LATER){
+                
+                OrderExpiredJob::dispatch($order->id)->delay(now()->addMinutes((env("DOKU_DUE_DATE")+1)));
 
-            self::sendWhatsapp($order->id,"pesanan");
+                WhatsappHelper::sendWhatsappOrderTemplate($order->id,"pesanan");
+            }
 
             DB::commit();
 
@@ -635,9 +698,9 @@ class OrderService extends BaseService
                 $remote_address = $row["remote_address"] ?? null;
                 $comment = $row["comment"] ?? null;
                 $time_limit = $row["time_limit"] ?? null;
-                $disabled = $row["disabled"] ?? null;
                 $auto_userpassword = $row["auto_userpassword"] ?? null;
-                $expired_date = $row["expired_date"] ?? null;
+                $expired_month = $row["expired_month"] ?? null;
+                $expired_date = null;
 
                 $stockReady = 0;
 
@@ -658,6 +721,7 @@ class OrderService extends BaseService
 
                 if($type == OrderEnum::TYPE_DUE_DATE){
                     $expired_date = null;
+                    $expired_month = null;
                 }
 
                 $productResult = $this->product;
@@ -675,14 +739,15 @@ class OrderService extends BaseService
                 }
 
                 if($business->category->name == BusinessCategoryEnum::MIKROTIK){
+                    if(empty($profile)){
+                        DB::rollBack();
+                        return $this->response(false, "Profile tidak boleh kosong");
+                    }
+                    
                     if($productResult->mikrotik == ProductEnum::MIKROTIK_PPPOE){
                         if(empty($service)){
                             DB::rollBack();
                             return $this->response(false, "Service tidak boleh kosong");
-                        }
-                        if(empty($profile)){
-                            DB::rollBack();
-                            return $this->response(false, "Profile tidak boleh kosong");
                         }
                         if(empty($local_address)){
                             DB::rollBack();
@@ -694,6 +759,11 @@ class OrderService extends BaseService
                         }
                     }
                     else{
+                        if(!isset($auto_userpassword)){
+                            DB::rollBack();
+                            return $this->response(false, "Jenis pengisian tidak boleh kosong");
+                        }
+
                         if(empty($server)){
                             DB::rollBack();
                             return $this->response(false, "Server tidak boleh kosong");
@@ -712,11 +782,6 @@ class OrderService extends BaseService
                                 }
                             }
                         }
-                    }
-
-                    if(!isset($auto_userpassword)){
-                        DB::rollBack();
-                        return $this->response(false, "Jenis pengisian tidak boleh kosong");
                     }
 
                     if(empty($username)){
@@ -772,16 +837,24 @@ class OrderService extends BaseService
                         }
 
                         if($oldQty != $orderItem->qty){
+                            $available = $orderItem->product->stocks()->where("type",ProductStockEnum::TYPE_MASUK)->sum("qty") - $orderItem->product->stocks()->where("type",ProductStockEnum::TYPE_KELUAR)->sum("qty");
+
                             $this->productStock->create([
+                                'date' => date("Y-m-d"),
+                                'type' => ProductStockEnum::TYPE_MASUK,
                                 'product_id' => $productResult->id,
                                 'qty' => $oldQty,
+                                'available' => $available + $oldQty,
                                 'note' => 'Stok masuk order #'.$result->code,
                                 'author_id' => $author_id,
                             ]);
     
                             $this->productStock->create([
+                                'date' => date("Y-m-d"),
+                                'type' => ProductStockEnum::TYPE_KELUAR,
                                 'product_id' => $productResult->id,
-                                'qty' => -$orderItem->qty,
+                                'qty' => $orderItem->qty,
+                                'available' => $available - $orderItem->qty,
                                 'note' => 'Stok keluar order #'.$result->code,
                                 'author_id' => $author_id,
                             ]);
@@ -792,9 +865,14 @@ class OrderService extends BaseService
                     $orderItem = $this->orderItem->create($dataOrderItem);
 
                     if($productResult->is_using_stock == ProductEnum::IS_USING_STOCK_TRUE){
+                        $available = $orderItem->product->stocks()->where("type",ProductStockEnum::TYPE_MASUK)->sum("qty") - $orderItem->product->stocks()->where("type",ProductStockEnum::TYPE_KELUAR)->sum("qty");
+
                         $this->productStock->create([
+                            'date' => date("Y-m-d"),
+                            'type' => ProductStockEnum::TYPE_KELUAR,
                             'product_id' => $productResult->id,
-                            'qty' => -$qty,
+                            'qty' => $qty,
+                            'available' => $available - $qty,
                             'note' => 'Stok keluar order #'.$result->code,
                             'author_id' => $author_id,
                         ]);
@@ -807,6 +885,10 @@ class OrderService extends BaseService
                 
                 if($business->category->name == BusinessCategoryEnum::MIKROTIK){
 
+                    if(!empty($expired_month)){
+                        $expired_date = date("Y-m-d",strtotime(date("Y-m-d",strtotime($result->created_at))." + ".$expired_month." month"));
+                    }
+
                     $dataOrderMikrotik = [
                         'order_item_id' => $orderItem->id,
                         'username' => $username,
@@ -814,21 +896,21 @@ class OrderService extends BaseService
                         'service' => $service,
                         'server' => $server,
                         'password' => $password,
-                        'type' => $type,
+                        'type' => $productResult->mikrotik,
                         'expired_date' => $expired_date,
+                        'expired_month' => $expired_month,
                         'time_limit' => $time_limit,
                         'comment' => $comment,
                         'local_address' => $local_address,
                         'remote_address' => $remote_address,
-                        'disabled' => $disabled,
                         'author_id' => $author_id,
                     ];
 
                     if($productResult->mikrotik == ProductEnum::MIKROTIK_PPPOE){
-                        $dataOrderMikrotik["type"] = OrderMikrotikEnum::TYPE_PPPOE;
+                        $dataOrderMikrotik = array_merge($dataOrderMikrotik,["type" => OrderMikrotikEnum::TYPE_PPPOE]);
                     }
                     else{
-                        $dataOrderMikrotik["type"] = OrderMikrotikEnum::TYPE_HOTSPOT;
+                        $dataOrderMikrotik = array_merge($dataOrderMikrotik,["type" => OrderMikrotikEnum::TYPE_HOTSPOT]);
                     }
 
                     $this->orderMikrotik->updateOrCreate([
@@ -844,7 +926,7 @@ class OrderService extends BaseService
                 return $this->response(false, "Total transaksi tidak boleh kurang dari samadengan 0");
             }
 
-            $settingFee = SettingHelper::checkSettingFee();
+            $settingFee = SettingHelper::checkSettingFee($result->id);
 
             if($settingFee["IsError"] == TRUE){
                 DB::rollBack();
@@ -855,8 +937,13 @@ class OrderService extends BaseService
             }
 
             $result->update([
-                'owner_fee' => $settingFee->owner_fee,
-                'agen_fee' => $settingFee->agen_fee,
+                'owner_fee' => $settingFee["owner_fee"],
+                'agen_fee' => $settingFee["agen_fee"],
+                'total_owner_fee' => $settingFee["total_owner_fee"],
+                'total_agen_fee' => $settingFee["total_agen_fee"],
+                'customer_type_fee' => $settingFee["customer_type_fee"],
+                'customer_value_fee' => $settingFee["customer_value_fee"],
+                'customer_total_fee' => $settingFee["customer_total_fee"],
             ]);
 
             $deteleOrderItem = $this->orderItem;
@@ -959,11 +1046,58 @@ class OrderService extends BaseService
                 ]);
             }
 
-            self::sendWhatsapp($result->id);
+            WhatsappHelper::sendWhatsappOrderTemplate($result->id);
 
             DB::commit();
 
             return $this->response(true, 'Berhasil mengubah status transaksi',$result);
+        } catch (Throwable $th) {
+            DB::rollBack();
+            Log::emergency($th->getMessage());
+
+            return $this->response(false, "Terjadi kesalahan saat memproses data");
+        }
+    }
+
+    public function updateProvider(UpdateProviderRequest $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            $provider_id = (empty($request->provider_id)) ? null : trim(strip_tags($request->provider_id));
+
+            $result = $this->order;
+            $result = $result->where("id",$id);
+            $result = $result->firstOrFail();
+
+            $result->update([
+                'provider_id' => $provider_id
+            ]);
+
+            if($result->provider->type == ProviderEnum::TYPE_DOKU){
+                $checkoutDoku = PaymentHelper::checkoutDoku($result->id);
+
+                if($checkoutDoku["IsError"] == TRUE){
+                    DB::rollBack();
+                    return $this->response(false, $checkoutDoku["Message"]);
+                }
+            }
+
+            if(in_array($result->provider->type,[ProviderEnum::TYPE_DOKU,ProviderEnum::TYPE_MANUAL_TRANSFER])){
+
+                OrderExpiredJob::dispatch($result->id)->delay(now()->addMinutes((env("DOKU_DUE_DATE")+1)));
+
+                $result->update([
+                    'status' => OrderEnum::STATUS_WAITING_PAYMENT,
+                    'progress' => OrderEnum::PROGRESS_DRAFT,
+                    'expired_date' => date("YmdHis",strtotime(date("Y-m-d H:i:s")." + ".(env("DOKU_DUE_DATE")+1)."minutes")),
+                ]);
+
+                WhatsappHelper::sendWhatsappOrderTemplate($result->id,"pesanan");
+            }
+
+            DB::commit();
+
+            return $this->response(true, 'Checkout berhasil dilakukan. Silahkan lakukan pembayaran sampai batas waktu yang telah ditentukan',$result);
         } catch (Throwable $th) {
             DB::rollBack();
             Log::emergency($th->getMessage());
@@ -986,7 +1120,7 @@ class OrderService extends BaseService
                 'progress' => $progress
             ]);
 
-            self::sendWhatsapp($result->id,"progress");
+            WhatsappHelper::sendWhatsappOrderTemplate($result->id,"progress");
 
             DB::commit();
 
@@ -999,101 +1133,366 @@ class OrderService extends BaseService
         }
     }
 
-    private function sendWhatsapp($orderId,string $type = "pesanan"){
-        $message = "";
+    private function addItemOrderPayLater($request){
+        $data = [];
+        try {
+            $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
+            $customer_phone = (empty($request->customer_phone)) ? null : trim(strip_tags($request->customer_phone));
+            $repeater = $request->repeater;
 
-        $order = $this->order;
-        $order = $order->where("id",$orderId);
-        $order = $order->first();
+            $checkExistOrderPayLater = $this->order;
+            $checkExistOrderPayLater = $checkExistOrderPayLater->where("business_id",$business_id);
+            $checkExistOrderPayLater = $checkExistOrderPayLater->where("customer_phone",$customer_phone);
+            $checkExistOrderPayLater = $checkExistOrderPayLater->whereHas("provider",function($query2){
+                $query2->where("type",ProviderEnum::TYPE_PAY_LATER);
+            });
+            $checkExistOrderPayLater = $checkExistOrderPayLater->where("status",OrderEnum::STATUS_PAY_LATER);
+            $checkExistOrderPayLater = $checkExistOrderPayLater->orderBy("created_at","DESC");
+            $checkExistOrderPayLater = $checkExistOrderPayLater->first();
 
-        if($type == "pesanan"){
-            if($order->status == OrderEnum::STATUS_WAITING_PAYMENT){
-                $message .= "Selesaikan Pembayaran Anda sebelum ".date("d F Y H:i:s",strtotime($order->expired_date))." WIB";
-                $message .= "\r\n";
-            }
-        }
-        else if($type == "progress"){
-            $message = "Progress pesanan anda diubah menjadi *".$order->progress()->msg."*";
-            $message .= "\r\n";
-        }
+            if($checkExistOrderPayLater){
+
+                $discount = $checkExistOrderPayLater->discount;
+                $total = 0;
+
+                foreach($repeater as $index => $row){
+                    $product_id = $row["product_id"] ?? null;
+                    $qty = $row["qty"] ?? null;
+                    $disc = $row["discount"] ?? 0;
+                    $username = $row["username"] ?? null;
+                    $password = $row["password"] ?? null;
+                    $service = $row["service"] ?? null;
+                    $server = $row["server"] ?? null;
+                    $profile = $row["profile"] ?? null;
+                    $local_address = $row["local_address"] ?? null;
+                    $remote_address = $row["remote_address"] ?? null;
+                    $comment = $row["comment"] ?? null;
+                    $time_limit = $row["time_limit"] ?? null;
+                    $auto_userpassword = $row["auto_userpassword"] ?? null;
+                    $address = $row["address"] ?? null;
+                    $mac_address = $row["mac_address"] ?? null;
+                    $expired_date = $row["expired_date"] ?? null;
+
+                    if(empty($product_id)){
+                        $data["IsError"] = TRUE;
+                        $data["Data"] = null;
+                        $data["Message"] = "Product ID tidak boleh kosong";
+                        goto ResultData;
+                    }
+
+                    if(empty($qty)){
+                        $data["IsError"] = TRUE;
+                        $data["Data"] = null;
+                        $data["Message"] = "Qty produk tidak boleh kosong";
+                        goto ResultData;
+                    }
+
+                    if($qty <= 0){
+                        $data["IsError"] = TRUE;
+                        $data["Data"] = null;
+                        $data["Message"] = "Qty produk tidak boleh kosong";
+                        goto ResultData;
+                    }
+
+                    $productResult = $this->product;
+                    $productResult = $productResult->where("id",$product_id);
+                    $productResult = $productResult->first();
+
+                    if(!$productResult){
+                        $data["IsError"] = TRUE;
+                        $data["Data"] = null;
+                        $data["Message"] = "Produk tidak ditemukan";
+                        goto ResultData;
+                    }
+
+                    if($productResult->price <= 0){
+                        $data["IsError"] = TRUE;
+                        $data["Data"] = null;
+                        $data["Message"] = "Harga produk ".$productResult->name." belum diatur";
+                        goto ResultData;
+                    }
+
+                    if($checkExistOrderPayLater->business->category->name == BusinessCategoryEnum::MIKROTIK){
+                        
+                        if(empty($profile)){
+                            $data["IsError"] = TRUE;
+                            $data["Data"] = null;
+                            $data["Message"] = "Profile tidak boleh kosong";
+                            goto ResultData;
+                        }
+
+                        if($productResult->mikrotik == ProductEnum::MIKROTIK_PPPOE){
+                            if(empty($service)){
+                                $data["IsError"] = TRUE;
+                                $data["Data"] = null;
+                                $data["Message"] = "Service tidak boleh kosong";
+                                goto ResultData;
+                            }
+                            if(empty($local_address)){
+                                $data["IsError"] = TRUE;
+                                $data["Data"] = null;
+                                $data["Message"] = "Local address tidak boleh kosong";
+                                goto ResultData;
+                            }
+                            if(empty($remote_address)){
+                                $data["IsError"] = TRUE;
+                                $data["Data"] = null;
+                                $data["Message"] = "Remote address tidak boleh kosong";
+                                goto ResultData;
+                            }
+                        }
+                        else{
+                            if(empty($server)){
+                                $data["IsError"] = TRUE;
+                                $data["Data"] = null;
+                                $data["Message"] = "Server tidak boleh kosong";
+                                goto ResultData;
+                            }
+
+                            if(!isset($time_limit)){
+                                $data["IsError"] = TRUE;
+                                $data["Data"] = null;
+                                $data["Message"] = "Time limit tidak boleh kosong";
+                                goto ResultData;
+                            }
+
+                            if(!isset($auto_userpassword)){
+                                $data["IsError"] = TRUE;
+                                $data["Data"] = null;
+                                $data["Message"] = "Jenis pengisian tidak boleh kosong";
+                                goto ResultData;
+                            }
+
+                            if($auto_userpassword == OrderMikrotikEnum::AUTO_USERPASSWORD_TRUE){
+                                $username = Str::random(6);
+                                $password = $username;
+                            }
+                        }
+
+                        if(empty($username)){
+                            $data["IsError"] = TRUE;
+                            $data["Data"] = null;
+                            $data["Message"] = "Username tidak boleh kosong";
+                            goto ResultData;
+                        }
+                        
+                        if(empty($password)){
+                            $data["IsError"] = TRUE;
+                            $data["Data"] = null;
+                            $data["Message"] = "Password tidak boleh kosong";
+                            goto ResultData;
+                        }
+                    }
+
+                    if($productResult->is_using_stock == ProductEnum::IS_USING_STOCK_TRUE){
+                        $stockReady = $productResult->stocks()->where("type",ProductStockEnum::TYPE_MASUK)->sum("qty") - $productResult->stocks()->where("type",ProductStockEnum::TYPE_KELUAR)->sum("qty");
+
+                        if($stockReady <= 0){
+                            $data["IsError"] = TRUE;
+                            $data["Data"] = null;
+                            $data["Message"] = "Stok produk ".$productResult->name." belum diatur";
+                            goto ResultData;
+                        }
+
+                        if($stockReady < $qty){
+                            $data["IsError"] = TRUE;
+                            $data["Data"] = null;
+                            $data["Message"] = "Stok produk ".$productResult->name." tinggal ".$stockReady;
+                            goto ResultData;
+                        }
+                    }
+                    
+                    $disc = str_replace(".","",$disc);
+
+                    $dataOrderItem = [
+                        'order_id' => $checkExistOrderPayLater->id,
+                        'product_id' => $productResult->id,
+                        'product_code' => $productResult->code,
+                        'product_name' => $productResult->name,
+                        'product_price' => $productResult->price,
+                        'discount' => $disc,
+                    ];
+
+                    $orderItem = $this->orderItem;
+                    $orderItem = $orderItem->where("order_id",$checkExistOrderPayLater->id);
+                    $orderItem = $orderItem->where("product_id",$productResult->id);
+                    $orderItem = $orderItem->first();
+
+                    $oldQty = $orderItem->qty ?? 0;
+                    $newQty = $oldQty + $qty;
+
+                    $dataOrderItem = array_merge($dataOrderItem,["qty" => $newQty]);
+
+                    if($orderItem){
+                        $orderItem->update($dataOrderItem);
+
+                        if($productResult->is_using_stock == ProductEnum::IS_USING_STOCK_TRUE){
+
+                            if($oldQty != $orderItem->qty){
+                                $available = $orderItem->product->stocks()->where("type",ProductStockEnum::TYPE_MASUK)->sum("qty") - $orderItem->product->stocks()->where("type",ProductStockEnum::TYPE_KELUAR)->sum("qty");
+
+                                $this->productStock->create([
+                                    'date' => date("Y-m-d"),
+                                    'type' => ProductStockEnum::TYPE_MASUK,
+                                    'product_id' => $productResult->id,
+                                    'qty' => $oldQty,
+                                    'available' => $available + $oldQty,
+                                    'note' => 'Stok masuk order #'.$checkExistOrderPayLater->code,
+                                ]);
         
-        $message .= "\r\n";
-        $message .= $order->business->name;
-        $message .= "\r\n";
-        $message .= $order->business->location;
-        $message .= "\r\n";
-        $message .= $order->business->user->phone;
-        $message .= "\r\n";
-        $message .= "=====";
-        $message .= "\r\n";
-        $message .= $order->status()->msg." #".$order->code;
-        $message .= "\r\n";
-        $message .= "=====";
-        $message .= "\r\n";
-        foreach($order->items as $index => $row){
-            $message .= $row->product_name;
-            $message .= "\r\n";
-            $message .= $row->qty." x ".number_format($row->product_price,0,',','.')." = ".number_format($row->totalNeto(),0,',','.');
-            if(!empty($row->order_mikrotik->mikrotik_id)){
-                $message .= "\r\n";
-                if($row->order_mikrotik->type == OrderMikrotikEnum::TYPE_HOTSPOT){
-                    $message .= "SSID : ".$row->order_mikrotik->server;
-                    $message .= "\r\n";
+                                $this->productStock->create([
+                                    'date' => date("Y-m-d"),
+                                    'type' => ProductStockEnum::TYPE_KELUAR,
+                                    'product_id' => $productResult->id,
+                                    'qty' => $newQty,
+                                    'available' => $available - $newQty,
+                                    'note' => 'Stok keluar order #'.$checkExistOrderPayLater->code,
+                                ]);
+                            }
+                        }
+                    }
+                    else{
+                        $orderItem = $this->orderItem->create($dataOrderItem);
+
+                        if($productResult->is_using_stock == ProductEnum::IS_USING_STOCK_TRUE){
+                            $available = $orderItem->product->stocks()->where("type",ProductStockEnum::TYPE_MASUK)->sum("qty") - $orderItem->product->stocks()->where("type",ProductStockEnum::TYPE_KELUAR)->sum("qty");
+
+                            $this->productStock->create([
+                                'date' => date("Y-m-d"),
+                                'type' => ProductStockEnum::TYPE_KELUAR,
+                                'product_id' => $productResult->id,
+                                'qty' => $qty,
+                                'available' => $available - $qty,
+                                'note' => 'Stok keluar order #'.$checkExistOrderPayLater->code,
+                            ]);
+                        }
+                    }
+
+                    $total += ( $qty * $productResult->price ) - $disc; 
+                    
+                    if($checkExistOrderPayLater->business->category->name == BusinessCategoryEnum::MIKROTIK){
+                        $dataOrderMikrotik = [
+                            'order_item_id' => $orderItem->id,
+                            'username' => $username,
+                            'profile' => $profile,
+                            'service' => $service,
+                            'server' => $server,
+                            'address' => $address,
+                            'mac_address' => $mac_address,
+                            'password' => $password,
+                            'type' => $productResult->mikrotik,
+                            'expired_date' => $expired_date,
+                            'time_limit' => $time_limit,
+                            'comment' => $comment,
+                            'local_address' => $local_address,
+                            'remote_address' => $remote_address,
+                            'disabled' => OrderMikrotikEnum::DISABLED_TRUE,
+                        ];
+
+                        if($productResult->mikrotik == ProductEnum::MIKROTIK_PPPOE){
+                            $dataOrderMikrotik = array_merge($dataOrderMikrotik,["type" => OrderMikrotikEnum::TYPE_PPPOE]);
+                        }
+                        else{
+                            $dataOrderMikrotik = array_merge($dataOrderMikrotik,["type" => OrderMikrotikEnum::TYPE_HOTSPOT]);
+                        }
+
+                        $this->orderMikrotik->updateOrCreate([
+                            'order_item_id' => $orderItem->id,
+                        ],$dataOrderMikrotik);
+
+                        $mikrotikConfig = SettingHelper::mikrotikConfig($checkExistOrderPayLater->business_id,$checkExistOrderPayLater->business->user_id);
+                        $ip = $mikrotikConfig->ip ?? null;
+                        $username = $mikrotikConfig->username ?? null;
+                        $password = $mikrotikConfig->password ?? null;
+                        $port = $mikrotikConfig->port ?? null;
+                        
+                        $connect = $this->routerosApi;
+                        $connect->debug("false");
+
+                        if(!$connect->connect($ip,$username,$password,$port)){
+                            $data["IsError"] = TRUE;
+                            $data["Data"] = null;
+                            $data["Message"] = 'Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda';
+                            goto ResultData;
+                        }
+
+                        if($dataOrderMikrotik["type"] == OrderMikrotikEnum::TYPE_PPPOE){
+                            $connect = $connect->comm('/ppp/secret/print');
+                        }
+                        else{
+                            $connect = $connect->comm('/ip/hotspot/user/print');
+                        }
+
+                        $connectLog = LogHelper::mikrotikLog($connect);
+
+                        if($connectLog["IsError"] == TRUE){
+                            $data["IsError"] = TRUE;
+                            $data["Data"] = null;
+                            $data["Message"] = $connectLog["Message"];
+                            goto ResultData;
+                        }
+
+                        foreach($connect as $i => $v){
+                            if($v["name"] == $dataOrderMikrotik["username"]){
+                                $data["IsError"] = TRUE;
+                                $data["Data"] = null;
+                                $data["Message"] = "Username ". $dataOrderMikrotik["username"]. " sudah terdaftar dimikrotik";
+                                goto ResultData;
+                            }
+                        }
+                    }
                 }
-                $message .= "Username : ".$row->order_mikrotik->username;
-                $message .= "\r\n";
-                $message .= "Password : ".$row->order_mikrotik->password;
-            }
-            $message .= "\r\n";
-            $message .= "=====";
-            $message .= "\r\n";
-        }
-        $message .= "Subtotal : ".number_format($order->totalNeto() + $order->discount,0,',','.');
-        $message .= "\r\n";
-        $message .= "Discount : ".number_format($order->discount,0,',','.');
-        $message .= "\r\n";
-        $message .= "Total : ".number_format($order->totalNeto(),0,',','.');
-        $message .= "\r\n";
-        if($order->status == OrderEnum::STATUS_SUCCESS){
-            $message .= "Bayar : ".number_format($order->totalNeto(),0,',','.');
-            $message .= "\r\n";
-        }
-        else{
-            $message .= "Bayar : ".number_format(0,0,',','.');
-            $message .= "\r\n";
-        }
-        $message .= "Kembalian : ".number_format(0,0,',','.');
-        $message .= "\r\n";
-        $message .= "\r\n";
+                $total -= $discount;
 
-        if($order->status == OrderEnum::STATUS_WAITING_PAYMENT){
-            if($order->provider->type == ProviderEnum::TYPE_DOKU){
-                $message .= "Link Pembayaran : ".$order->payment_url;
+                if($total <= 0){
+                    $data["IsError"] = TRUE;
+                    $data["Data"] = null;
+                    $data["Message"] = "Total transaksi tidak boleh kurang dari samadengan 0";
+                    goto ResultData;
+                }
+    
+                $settingFee = SettingHelper::checkSettingFee($checkExistOrderPayLater->id);
+    
+                if($settingFee["IsError"] == TRUE){
+                    $data["IsError"] = TRUE;
+                    $data["Data"] = null;
+                    $data["Message"] = $settingFee["Message"];
+                    goto ResultData;
+                }
+                else{
+                    $settingFee = $settingFee["Data"];
+                }
+                
+                $checkExistOrderPayLater->update([
+                    'owner_fee' => $settingFee["owner_fee"],
+                    'agen_fee' => $settingFee["agen_fee"],
+                    'total_owner_fee' => $settingFee["total_owner_fee"],
+                    'total_agen_fee' => $settingFee["total_agen_fee"],
+                    'customer_type_fee' => $settingFee["customer_type_fee"],
+                    'customer_value_fee' => $settingFee["customer_value_fee"],
+                    'customer_total_fee' => $settingFee["customer_total_fee"],
+                ]);
+
+                $data["IsError"] = FALSE;
+                $data["Data"] = $checkExistOrderPayLater;
+                $data["Message"] = "Checkout berhasil dilakukan. Silahkan lakukan pembayaran sampai batas waktu yang telah ditentukan";
+                goto ResultData;
+            }else{
+                $data["IsError"] = FALSE;
+                $data["Data"] = null;
+                $data["Message"] = "Customer belum memiliki pesanan bayar nanti";
+                goto ResultData;
             }
-            else if($order->provider->type == ProviderEnum::TYPE_MANUAL_TRANSFER){
-                $message .= "Link Pembayaran : ".route('landing-page.manual-payments.index',$order->code);
-            }
-        }
-        else{
-            $message .= "Link Invoice : ".route('landing-page.orders.index',['code' => $order->code]);
+
+        } catch (\Throwable $th) {
+            $data["IsError"] = TRUE;
+            $data["Data"] = null;
+            $data["Message"] = $th->getMessage();
+            goto ResultData;
         }
 
-        $message .= "\r\n";
-        $message .= "\r\n";
-
-        $message .= "Penyedia Layanan / www.bhilnekka.com";
-        $message .= "\r\n";
-        $message .= "TERIMAKASIH";
-        $message .= "\r\n";
-
-        if(!empty($order->customer_id)){
-            return WhatsappHelper::send($order->customer->phone,$order->customer->name,["title" => "Notifikasi Pesanan" ,"message" => $message],true);
-        }
-        else{
-            if(!empty($order->customer_name) && !empty($order->customer_phone)){
-                return WhatsappHelper::send($order->customer_phone,$order->customer_name,["title" => "Notifikasi Pesanan" ,"message" => $message],true);
-            }
-        }
+        ResultData:
+        return $data;
     }
     
 }

@@ -37,18 +37,23 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
         Route::get('/search', 'ProductController@showByCode')->name('showByCode');
     });
     
-    Route::group(["as" => "customers.", "prefix" => "customers"], function () {
-        Route::get('/', 'CustomerController@index')->name('index');
+    Route::group(["as" => "users.", "prefix" => "users"], function () {
+        Route::get('/customer', 'UserController@customer')->name('customer');
+        Route::get('/owner', 'UserController@owner')->name('owner');
+        Route::get('/agen', 'UserController@agen')->name('agen');
+        Route::get('/adminAgen', 'UserController@adminAgen')->name('adminAgen');
     });
 
     Route::group(["as" => "orders.", "prefix" => "orders"], function () {
         Route::get('/', 'OrderController@index')->name('index');
+        Route::get('/customerGeneral', 'OrderController@customerGeneral')->name('customerGeneral');
     });
 
     Route::group(["as" => "mikrotik-configs.", "prefix" => "mikrotik-configs"], function () {
         Route::get('/profile/pppoe', 'MikrotikConfigController@profilePppoe')->name('profilePppoe');
         Route::get('/profile/hotspot', 'MikrotikConfigController@profileHotspot')->name('profileHotspot');
         Route::get('/server/hotspot', 'MikrotikConfigController@serverHotspot')->name('serverHotspot');
+        Route::get('/profile/pppoe/{name}', 'MikrotikConfigController@detailProfilePppoe')->name('detailProfilePppoe');
     });
 
     Route::group(["as" => "tables.", "prefix" => "tables"], function () {

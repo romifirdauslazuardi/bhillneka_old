@@ -37,29 +37,29 @@ class DashboardService extends BaseService
         return $this->response(true, 'Berhasil mendapatkan data', count($products));
     }
 
-    public function totalIncomeOwnerBruto(){
+    public function totalIncomeOwnerNeto(){
         $orders = $this->orderSuccess();
 
         $total = 0;
         foreach($orders as $index => $row){
-            $total += $row->incomeOwnerBruto();
+            $total += $row->incomeOwnerNeto();
         }
 
         return $this->response(true, 'Berhasil mendapatkan data', $total);
     }
 
-    public function totalIncomeAgen(){
+    public function totalIncomeAgenNeto(){
         $orders = $this->orderSuccess();
 
         $total = 0;
         foreach($orders as $index => $row){
-            $total += $row->incomeAgen();
+            $total += $row->incomeAgenNeto();
         }
 
         return $this->response(true, 'Berhasil mendapatkan data', $total);
     }
 
-    public function chartIncomeAgen(){
+    public function chartIncomeAgenNeto(){
         $orders = $this->orderSuccess();
 
         $labels = [];
@@ -71,15 +71,15 @@ class DashboardService extends BaseService
         foreach($orders as $index => $row){
             if($index == 0){
                 $labels[date('d-m-Y',strtotime($row->created_at))] = date('d F Y',strtotime($row->created_at));
-                $value[date('d-m-Y',strtotime($row->created_at))] = $row->incomeAgen();
+                $value[date('d-m-Y',strtotime($row->created_at))] = $row->incomeAgenNeto();
             }
             else{
                 if(!isset($labels[date('d-m-Y',strtotime($row->created_at))])){
                     $labels[date('d-m-Y',strtotime($row->created_at))] = date('d F Y',strtotime($row->created_at));
-                    $value[date('d-m-Y',strtotime($row->created_at))] = $row->incomeAgen();
+                    $value[date('d-m-Y',strtotime($row->created_at))] = $row->incomeAgenNeto();
                 }
                 else{
-                    $value[date('d-m-Y',strtotime($row->created_at))] += $row->incomeAgen();
+                    $value[date('d-m-Y',strtotime($row->created_at))] += $row->incomeAgenNeto();
                 }
             }
         }
@@ -100,7 +100,7 @@ class DashboardService extends BaseService
         return $this->response(true, 'Berhasil mendapatkan data', $data);
     }
 
-    public function chartIncomeOwnerBruto(){
+    public function chartIncomeOwnerNeto(){
         $orders = $this->orderSuccess();
 
         $labels = [];
@@ -112,15 +112,15 @@ class DashboardService extends BaseService
         foreach($orders as $index => $row){
             if($index == 0){
                 $labels[date('d-m-Y',strtotime($row->created_at))] = date('d F Y',strtotime($row->created_at));
-                $value[date('d-m-Y',strtotime($row->created_at))] = $row->incomeOwnerBruto();
+                $value[date('d-m-Y',strtotime($row->created_at))] = $row->incomeOwnerNeto();
             }
             else{
                 if(!isset($labels[date('d-m-Y',strtotime($row->created_at))])){
                     $labels[date('d-m-Y',strtotime($row->created_at))] = date('d F Y',strtotime($row->created_at));
-                    $value[date('d-m-Y',strtotime($row->created_at))] = $row->incomeOwnerBruto();
+                    $value[date('d-m-Y',strtotime($row->created_at))] = $row->incomeOwnerNeto();
                 }
                 else{
-                    $value[date('d-m-Y',strtotime($row->created_at))] += $row->incomeOwnerBruto();
+                    $value[date('d-m-Y',strtotime($row->created_at))] += $row->incomeOwnerNeto();
                 }
             }
         }
@@ -172,7 +172,7 @@ class DashboardService extends BaseService
         }
         
         if($orderSuccess >= 1 && $orderPembagi >= 1){
-            return floatval(($orderSuccess/$orderPembagi) * 100);
+            return ceil(($orderSuccess/$orderPembagi) * 100);
         }
 
         return 0;

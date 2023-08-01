@@ -48,7 +48,6 @@ class IncomeReportController extends Controller
             $total = $response["total"];
             $total_owner = $response["total_owner"];
             $total_agen = $response["total_agen"];
-            $total_doku_fee = $response["total_doku_fee"];
 
             $collection = new Collection();
             foreach($orders as $index => $row){
@@ -64,8 +63,8 @@ class IncomeReportController extends Controller
                 $pushData[] = $index+1;
                 $pushData[] = $row->code;
                 $pushData[] = $customer;
-                $pushData[] = $row->incomeAgen();
-                $pushData[] = $row->incomeOwnerBruto();
+                $pushData[] = $row->incomeAgenNeto();
+                $pushData[] = $row->incomeOwnerNeto();
                 $pushData[] = $row->totalNeto();
                 $pushData[] = $row->progress()->msg ?? null;
                 $pushData[] = $row->status()->msg ?? null;
@@ -105,6 +104,4 @@ class IncomeReportController extends Controller
             return redirect()->route($this->route . 'index')->withInput();
         }
     }
-
-
 }

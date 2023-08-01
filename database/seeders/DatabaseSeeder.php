@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             PageSeeder::class,
             BusinessCategorySeeder::class,
             BankSeeder::class,
+            BusinessSlugSeeder::class,
+            TableCodeSeeder::class,
             ProvincesSeeder::class,
             CitiesSeeder::class,
             DistrictsSeeder::class,

@@ -58,7 +58,10 @@
                                         <p style="margin-bottom: 0;padding-bottom:0;">{{$row->name}}</p>
                                         <h6>{{number_format($row->price,0,',','.')}}</h6>
                                     </div>
-                                    <a href="#" class="btn btn-success btn-sm d-block btn-add-cart" data-id="{{$row->id}}" data-name="{{$row->name}}" data-price="{{$row->price}}" data-image="{{$row->image}}"><i class="fa fa-shopping-cart"></i> ADD TO CART</a>
+                                    <div class="d-flex justify-content-center">
+                                        <a href="#" class="btn btn-secondary btn-sm d-block btn-show-product" data-index="{{$index}}" style="margin-right: 5px;"><i class="fa fa-eye"></i> LIHAT DETAIL</a>
+                                        <a href="#" class="btn btn-warning btn-sm d-block btn-add-cart" data-id="{{$row->id}}" data-name="{{$row->name}}" data-price="{{$row->price}}" data-image="{{$row->image}}"><i class="fa fa-shopping-cart"></i> ADD TO CART</a>
+                                    </div>
                                 </div>
                             </div>
                             @empty
@@ -79,7 +82,7 @@
                             <input type="hidden" name="user_id" value="{{$business->user_id}}">
                             <input type="hidden" name="business_id" value="{{$business->id}}">
                             <input type="hidden" name="type" value="{{\App\Enums\OrderEnum::TYPE_ON_TIME_PAY}}">
-                            <input type="hidden" name="table_id" value="{{$table->id}}">
+                            <input type="hidden" name="table_id" value="{{$table->id ?? null}}">
                             @if(count($carts) >= 1)
                                 @php
                                     $index = 0;
@@ -88,11 +91,13 @@
                                 
                                 <input type="hidden" name="repeater[{{$index}}][product_id]" value="{{$row->id}}">
                                 <input type="hidden" name="repeater[{{$index}}][qty]" value="{{$row->quantity}}">
-                                <table class="mb-1">
+                                <table class="mb-1" style="width:100%;">
                                     <tbody>
                                         <tr>
-                                            <td style="width: 35%;">{{$row->name}}</td>
-                                            <td style="width: 35%;">{{number_format($row->price,0,',','.')}}</td>
+                                            <td style="width: 35%;">
+                                                {{$row->name}}
+                                            </td>
+                                            <td style="width: 35%;" class="text-center">{{number_format($row->price,0,',','.')}}</td>
                                             <td style="width: 30%;">
                                                 <div class="d-flex">
                                                     <button class="btn btn-icon btn-soft-primary btn-min-cart" style="margin-right: 5px;" data-id="{{$row->id}}">-</button>
@@ -101,8 +106,50 @@
                                                 </div>
                                             </td>
                                         </tr>
+                                        @if($business->category->name == \App\Enums\BusinessCategoryEnum::MIKROTIK)
+                                        <tr class="mt-1">
+                                            <td colspan="3">
+                                                <a href="#" class="btn btn-secondary btn-sm d-block btn-configuration mt-1" data-index="{{$index}}">Atur Konfigurasi User</a>
+                                            </td>
+                                        </tr>
+                                        @endif
                                     </tbody>
                                 </table>
+
+                                @if($business->category->name == \App\Enums\BusinessCategoryEnum::MIKROTIK)
+                                <div class="modal fade modalMikrotik modalMikrotik-{{$index}}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                        <div class="modal-content rounded shadow border-0">
+                                            <div class="modal-header border-bottom">
+                                                <h5 class="modal-title">
+                                                    Pengaturan Hotspot
+                                                </h5>
+                                                <button type="button" class="btn btn-icon btn-close" data-bs-dismiss="modal" id="close-modal"><i class="uil uil-times fs-4 text-dark"></i></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <input type="hidden" name="repeater[{{$index}}][auto_userpassword]" value="{{\App\Enums\OrderMikrotikEnum::AUTO_USERPASSWORD_FALSE}}" class="auto_userpassword">
+                                                <input type="hidden" class="form-control server" name="repeater[{{$index}}][server]" value="{{$row->attributes->product->server ?? null}}">
+                                                <input type="hidden" class="form-control profile" name="repeater[{{$index}}][profile]" value="{{$row->attributes->product->profile ?? null}}">
+                                                <input type="hidden" class="form-control address" name="repeater[{{$index}}][address]" value="{{$row->attributes->product->address ?? null}}">
+                                                <input type="hidden" class="form-control mac-address" name="repeater[{{$index}}][mac_address]" value="{{$row->attributes->product->mac_address ?? null}}">
+                                                <input type="hidden" class="form-control time-limit" name="repeater[{{$index}}][time_limit]" value="{{$row->attributes->product->time_limit ?? null}}">
+                                                <input type="hidden" class="form-control comment" name="repeater[{{$index}}][comment]" value="{{$row->attributes->product->comment ?? null}}">
+                                                <div class="form-group mb-3">
+                                                    <label>Username<span class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control username" placeholder="Username" name="repeater[{{$index}}][username]">
+                                                </div>
+                                                <div class="form-group mb-3">
+                                                    <label>Password<span class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control password" placeholder="Password" name="repeater[{{$index}}][password]">
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endif
                                 @php
                                     $index += 1;
                                 @endphp
@@ -114,6 +161,7 @@
                                             <div class="table">
                                                 <table class="table table-bordered">
                                                     <tbody>
+                                                        @if($business->category->name == \App\Enums\BusinessCategoryEnum::FNB)
                                                         <tr>
                                                             <td>Meja</td>
                                                             <td>:</td>
@@ -121,11 +169,12 @@
                                                                 {{$table->name}}
                                                             </td>
                                                         </tr>
+                                                        @endif
                                                         <tr>
                                                             <td>Total</td>
                                                             <td>:</td>
                                                             <td>
-                                                                {{number_format(Cart::getTotal(),0,',','.')}}
+                                                                <b>{{number_format(Cart::getTotal(),0,',','.')}}</b>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -142,6 +191,7 @@
                                                                 <input type="text" class="form-control" name="customer_phone" value="{{old('customer_phone')}}">
                                                             </td>
                                                         </tr>
+                                                        @if($business->category->name == \App\Enums\BusinessCategoryEnum::FNB)
                                                         <tr>
                                                             <td>Dine In/Take Away</td>
                                                             <td>:</td>
@@ -153,6 +203,7 @@
                                                                 </select>
                                                             </td>
                                                         </tr>
+                                                        @endif
                                                         <tr>
                                                             <td>Metode Pembayaran</td>
                                                             <td>:</td>
@@ -183,6 +234,86 @@
         </div>
     </div>
 </section>
+
+@foreach($products as $index => $row)
+<div class="modal fade modalShowProduct modalShowProduct-{{$index}}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded shadow border-0">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title">
+                    Detail Produk
+                </h5>
+                <button type="button" class="btn btn-icon btn-close" data-bs-dismiss="modal" id="close-modal"><i class="uil uil-times fs-4 text-dark"></i></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#tab-product-{{$index}}">Data Produk</a>
+                    </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content pt-3">
+                    <div class="tab-pane container active" id="tab-product-{{$index}}">
+                        <div class="row">
+                            <div class="col-12">
+                                @if(in_array($row->mikrotik,[\App\Enums\ProductEnum::MIKROTIK_HOTSPOT]))
+                                <div class="row mb-2">
+                                    <div class="col-md-3">
+                                        Mikrotik
+                                    </div>
+                                    <div class="col-md-8">
+                                        : {{$row->mikrotik() ?? null}}
+                                    </div>
+                                </div>
+                                @endif
+
+                                <div class="row mb-2">
+                                    <div class="col-md-3">
+                                        Kode Produk
+                                    </div>
+                                    <div class="col-md-8">
+                                        : {{$row->code}}
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-md-3">
+                                        Nama Produk
+                                    </div>
+                                    <div class="col-md-8">
+                                        : {{$row->name}}
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-md-3">
+                                        Harga Produk
+                                    </div>
+                                    <div class="col-md-8">
+                                        : {{number_format($row->price,0,',','.')}}
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-md-3">
+                                        Deskripsi
+                                    </div>
+                                    <div class="col-md-8">
+                                        : {{$row->description}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
 
 <form action="{{route('landing-page.shops.addToCart')}}" method="POST" id="frmAddToCart">
     @csrf
@@ -246,6 +377,22 @@
             $("#frmUpdateCart").attr("action", "{{ route('landing-page.shops.updateCart', '_id_') }}".replace("_id_", id));
             $('#frmUpdateCart').submit();
         })
+
+        $(document).on("click",".btn-configuration",function(e){
+            e.preventDefault();
+
+            let index = $(this).data("index");
+
+            $(".modalMikrotik-"+index).modal("show");
+        });
+
+        $(document).on("click",".btn-show-product",function(e){
+            e.preventDefault();
+
+            let index = $(this).data("index");
+
+            $(".modalShowProduct-"+index).modal("show");
+        });
     })
 </script>
 @endsection

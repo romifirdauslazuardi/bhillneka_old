@@ -7,6 +7,7 @@ use App\Enums\OrderEnum;
 use App\Enums\OrderMikrotikEnum;
 use App\Helpers\LogHelper;
 use App\Helpers\SettingHelper;
+use App\Helpers\WhatsappHelper;
 use App\Models\Order;
 use App\Models\RouterosAPI;
 use Illuminate\Bus\Queueable;
@@ -62,6 +63,12 @@ class OrderMikrotikHotspotJob implements ShouldQueue
                 if(!$connect->connect($ip,$username,$password,$port)){
                     Log::emergency('OrdferMikrotikHotspotJob : Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda '.$order->code);
                 }
+
+                $message = "Maaf, penggunaan hotspot sudah habis";
+                $message .= "\r\n";
+                $message .= "=====";
+                $message .= "\r\n";
+
                 foreach($order->items as $index => $row){
                     if(!empty($row->order_mikrotik)){
                         if($row->order_mikrotik->type == OrderMikrotikEnum::TYPE_HOTSPOT){
@@ -74,7 +81,7 @@ class OrderMikrotikHotspotJob implements ShouldQueue
                                 $connectLog = LogHelper::mikrotikLog($connect);
     
                                 if($connectLog["IsError"] == TRUE){
-                                    Log::emergency("OrderMikrotikExpiredCommand : ".$connectLog["Message"]. " #". $order->code);
+                                    Log::emergency("OrderMikrotikHotspotJob : ".$connectLog["Message"]. " #". $order->code);
                                 }
 
                                 if($connectLog["IsError"] == FALSE){
@@ -88,6 +95,24 @@ class OrderMikrotikHotspotJob implements ShouldQueue
                                 'disabled' => OrderMikrotikEnum::DISABLED_TRUE,
                             ]);
                         }
+                    }
+
+                    $message .= "SSID : ".$row->order_mikrotik->server ?? null;
+                    $message .= "\r\n";
+                    $message .= "username = ".$row->order_mikrotik->username ?? null;
+                    $message .= "\r\n";
+                    $message .= "password = ".$row->order_mikrotik->password ?? null;
+                    $message .= "\r\n";
+                    $message .= "=====";
+                    $message .= "\r\n";
+                }
+
+                if(!empty($order->customer_id)){
+                    return WhatsappHelper::send($order->customer->phone,$order->customer->name,["title" => "Penggunaan Hotspot Habis" ,"message" => $message],true);
+                }
+                else{
+                    if(!empty($order->customer_name) && !empty($order->customer_phone)){
+                        return WhatsappHelper::send($order->customer_phone,$order->customer_name,["title" => "Penggunaan Hotspot Habis" ,"message" => $message],true);
                     }
                 }
             }

@@ -206,9 +206,9 @@
         $(document).on("click", ".btn-export-excel", function(e) {
             e.preventDefault();
 
-            $('#modalExport').find('.export-title').html("Excel");
-            $("#frmExport").attr("action", "{{ route('dashboard.orders.exportExcel') }}");
-            $("#modalExport").modal("show");
+            $('#modalExportExcel').find('.export-title').html("Excel");
+            $("#frmExportExcel").attr("action", "{{ route('dashboard.orders.exportExcel') }}");
+            $("#modalExportExcel").modal("show");
         });
 
         $(document).on('submit','#frmUpdateProgress',function(e){

@@ -65,5 +65,17 @@
     .swal2-container {
         z-index: 4444;
     }
+
+    .hasBankNonActive{
+        color: grey !important;
+    }
+
+    .table-danger{
+        background-color: red;
+    }
+
+    .table-success{
+        background-color: green;
+    }
 </style>
 @yield("css")

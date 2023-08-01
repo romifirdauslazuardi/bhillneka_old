@@ -53,6 +53,10 @@ class UpdateRequest extends FormRequest
                 'required',
                 Rule::exists('business', 'id'),
             ],
+            'table_id' => [
+                'nullable',
+                Rule::exists('tables', 'id'),
+            ],
             'fnb_type' => [
                 'required',
                 'in:'.implode(",",[OrderEnum::FNB_NONE,OrderEnum::FNB_TAKEAWAY,OrderEnum::FNB_DINE_IN])
@@ -78,6 +82,7 @@ class UpdateRequest extends FormRequest
             'status.in' => 'Status order tidak valid',
             'business_id.required' => 'Bisnis harus diisi',
             'business_id.exists' => 'Bisnis tidak ditemukan',
+            'table_id.exists' => 'Meja tidak ditemukan',
             'fnb_type.required' => 'Tipe FNB tharis diisi',
             'fnb_type.in' => 'Tipe FNB tidak valid',
         ];

@@ -42,6 +42,8 @@
                                     <th>Kode Produk</th>
                                     <th>Nama Produk</th>
                                     <th>Harga Produk</th>
+                                    <th>Estimasi Pendapatan</th>
+                                    <th>Estimasi Biaya Layanan & Aplikasi</th>
                                     @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
                                     <th>Pemilik Usaha</th>
                                     @endif
@@ -69,6 +71,8 @@
                                         <td>{{$row->code}}</td>
                                         <td>{{$row->name}}</td>
                                         <td>{{number_format($row->price,0,',','.')}}</td>
+                                        <td>{{number_format($row->estimationAgenIncome,0,',','.')}}</td>
+                                        <td>{{number_format($row->estimationOwnerIncome,0,',','.')}}</td>
                                         @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
                                         <td>{{$row->user->name ?? null}}</td>
                                         @endif

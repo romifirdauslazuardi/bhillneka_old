@@ -12,6 +12,7 @@ class Table extends Model
     use HasFactory, Loggable,SoftDeletes;
     protected $table = "tables";
     protected $fillable = [
+        'code',
         'name',
         'user_id',
         'author_id',

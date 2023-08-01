@@ -29,15 +29,6 @@
 
                         <div class="row mb-2">
                             <div class="col-md-3">
-                                Ordernum
-                            </div>
-                            <div class="col-md-8">
-                                : {{$result->order_item->order->code ?? null}}
-                            </div>
-                        </div>
-
-                        <div class="row mb-2">
-                            <div class="col-md-3">
                                 Username
                             </div>
                             <div class="col-md-8">
@@ -155,19 +146,10 @@
 
                         <div class="row mb-2">
                             <div class="col-md-3">
-                                Disabled (Database)
+                                Status
                             </div>
                             <div class="col-md-8">
-                                : {{$result->disabled}}
-                            </div>
-                        </div>
-
-                        <div class="row mb-2">
-                            <div class="col-md-3">
-                                Disabled (Mikrotik)
-                            </div>
-                            <div class="col-md-8">
-                                : {{$result->disabled_mikrotik}}
+                                : {!!$result->disabled_mikrotik!!}
                             </div>
                         </div>
 

@@ -20,6 +20,7 @@ final class OrderEnum extends Enum
     const STATUS_REFUNDED = "REFUNDED";
     const STATUS_REDIRECT = "REDIRECT";
     const STATUS_TIMEOUT = "TIMEOUT";
+    const STATUS_PAY_LATER = "PAY LATER";
 
     const PROOF_ORDER_EXT = ['jpeg','jpg','png','svg'];
 
@@ -53,6 +54,7 @@ final class OrderEnum extends Enum
             self::STATUS_REFUNDED => 'REFUNDED',
             self::STATUS_REDIRECT => 'REDIRECT',
             self::STATUS_TIMEOUT => 'TIMEOUT',
+            SELF::STATUS_PAY_LATER => 'BAYAR NANTI',
         ];
 
         return $data;

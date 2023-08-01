@@ -61,17 +61,11 @@ class ProductController extends Controller
         $users = $users->data;
 
         $status = ProductEnum::status();
-        $is_using_stock = ProductEnum::is_using_stock();
-
-        $business = $this->businessService->index(new Request([]),false);
-        $business = $business->data;
 
         $data = [
             'table' => $response->data,
             'users' => $users,
             'status' => $status,
-            'is_using_stock' => $is_using_stock,
-            'business' => $business,
         ];
 
         return view($this->view . 'index', $data);

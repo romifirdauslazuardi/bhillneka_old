@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use App\Enums\OrderEnum;
 use App\Enums\ProductEnum;
+use App\Enums\ProductStockEnum;
+use App\Helpers\WhatsappHelper;
 use Illuminate\Console\Command;
 use App\Models\Order;
 use App\Models\ProductStock;
@@ -48,9 +50,14 @@ class OrderExpiredCommand extends Command
 
                 foreach($row->items as $i => $orderItem){
                     if($orderItem->product->is_using_stock == ProductEnum::IS_USING_STOCK_TRUE){
+                        $available = $orderItem->product->stocks()->where("type",ProductStockEnum::TYPE_MASUK)->sum("qty") - $orderItem->product->stocks()->where("type",ProductStockEnum::TYPE_KELUAR)->sum("qty");
+
                         ProductStock::create([
+                            'date' => date("Y-m-d"),
+                            'type' => ProductStockEnum::TYPE_MASUK,
                             'product_id' => $orderItem->product_id,
                             'qty' => $orderItem->qty,
+                            'available' => $available + $orderItem->qty,
                             'note' => 'Stok masuk order #'.$row->code,
                         ]);
                     }

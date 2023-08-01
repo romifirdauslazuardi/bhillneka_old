@@ -29,8 +29,8 @@
 
 <section class="section">
     <div class="container">
-        <div class="row">
-            <div class="col-12">
+        <div class="row mb-5">
+            <div class="col-12 wow animate__animated animate__fadeInUp">
                 {!! $result->trixRender('content') !!}
             </div>
         </div>

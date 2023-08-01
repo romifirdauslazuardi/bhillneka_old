@@ -29,11 +29,11 @@
 
 <section class="section">
     <div class="container">
-        <div class="row d-flex justify-content-center">
+        <div class="row d-flex justify-content-center mb-5">
             <div class="col-12">
                 <div class="accordion" id="accordionExample">
                     @foreach($table as $index => $row)
-                    <div class="accordion-item rounded shadow mt-3">
+                    <div class="accordion-item rounded shadow mt-3 wow animate__animated animate__fadeInUp">
                         <h2 class="accordion-header" id="heading-{{$index}}">
                             <button class="accordion-button border-0 bg-light collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{$index}}"
                                 aria-expanded="false" aria-controls="collapse-{{$index}}">

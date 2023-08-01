@@ -20,8 +20,14 @@ class Order extends Model
         'customer_name',
         'customer_phone',
         'discount',
+        'type_fee',
         'owner_fee',
         'agen_fee',
+        'total_owner_fee',
+        'total_agen_fee',
+        'customer_type_fee',
+        'customer_value_fee',
+        'customer_total_fee',
         'doku_fee',
         'provider_id',
         'note',
@@ -147,7 +153,12 @@ class Order extends Model
                 'msg' => 'Redirect',
             ];
         }
-
+        else if($this->status == OrderEnum::STATUS_PAY_LATER){
+            $return = (object) [
+                'class' => 'secondary',
+                'msg' => 'Bayar Nanti',
+            ];
+        }
 
         return $return;
     }
@@ -238,17 +249,37 @@ class Order extends Model
 
     public function getDiscountAttribute($value)
     {
-        return (int)$value;
+        return floatval($value);
     }
 
     public function getOwnerFeeAttribute($value)
     {
-        return (int)($value);
+        return floatval($value);
     }
 
     public function getAgenFeeAttribute($value)
     {
         return (int)$value;
+    }
+
+    public function getTotalOwnerFeeAttribute($value)
+    {
+        return floatval($value);
+    }
+
+    public function getTotalAgenFeeAttribute($value)
+    {
+        return floatval($value);
+    }
+
+    public function getCustomerValueFee($value)
+    {
+        return floatval($value);
+    }
+
+    public function getCustomerTotalFee($value)
+    {
+        return floatval($value);
     }
 
     public function getDokuFeeAttribute($value)
@@ -263,12 +294,7 @@ class Order extends Model
             $total += $row->qty * $row->product_price;
         }
 
-        if($this->type == OrderEnum::TYPE_DUE_DATE){
-            $hari = DateHelper::differentDay($this->created_at,$this->expired_date);
-
-            $total = $total * $hari;
-        }
-
+        $total += $this->customer_total_fee + $this->doku_fee;
         return (int)$total;
     }
 
@@ -279,22 +305,39 @@ class Order extends Model
         }
 
         $total = $total - $this->discount;
+        $total += $this->customer_total_fee;
 
         return (int)$total;
     }
 
-    public function incomeAgen(){
-        $total = ceil(($this->agen_fee / 100) * $this->totalNeto());
+    public function totalNetoWithoutCustomerFee(){
+        $total = 0;
+        foreach($this->items()->get() as $index => $row){
+            $total += ($row->qty * $row->product_price) - $row->discount;
+        }
+
+        $total = $total - $this->discount;
+
         return (int)$total;
     }
 
-    public function incomeOwnerBruto(){
-        $total = floor(($this->owner_fee / 100) * $this->totalNeto());
-        return (int)$total;
+    public function incomeAgenBruto(){
+        $total = $this->total_agen_fee + $this->doku_fee;
+        return $total;
+    }
+
+    public function incomeAgenNeto(){
+        $total = $this->total_agen_fee - $this->doku_fee;
+        return $total;
     }
 
     public function incomeOwnerNeto(){
-        $total = $this->incomeOwnerBruto() - $this->doku_fee;
-        return (int)$total;
+        $total = $this->total_owner_fee;
+        return $total;
+    }
+
+    public function incomeOwnerBruto(){
+        $total = $this->total_owner_fee + $this->doku_fee;
+        return $total;
     }
 }

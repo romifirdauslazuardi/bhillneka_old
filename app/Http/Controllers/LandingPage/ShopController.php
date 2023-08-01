@@ -37,24 +37,47 @@ class ShopController extends Controller
         $this->cartService = new CartService();
     }
 
-    public function index($business_id,$table_id,Request $request){
+    public function index($business_slug,Request $request){
+
+        $table_slug = $request->table;
+
+        $business = $this->businessService->showBySlug($business_slug);
+        if(!$business->success){
+            alert()->html("Gagal",$business->message, 'error');
+            return redirect()->route("landing-page.home.index");
+        }
+        $business = $business->data;
+
+        if(!empty($table_slug)){
+            $table = $this->tableService->showByCode($table_slug);
+            if(!$table->success){
+                alert()->html("Gagal",$table->message, 'error');
+                return redirect()->route("landing-page.home.index");
+            }
+            $table = $table->data;
+        }
+        else{
+            $table = null;
+        }
 
         $request->merge([
-            'business_id' => $business_id,
+            'business_id' => $business->id,
             'status' => ProductEnum::STATUS_TRUE
         ]);
 
         $products = $this->productService->index($request,false);
         $products = $products->data;
 
-        $business = $this->businessService->show($business_id);
-        $business = $business->data;
-
-        $table = $this->tableService->show($table_id);
-        $table = $table->data;
-
         $providers = $this->providerService->index(new Request(['status' => ProviderEnum::STATUS_TRUE]),false);
         $providers = $providers->data;
+
+        foreach($providers as $index => $row){
+            if($row->type == ProviderEnum::TYPE_PAY_LATER){
+                if(empty($business->user_pay_later->status)){
+                    unset($providers[$index]);
+                }
+            }
+        }
 
         $carts = $this->cartService->index();
         $carts = $carts->data;

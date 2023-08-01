@@ -25,11 +25,12 @@ class UserService extends BaseService
         $this->user = new User();
     }
 
-    public function index(Request $request, bool $paginate = true)
+    public function index(Request $request, bool $paginate = true,array $column = [])
     {
         $search = (empty($request->search)) ? null : trim(strip_tags($request->search));
         $role = (empty($request->role)) ? null : trim(strip_tags($request->role));
         $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
+        $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
 
         if(Auth::user()->hasRole([RoleEnum::AGEN])){
             $user_id = Auth::user()->id;
@@ -39,7 +40,11 @@ class UserService extends BaseService
             $user_id = Auth::user()->user_id;
         }
 
-        if(!empty(Auth::user()->business_id)){}
+        if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN,RoleEnum::AGEN])){
+            if(!empty(Auth::user()->business_id)){
+                $business_id = Auth::user()->business_id;
+            }
+        }
 
         $table = $this->user;
         if (!empty($search)) {
@@ -59,26 +64,33 @@ class UserService extends BaseService
         if (Auth::user()->hasRole([
             RoleEnum::AGEN
         ])) {
-            $table = $table->where(function($query2){
+            $table = $table->where(function($query2) use($business_id){
                 $query2->role([RoleEnum::ADMIN_AGEN]);
-                $query2->orWhere(function($query3){
+                $query2->orWhere(function($query3) use($business_id){
                     $query3->role([RoleEnum::CUSTOMER]);
-                    $query3->where("business_id",Auth::user()->business_id);
+                    if(!empty($business_id)){
+                        $query3->where("business_id",$business_id);
+                    }
                 });
             });
         }
         if (Auth::user()->hasRole([
             RoleEnum::ADMIN_AGEN
         ])) {
-            $table = $table->where(function($query2){
-                $query2->where(function($query3){
+            $table = $table->where(function($query2) use($business_id){
+                $query2->where(function($query3) use($business_id){
                     $query3->role([RoleEnum::CUSTOMER]);
-                    $query3->where("business_id",Auth::user()->business_id);
+                    if(!empty($business_id)){
+                        $query3->where("business_id",$business_id);
+                    }
                 });
             });
         }
         if(!empty($user_id)){
             $table = $table->where("user_id",$user_id);
+        }
+        if(count($column) >= 1){
+            $table = $table->select($column);
         }
         $table = $table->orderBy('created_at', 'DESC');
 
@@ -270,10 +282,13 @@ class UserService extends BaseService
         }
     }
 
-    public function getUserAgen(){
+    public function getUserAgen(array $column = []){
         try {
             $table = $this->user;
             $table = $table->role([RoleEnum::AGEN]);
+            if(count($column) >= 1){
+                $table = $table->select($column);
+            }
             $table = $table->orderBy('created_at', 'DESC');
             $table = $table->get();
 
@@ -285,10 +300,13 @@ class UserService extends BaseService
         }
     }
 
-    public function getUserOwnerAgen(){
+    public function getUserOwnerAgen(array $column = []){
         try {
             $table = $this->user;
             $table = $table->role([RoleEnum::OWNER,RoleEnum::AGEN]);
+            if(count($column) >= 1){
+                $table = $table->select($column);
+            }
             $table = $table->orderBy('created_at', 'DESC');
             $table = $table->get();
 
@@ -302,18 +320,12 @@ class UserService extends BaseService
 
     public function getUserCustomer(Request $request,array $column = []){
         try {
-            $user_id = $request->user_id;
-
-            if(Auth::user()->hasRole([RoleEnum::AGEN])){
-                $user_id = Auth::user()->id;
-            }
-
             $table = $this->user;
             if(count($column) >= 1){
                 $table = $table->select($column);
             }
-            if(!empty($user_id)){
-                $table = $table->where("user_id",$user_id);
+            if(!empty(Auth::user()->business_id)){
+                $table = $table->where("business_id",Auth::user()->business_id);
             }
             $table = $table->role([RoleEnum::CUSTOMER]);
             $table = $table->orderBy('created_at', 'DESC');

@@ -6,7 +6,7 @@
 
     <body>
         <div class="container pt-5">
-        {{\QrCode::size(250)->generate(route('landing-page.shops.index',["business_id" => $result->business_id,"table_id" => $result->id]))}}
+        {{\QrCode::size(250)->generate(route('landing-page.shops.index',["business_slug" => $result->business->slug,"table" => $result->code]))}}
         </div>
     </body>
 </html>
