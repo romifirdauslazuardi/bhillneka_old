@@ -140,7 +140,8 @@
                         <div class="d-flex justify-content-start mt-3">
                             <a href="{{route('dashboard.business.index')}}" class="btn btn-warning btn-sm" style="margin-right: 10px;"><i class="fa fa-arrow-left"></i> Kembali</a>
                             <a href="{{route('dashboard.business.edit',$result->id)}}" class="btn btn-primary btn-sm" style="margin-right: 10px;"><i class="fa fa-edit"></i> Edit</a>
-                            <a href="#" class="btn btn-danger btn-sm btn-delete" data-id="{{$result->id}}"><i class="fa fa-trash"></i> Hapus</a>
+                            <a href="#" class="btn btn-danger btn-sm btn-delete" data-id="{{$result->id}}" style="margin-right: 10px;"><i class="fa fa-trash"></i> Hapus</a>
+                            <a href="#" class="btn btn-success btn-sm btn-apply" data-id="{{$result->id}}"><i class="fa fa-check"></i> Terapkan Bisnis Page</a>
                         </div>
                     </div>
                 </div>
@@ -155,6 +156,12 @@
     <input type="hidden" name="id"/>
 </form>
 
+<form id="frmApply" method="POST" action="{{route('dashboard.profile.updateBusinessPage')}}">
+    @csrf
+    @method('PUT')
+    <input type="hidden" name="business_id" />
+</form>
+
 @include("dashboard.components.loader")
 @endsection
 
@@ -167,6 +174,44 @@
                 $("#frmDelete").attr("action", "{{ route('dashboard.business.destroy', '_id_') }}".replace("_id_", id));
                 $("#frmDelete").find('input[name="id"]').val(id);
                 $("#frmDelete").submit();
+            }
+        })
+
+        $(document).on("click", ".btn-apply", function() {
+            let id = $(this).data("id");
+            if (confirm("Apakah anda yakin ingin mengaktifkan halaman bisnis ini ?")) {
+                $("#frmApply").find('input[name="business_id"]').val(id);
+                $.ajax({
+                    url : $("#frmApply").attr("action"),
+                    method : "POST",
+                    data : new FormData($('#frmApply')[0]),
+                    contentType:false,
+                    cache:false,
+                    processData:false,
+                    dataType : "JSON",
+                    beforeSend : function(){
+                        return openLoader();
+                    },
+                    success : function(resp){
+                        if(resp.success == false){
+                            responseFailed(resp.message);                   
+                        }
+                        else{
+                            responseSuccess(resp.message,"{{url()->current()}}");
+                        }
+                    },
+                    error: function (request, status, error) {
+                        if(request.status == 422){
+                            responseFailed(request.responseJSON.message);
+                        }
+                        else{
+                            responseInternalServerError();
+                        }
+                    },
+                    complete :function(){
+                        return closeLoader();
+                    }
+                })
             }
         })
     })

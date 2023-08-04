@@ -57,6 +57,7 @@
                                                     <a href="{{route('dashboard.business.show',$row->id)}}" class="dropdown-item"><i class="fa fa-eye"></i> Show</a>
                                                     <a href="{{route('dashboard.business.edit',$row->id)}}" class="dropdown-item"><i class="fa fa-edit"></i> Edit</a>
                                                     <a href="#" class="dropdown-item btn-delete" data-id="{{$row->id}}"><i class="fa fa-trash"></i> Hapus</a>
+                                                    <a href="#" class="dropdown-item btn-apply" data-id="{{$row->id}}"><i class="fa fa-check"></i> Terapkan Bisnis Page</a>
                                                 </div>
                                             </div>
                                         </td>
@@ -95,6 +96,12 @@
     <input type="hidden" name="id" />
 </form>
 
+<form id="frmApply" method="POST" action="{{route('dashboard.profile.updateBusinessPage')}}">
+    @csrf
+    @method('PUT')
+    <input type="hidden" name="business_id" />
+</form>
+
 @section("script")
 <script>
     $(function() {
@@ -110,6 +117,44 @@
                 $("#frmDelete").attr("action", "{{ route('dashboard.business.destroy', '_id_') }}".replace("_id_", id));
                 $("#frmDelete").find('input[name="id"]').val(id);
                 $("#frmDelete").submit();
+            }
+        })
+
+        $(document).on("click", ".btn-apply", function() {
+            let id = $(this).data("id");
+            if (confirm("Apakah anda yakin ingin mengaktifkan halaman bisnis ini ?")) {
+                $("#frmApply").find('input[name="business_id"]').val(id);
+                $.ajax({
+                    url : $("#frmApply").attr("action"),
+                    method : "POST",
+                    data : new FormData($('#frmApply')[0]),
+                    contentType:false,
+                    cache:false,
+                    processData:false,
+                    dataType : "JSON",
+                    beforeSend : function(){
+                        return openLoader();
+                    },
+                    success : function(resp){
+                        if(resp.success == false){
+                            responseFailed(resp.message);                   
+                        }
+                        else{
+                            responseSuccess(resp.message,"{{url()->current()}}");
+                        }
+                    },
+                    error: function (request, status, error) {
+                        if(request.status == 422){
+                            responseFailed(request.responseJSON.message);
+                        }
+                        else{
+                            responseInternalServerError();
+                        }
+                    },
+                    complete :function(){
+                        return closeLoader();
+                    }
+                })
             }
         })
     })
