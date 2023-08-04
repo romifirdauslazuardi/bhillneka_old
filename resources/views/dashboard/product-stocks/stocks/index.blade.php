@@ -1,6 +1,15 @@
 <div class="row">
     <div class="col-12 mt-4">
         <div class="card border-0 rounded shadow p-4">
+            @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
+                @if(!empty(Auth::user()->business_id))
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <a href="#" class="btn btn-success btn-sm btn-add-stock" data-id="{{$result->id}}" data-product-name="{{$result->name}}"><i class="fa fa-plus"></i> Tambah Stok</a>
+                    </div>
+                </div>
+                @endif
+            @endif
             <div class="d-flex justify-content-between">
                 <h5 class="card-title mb-3">Informasi Data Stok</h5>
                 <h5 class="card-title mb-3">Stok Tersedia  : <b>{{$result->stock}}</b></h5>

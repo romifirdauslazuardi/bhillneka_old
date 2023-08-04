@@ -82,6 +82,8 @@ class SettingCustomerFeeService extends BaseService
             $type = (empty($request->type)) ? null : trim(strip_tags($request->type));
             $value = (empty($request->value)) ? null : trim(strip_tags($request->value));
 
+            $limit = str_replace(".","",$limit);
+
             $checkExistFee = $this->settingCustomerFee;
             $checkExistFee = $checkExistFee->where("mark",$mark);
             $checkExistFee = $checkExistFee->where("limit",$limit);
@@ -113,6 +115,8 @@ class SettingCustomerFeeService extends BaseService
             $limit = (empty($request->limit)) ? null : trim(strip_tags($request->limit));
             $type = (empty($request->type)) ? null : trim(strip_tags($request->type));
             $value = (empty($request->value)) ? null : trim(strip_tags($request->value));
+
+            $limit = str_replace(".","",$limit);
 
             $result = $this->settingCustomerFee->findOrFail($id);
 

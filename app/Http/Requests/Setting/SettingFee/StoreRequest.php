@@ -18,8 +18,6 @@ class StoreRequest extends FormRequest
             ],
             'limit' => [
                 'required',
-                'numeric',
-                'min:1',
             ],
             'owner_fee' => [
                 'required',
@@ -35,8 +33,6 @@ class StoreRequest extends FormRequest
             'mark.required' => 'Tanda lebih dari / kurang dari harus diisi',
             'mark.in' => 'Tanda lebih dari / kurang dari tidak valid',
             'limit.required' => 'Batas nominal harus diisi',
-            'limit.numeric' => 'Batas nominal harus berupa angka',
-            'limit.min' => 'Batas nominal minimal 1',
             'owner_fee.required' => 'Fee owner harus diisi',
             'owner_fee.numeric' => 'Fee owner harus berupa angka',
             'owner_fee.min' => 'Fee owner minimal 0',

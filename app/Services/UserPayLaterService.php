@@ -41,7 +41,7 @@ class UserPayLaterService extends BaseService
         $provider = $provider->first();
 
         if(!$provider){
-            return $this->response(false, 'Metode pembayaran belum diaktifkan');   
+            return $this->response(false, 'Metode pembayaran bayar nanti belum diaktifkan oleh owner');   
         }
 
         if(Auth::user()->hasRole([RoleEnum::AGEN])){

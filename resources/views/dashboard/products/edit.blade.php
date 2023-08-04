@@ -43,22 +43,31 @@
                         <div class="row mt-3">
                             <div class="row mb-3">
                                 <div class="col-lg-12">
-                                    @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::FNB]))
                                     <div class="form-group row mb-3">
-                                        <label class="col-md-3 col-form-label">Foto Produk</label>
+                                        <label class="col-md-3 col-form-label">
+                                            Foto
+                                            @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
+                                                {{" Produk "}}
+                                            @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
+                                                {{" Jasa "}}
+                                            @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                                {{" Mikrotik "}}
+                                            @endif
+                                        </label>
                                         <div class="col-md-9">
                                             <input type="file" class="form-control" name="image" accept="image/*">
                                             <p class="text-info" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;"><small><i>Kosongkan jika tidak diubah</i></small></p>
                                         </div>
                                     </div>
-                                    @endif
                                     <div class="form-group row mb-3">
                                         <label class="col-md-3 col-form-label">
                                             Kode 
-                                            @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB,\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                            @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
                                                 {{" Produk "}}
                                             @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
                                                 {{" Jasa "}}
+                                            @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                                {{" Mikrotik "}}
                                             @endif
                                             <span class="text-danger">*</span>
                                         </label>
@@ -69,10 +78,12 @@
                                     <div class="form-group row mb-3">
                                         <label class="col-md-3 col-form-label">
                                             Nama 
-                                            @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB,\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                            @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
                                                 {{" Produk "}}
                                             @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
                                                 {{" Jasa "}}
+                                            @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                                {{" Mikrotik "}}
                                             @endif
                                             <span class="text-danger">*</span>
                                         </label>
@@ -83,10 +94,12 @@
                                     <div class="form-group row mb-3">
                                         <label class="col-md-3 col-form-label">
                                             Harga 
-                                            @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB,\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                            @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
                                                 {{" Produk "}}
                                             @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
                                                 {{" Jasa "}}
+                                            @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                                {{" Mikrotik "}}
                                             @endif
                                             <span class="text-danger">*</span>
                                         </label>
@@ -97,10 +110,12 @@
                                     <div class="form-group row mb-3">
                                         <label class="col-md-3 col-form-label">
                                             Deskripsi 
-                                            @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB,\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                            @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
                                                 {{" Produk "}}
                                             @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
                                                 {{" Jasa "}}
+                                            @elseif(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                                {{" Mikrotik "}}
                                             @endif
                                         </label>
                                         <div class="col-md-9">

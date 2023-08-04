@@ -82,6 +82,8 @@ class SettingFeeService extends BaseService
             $limit = (empty($request->limit)) ? null : trim(strip_tags($request->limit));
             $owner_fee = (!isset($request->owner_fee)) ? null : trim(strip_tags($request->owner_fee));
 
+            $limit = str_replace(".","",$limit);
+
             $checkExistFee = $this->settingFee;
             $checkExistFee = $checkExistFee->where("mark",$mark);
             $checkExistFee = $checkExistFee->where("limit",$limit);
@@ -119,6 +121,8 @@ class SettingFeeService extends BaseService
             $limit = (empty($request->limit)) ? null : trim(strip_tags($request->limit));
             $owner_fee = (empty($request->owner_fee)) ? null : trim(strip_tags($request->owner_fee));
 
+            $limit = str_replace(".","",$limit);
+            
             $result = $this->settingFee->findOrFail($id);
 
             $checkExistFee = $this->settingFee;

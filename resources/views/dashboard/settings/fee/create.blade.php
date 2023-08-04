@@ -37,7 +37,7 @@
                                 </select>
                             </div>
                             <div class="col-md-4 mb-1">
-                                <input type="text" class="form-control" name="limit" placeholder="Nominal" value="{{old('limit')}}">
+                                <input type="text" class="form-control formatRupiah" name="limit" placeholder="Nominal" value="{{old('limit')}}">
                             </div>
                         </div>
                         <div class="form-group row mb-3">
@@ -77,6 +77,15 @@
     $(function(){
 
         $('button[type="submit"]').attr("disabled",false);
+
+        $(document).on("keyup",".formatRupiah",function(e){
+            e.preventDefault();
+
+            let val = $(this).val();
+
+            $(this).val(formatRupiah(val,undefined));
+            
+        });
 
         $(document).on('submit','#frmStore',function(e){
             e.preventDefault();

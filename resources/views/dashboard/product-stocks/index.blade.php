@@ -68,6 +68,11 @@
                                                     <i class="fa fa-bars"></i>
                                                 </button>
                                                 <div class="dropdown-menu">
+                                                    @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
+                                                        @if(!empty(Auth::user()->business_id))
+                                                        <a href="#" class="dropdown-item btn-add-stock" data-id="{{$row->id}}" data-product-name="{{$row->name}}"><i class="fa fa-plus"></i> Tambah Stok</a>
+                                                        @endif
+                                                    @endif
                                                     <a href="{{route('dashboard.product-stocks.show',$row->id)}}" class="dropdown-item"><i class="fa fa-eye"></i> Show</a>
                                                 </div>
                                             </div>
@@ -148,6 +153,17 @@
             }
         });
 
+        $(document).on("click", ".btn-add-stock", function(e) {
+            e.preventDefault();
+
+            let id = $(this).attr("data-id");
+            let productName = $(this).attr("data-product-name");
+
+            $("#frmAddStock").find('input[name="product_id"]').val(id);
+            $("#frmAddStock").find('.product-name').val(productName);
+            $("#modalAddStock").modal("show");
+        });
+
         $(document).on('submit','#frmImport',function(e){
             e.preventDefault();
             if(confirm("Apakah anda yakin ingin menyimpan data ini ?")){
@@ -155,6 +171,43 @@
                     url : $("#frmImport").attr("action"),
                     method : "POST",
                     data : new FormData($('#frmImport')[0]),
+                    contentType:false,
+                    cache:false,
+                    processData:false,
+                    dataType : "JSON",
+                    beforeSend : function(){
+                        return openLoader();
+                    },
+                    success : function(resp){
+                        if(resp.success == false){
+                            responseFailed(resp.message);                   
+                        }
+                        else{
+                            responseSuccess(resp.message,"{{route('dashboard.product-stocks.index')}}");
+                        }
+                    },
+                    error: function (request, status, error) {
+                        if(request.status == 422){
+                            responseFailed(request.responseJSON.message);
+                        }
+                        else{
+                            responseInternalServerError();
+                        }
+                    },
+                    complete :function(){
+                        return closeLoader();
+                    }
+                })
+            }
+        })
+
+        $(document).on('submit','#frmAddStock',function(e){
+            e.preventDefault();
+            if(confirm("Apakah anda yakin ingin menyimpan data ini ?")){
+                $.ajax({
+                    url : $("#frmAddStock").attr("action"),
+                    method : "POST",
+                    data : new FormData($('#frmAddStock')[0]),
                     contentType:false,
                     cache:false,
                     processData:false,

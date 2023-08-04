@@ -325,7 +325,7 @@
                                     <div class="display-due-date @if($result->type == App\Enums\OrderEnum::TYPE_ON_TIME_PAY) d-none @endif">
                                         <div class="form-group row mb-3">
                                             <label>Jatuh Tempo</label>
-                                            <input type="text" class="form-control" readonly disabled value="{{$result->repeat_order_at}}">
+                                            <input type="text" class="form-control" readonly disabled value="{{(empty($result->repeat_order_at)) ? date('d-m-Y',strtotime($result->created_at.' + 30 day')) : 'Setiap tanggal '.$result->repeat_order_at}}">
                                         </div>
                                     </div>
                                     <div class="form-group row mb-3">

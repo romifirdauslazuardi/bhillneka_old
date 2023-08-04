@@ -46,7 +46,7 @@ class UpdateRequest extends FormRequest
                 Rule::exists('users', 'id'),
             ],
             'business_id' => [
-                'required',
+                (Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])) ? "required" : "nullable",
                 Rule::exists('business', 'id'),
             ],
             'status' => [

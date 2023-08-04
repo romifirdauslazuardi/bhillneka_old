@@ -21,6 +21,15 @@
 @section("content")
 <div class="row">
     <div class="col-12 mt-4">
+        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]) && !empty(Auth::user()->business_id))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-warning" role="alert">
+                        Halo owner , bisnis page sedang diaktifkan , halaman rekening akan tampil sesuai rekening bisnis page yang sedang aktif . Nonaktifkan bisnis page jika ingin menambahkan/menampilkan rekening Anda sendiri
+                    </div>
+                </div>
+            </div>
+        @endif
         <div class="card border-0 rounded shadow p-4">
             <div class="row mb-3">
                 <div class="col-lg-12">

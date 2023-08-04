@@ -74,6 +74,11 @@ class StoreRequest extends FormRequest
                 'max:2048',
                 'mimes:jpeg,png,jpg,svg',
             ],
+            'qty' => [
+                ($this->is_using_stock == ProductEnum::IS_USING_STOCK_TRUE) ? "required" : "nullable",
+                "numeric",
+                "min:1",
+            ]
         ];
     }
 
@@ -100,6 +105,9 @@ class StoreRequest extends FormRequest
             'image.image' => 'Gambar harus berupa gambar',
             'image.mimes' => 'Gambar harus berupa jpeg,png,jpg,svg',
             'image.max' => 'Gambar tidak boleh lebih dari 2MB',
+            'qty.required' => 'Qty stok awal harus diisi',
+            'qty.numeric' => 'Qty stok awal harus berupa angka',
+            'qty.min' => 'Qty stok awal minimal 1',
         ];
     }
 

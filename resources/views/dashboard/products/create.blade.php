@@ -44,14 +44,21 @@
                             <div class="tab-pane container active" id="product">
                                 <div class="row mt-3">
                                     <div class="col-lg-12">
-                                        @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::FNB]))
                                         <div class="form-group row mb-3">
-                                            <label class="col-md-3 col-form-label">Foto Produk</label>
+                                            <label class="col-md-3 col-form-label">
+                                                Foto
+                                                @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
+                                                    {{" Produk "}}
+                                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
+                                                    {{" Jasa "}}
+                                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                                    {{" Mikrotik "}}
+                                                @endif
+                                            </label>
                                             <div class="col-md-9">
                                                 <input type="file" class="form-control" name="image" accept="image/*">
                                             </div>
                                         </div>
-                                        @endif
                                         <div class="form-group row mb-3">
                                             <label class="col-md-3 col-form-label">
                                                 Kode 
@@ -160,12 +167,20 @@
                                         <div class="form-group row mb-3">
                                             <label class="col-md-3 col-form-label">Apakah Produk Stok ? <span class="text-danger">*</span></label>
                                             <div class="col-md-9">
-                                                <select class="form-control select2" name="is_using_stock" >
+                                                <select class="form-control select2 select-is-using-stock" name="is_using_stock" >
                                                     <option value="">==Pilih Dengan Stock / Tanpa Stock==</option>
                                                     @foreach ($is_using_stock as $index => $row)
                                                     <option value="{{$index}}">{{$row}}</option>
                                                     @endforeach
                                                 </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row mb-3 display-initial-stock d-none">
+                                            <label class="col-md-3 col-form-label">
+                                                Stok Awal <span class="text-danger">*</span>
+                                            </label>
+                                            <div class="col-md-9">
+                                                <input type="number" class="form-control" name="qty" placeholder="Stok Awal" value="{{old('qty')}}" >
                                             </div>
                                         </div>
                                         @endif
@@ -328,6 +343,24 @@
                 $('.display-local-address').removeClass("d-none").addClass("d-none");
                 $('.display-remote-address').removeClass("d-none").addClass("d-none");
                 $('.display-expired-date').removeClass("d-none").addClass("d-none");
+            }
+        });
+
+        $(document).on("change",".select-is-using-stock",function(e){
+            e.preventDefault();
+
+            let val = $(this).val();
+
+            if(val != null && val != "" && val != undefined){
+                if(val == '{{\App\Enums\ProductEnum::IS_USING_STOCK_TRUE}}'){
+                    $('.display-initial-stock').removeClass("d-none");
+                }
+                else{
+                    $('.display-initial-stock').removeClass("d-none").addClass("d-none");
+                }
+            }
+            else{
+                $('.display-initial-stock').removeClass("d-none").addClass("d-none");
             }
         });
 

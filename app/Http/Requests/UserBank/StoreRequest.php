@@ -16,6 +16,10 @@ class StoreRequest extends FormRequest
     {
         $merge = [];
 
+        if(Auth::user()->hasRole([RoleEnum::OWNER])){
+            $merge["user_id"] = Auth::user()->id;
+        }
+        
         if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
             $merge["business_id"] = Auth::user()->business_id;
             $merge["user_id"] = Auth::user()->business->user_id ?? null;
@@ -48,7 +52,7 @@ class StoreRequest extends FormRequest
                 Rule::exists('users', 'id'),
             ],
             'business_id' => [
-                'required',
+                (Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])) ? "required" : "nullable",
                 Rule::exists('business', 'id'),
             ],
             'status' => [

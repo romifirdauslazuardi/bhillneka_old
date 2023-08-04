@@ -21,32 +21,20 @@
 @section("content")
 <div class="row">
     <div class="col-12 mt-4">
+        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]) && !empty(Auth::user()->business_id))
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-warning" role="alert">
+                        Halo owner , bisnis page sedang diaktifkan , halaman rekening akan tampil sesuai rekening bisnis page yang sedang aktif . Nonaktifkan bisnis page jika ingin menambahkan/menampilkan rekening Anda sendiri
+                    </div>
+                </div>
+            </div>
+        @endif
         <div class="card border-0 rounded shadow p-4">
             <form action="{{route('dashboard.user-banks.store')}}" id="frmStore" autocomplete="off">
                 @csrf
                 <div class="row mb-3">
                     <div class="col-lg-12">
-                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-                        <div class="form-group row mb-3">
-                            <label class="col-md-3 col-form-label">Pengguna<span class="text-danger">*</span></label>
-                            <div class="col-md-9">
-                                <select class="form-control select2 select-user" name="user_id" >
-                                    <option value="">==Pilih Pengguna==</option>
-                                    @foreach ($users as $index => $row)
-                                    <option value="{{$row->id}}" @if($row->id == old('user_id')) selected @endif>{{$row->name}} - {{$row->phone}} </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group row mb-3">
-                            <label class="col-md-3 col-form-label">Bisnis<span class="text-danger">*</span></label>
-                            <div class="col-md-9">
-                                <select class="form-control select2 select-business" name="business_id" >
-                                    <option value="">==Pilih Bisnis==</option>
-                                </select>
-                            </div>
-                        </div>
-                        @endif
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Bank<span class="text-danger">*</span></label>
                             <div class="col-md-9">

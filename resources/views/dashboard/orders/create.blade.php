@@ -89,7 +89,7 @@
                                 <label class="col-md-5 col-form-label">Pilih Produk </label>
                                 <div class="col-md-7">
                                     <div class="input-group">
-                                        <input type="text" class="form-control code" placeholder="Kode Produk">
+                                        <input type="text" class="form-control code" placeholder="Pilih Produk">
                                         <div class="input-group-append">
                                         <button class="input-group-text btn btn-success btn-show-product" type="button"><i class="fa fa-search"></i></button>
                                     </div>

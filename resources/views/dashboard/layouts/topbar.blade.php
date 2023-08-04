@@ -14,7 +14,9 @@
             @if(Auth::user()->hasRole([App\Enums\RoleEnum::OWNER,App\Enums\RoleEnum::AGEN,App\Enums\RoleEnum::ADMIN_AGEN]))
             <a class="btn btn-sm business-setting" href="#" style="margin-left: 5px;">
                 @if(!empty(Auth::user()->business_id))
-                <span class="text-success">{{Auth::user()->business->name ?? null}} @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER])) - ({{Auth::user()->business->user->name ?? null}}) @endif</span>
+                <span class="text-success">
+                {{substr(Auth::user()->business->name ?? null, 0, 8) . '...'}} @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER])) - ({{Auth::user()->business->user->name ?? null}}) @endif
+                </span>
                 <i class="fa fa-caret-down text-success"></i>
                 <br>
                 <small><i>(Klik untuk ubah bisnis page)</i></small>

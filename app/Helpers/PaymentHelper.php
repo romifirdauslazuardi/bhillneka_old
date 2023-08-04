@@ -169,12 +169,12 @@ class PaymentHelper
                     "settlement" => array (
                         array (
                             "bank_account_settlement_id" => $order->owner_bank_settlement_id,
-                            "value" => 10,
+                            "value" => $order->owner_fee,
                             "type" => "PERCENTAGE"
                         ),
                         array (
                             "bank_account_settlement_id" => $order->agen_bank_settlement_id,
-                            "value" => 90,
+                            "value" => $order->agen_fee,
                             "type" => "PERCENTAGE"
                         )
                     )

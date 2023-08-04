@@ -163,6 +163,17 @@
             $('#modalUpdate').modal("show");
         });
 
+        $(document).on("click", ".btn-add-stock", function(e) {
+            e.preventDefault();
+
+            let id = $(this).attr("data-id");
+            let productName = $(this).attr("data-product-name");
+
+            $("#frmAddStock").find('input[name="product_id"]').val(id);
+            $("#frmAddStock").find('.product-name').val(productName);
+            $("#modalAddStock").modal("show");
+        });
+
         $(document).on('submit','#frmUpdate',function(e){
             e.preventDefault();
             if(confirm("Apakah anda yakin ingin menyimpan data ini ?")){
@@ -183,6 +194,43 @@
                         }
                         else{
                             responseSuccess(resp.message,"{{route('dashboard.product-stocks.show',$result->id)}}");
+                        }
+                    },
+                    error: function (request, status, error) {
+                        if(request.status == 422){
+                            responseFailed(request.responseJSON.message);
+                        }
+                        else{
+                            responseInternalServerError();
+                        }
+                    },
+                    complete :function(){
+                        return closeLoader();
+                    }
+                })
+            }
+        })
+
+        $(document).on('submit','#frmAddStock',function(e){
+            e.preventDefault();
+            if(confirm("Apakah anda yakin ingin menyimpan data ini ?")){
+                $.ajax({
+                    url : $("#frmAddStock").attr("action"),
+                    method : "POST",
+                    data : new FormData($('#frmAddStock')[0]),
+                    contentType:false,
+                    cache:false,
+                    processData:false,
+                    dataType : "JSON",
+                    beforeSend : function(){
+                        return openLoader();
+                    },
+                    success : function(resp){
+                        if(resp.success == false){
+                            responseFailed(resp.message);                   
+                        }
+                        else{
+                            responseSuccess(resp.message,"{{route('dashboard.product-stocks.index')}}");
                         }
                     },
                     error: function (request, status, error) {

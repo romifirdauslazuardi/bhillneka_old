@@ -41,12 +41,10 @@ class OrderController extends Controller
             $providers = $this->providerService->index(new Request(['status' => ProviderEnum::STATUS_TRUE]),false);
             $providers = $providers->data;
 
-            if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
-                foreach($providers as $index => $row){
-                    if($row->type == ProviderEnum::TYPE_PAY_LATER){
-                        if(empty($result->business->user_pay_later->status)){
-                            unset($providers[$index]);
-                        }
+            foreach($providers as $index => $row){
+                if($row->type == ProviderEnum::TYPE_PAY_LATER){
+                    if(empty($result->business->user_pay_later->status)){
+                        unset($providers[$index]);
                     }
                 }
             }

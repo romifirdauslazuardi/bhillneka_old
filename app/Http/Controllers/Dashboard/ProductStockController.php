@@ -65,9 +65,12 @@ class ProductStockController extends Controller
         $users = $this->userService->index(new Request(['role' => RoleEnum::AGEN]),false);
         $users = $users->data;
 
+        $type = ProductStockEnum::type();
+
         $data = [
             'table' => $response,
             'users' => $users,
+            'type' => $type,
         ];
 
         return view($this->view . 'index', $data);

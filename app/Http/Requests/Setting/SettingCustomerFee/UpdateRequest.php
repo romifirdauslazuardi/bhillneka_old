@@ -18,8 +18,6 @@ class UpdateRequest extends FormRequest
             ],
             'limit' => [
                 'required',
-                'numeric',
-                'min:1',
             ],
             'type' => [
                 'required',
@@ -39,8 +37,6 @@ class UpdateRequest extends FormRequest
             'mark.required' => 'Tanda lebih dari / kurang dari harus diisi',
             'mark.in' => 'Tanda lebih dari / kurang dari tidak valid',
             'limit.required' => 'Batas nominal harus diisi',
-            'limit.numeric' => 'Batas nominal harus berupa angka',
-            'limit.min' => 'Batas nominal minimal 1',
             'type.required' => 'Jenis percetage / fixed harus disi',
             'type.in' => 'Jenis percentage / fixed tidak valid',
             'value.required' => 'Nilai fee harus diisi',

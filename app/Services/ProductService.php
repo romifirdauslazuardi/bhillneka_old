@@ -9,6 +9,7 @@ use App\Services\BaseService;
 use App\Http\Requests\Product\StoreRequest;
 use App\Http\Requests\Product\UpdateRequest;
 use App\Models\Product;
+use App\Models\ProductStock;
 use Illuminate\Http\Request;
 use App\Helpers\SlugHelper;
 use App\Helpers\SettingHelper;
@@ -27,12 +28,14 @@ class ProductService extends BaseService
     protected $product;
     protected $routerosApi;
     protected $business;
+    protected $productStock;
 
     public function __construct()
     {
         $this->product = new Product();
         $this->routerosApi = new RouterosAPI();
         $this->business = new Business();
+        $this->productStock = new ProductStock();
     }
 
     public function index(Request $request, bool $paginate = true)
@@ -243,6 +246,7 @@ class ProductService extends BaseService
 
     public function store(StoreRequest $request)
     {
+        DB::beginTransaction();
         try {
             $code = (empty($request->code)) ? null : trim(strip_tags($request->code));
             $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
@@ -264,6 +268,7 @@ class ProductService extends BaseService
             $address = (empty($request->address)) ? null : trim(strip_tags($request->address));
             $mac_address = (empty($request->mac_address)) ? null : trim(strip_tags($request->mac_address));
             $expired_date = (empty($request->expired_date)) ? null : trim(strip_tags($request->expired_date));
+            $qty = (empty($request->qty)) ? null : trim(strip_tags($request->qty));
             $image = $request->file("image");
 
             $slug = SlugHelper::generate(Product::class,$name,"slug");
@@ -349,8 +354,22 @@ class ProductService extends BaseService
                 'author_id' => Auth::user()->id,
             ]);
 
+            if($create->is_using_stock == ProductEnum::IS_USING_STOCK_TRUE){
+                $create = $this->productStock->create([
+                    'type' => ProductStockEnum::TYPE_MASUK,
+                    'product_id' => $create->id,
+                    'qty' => $qty,
+                    'available' => $qty,
+                    'date' => date("Y-m-d"),
+                    'author_id' => Auth::user()->id,
+                ]);
+            }
+
+            DB::commit();
+
             return $this->response(true, 'Berhasil menambahkan data',$create);
         } catch (Throwable $th) {
+            DB::rollBack();
             Log::emergency($th->getMessage());
 
             return $this->response(false, "Terjadi kesalahan saat memproses data");

@@ -57,11 +57,7 @@
                 <li>
                     <a href="{{(\SettingHelper::hasBankActive()==false) ? '#' : route('dashboard.users.index')}}" class="{{(\SettingHelper::hasBankActive()==false) ? 'hasBankNonActive' : ''}}">
                         <i class="fa fa-{{(\SettingHelper::hasBankActive()==false) ? 'lock' : 'users'}}"></i>
-                        @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))
-                        Pengguna
-                        @elseif(Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN,App\Enums\RoleEnum::ADMIN_AGEN]))
-                        Pelanggan
-                        @endif
+                        User Management
                     </a>
                 </li>
             </li>
@@ -117,9 +113,11 @@
                 </li>
                 @endif
 
+                @if(\SettingHelper::payLaterActive()==true)
                 <li>
                     <li><a href="{{route('dashboard.user-pay-laters.index')}}"><i class="fa fa-cogs"></i>Pengaturan Bayar Nanti</a></li>
                 </li>
+                @endif
             @endif
 
             @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]))

@@ -12,6 +12,7 @@ use App\Enums\UserBankEnum;
 use App\Models\SettingFee;
 use App\Models\MikrotikConfig;
 use App\Models\Order;
+use App\Models\Provider;
 use App\Models\SettingCustomerFee;
 use App\Models\UserBank;
 use App\Services\UserService;
@@ -223,21 +224,36 @@ class SettingHelper
     }
 
     public static function hasBankActive(){
-        if(Auth::user()->hasRole([RoleEnum::OWNER])){
-            return true;
-        }
-
         $data = new UserBank();
         $data = $data->where("status",UserBankEnum::STATUS_APPROVED);
-        if(Auth::user()->hasRole([RoleEnum::AGEN])){
+        if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::OWNER])){
             $data = $data->where("user_id",Auth::user()->id);
         }
         else if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
             $data = $data->where("user_id",Auth::user()->user_id);
         }
+        if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
+            if(!empty(Auth::user()->business_id)){
+                $data = $data->where("business_id",Auth::user()->business_id);
+            }
+        }
         $data = $data->get();
 
         if(count($data) >= 1){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public static function payLaterActive(){
+        $data = new Provider();
+        $data = $data->where("type",ProviderEnum::TYPE_PAY_LATER);
+        $data = $data->where("status",ProviderEnum::STATUS_TRUE);
+        $data = $data->first();
+
+        if($data){
             return true;
         }
         else{
