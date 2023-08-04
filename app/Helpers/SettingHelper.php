@@ -126,6 +126,7 @@ class SettingHelper
                             $customer_total_fee = round($customer_total_fee);                  
                         }
                         else{
+                            Log::info($order->value);;
                             $customer_total_fee = $order->value;
                         }
 
