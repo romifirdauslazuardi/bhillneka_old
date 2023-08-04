@@ -18,6 +18,12 @@
             </li>
             @endif
 
+            @if((Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]) && !empty(Auth::user()->business_id)))
+            <li>
+                <li><a href="{{route('dashboard.orders.create')}}"><i class="fa fa-plus"></i>Buat Order</a></li>
+            </li>
+            @endif
+
             @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER]) || (Auth::user()->hasRole([\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]) && !empty(Auth::user()->business_id)))
             <li style="margin-left: 25px;font-size:15px;"><small>Halaman Bisnis</small></li>
             @endif
