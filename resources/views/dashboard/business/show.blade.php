@@ -108,6 +108,17 @@
                         </div>
 
                         <div class="row mb-2">
+                                    <div class="col-md-3">
+                                        QRcode
+                                    </div>
+                                    <div class="col-md-8">
+                                        : <a href="{{route('dashboard.business.qrcode',$result->id)}}">
+                                            {{\QrCode::size(100)->generate(route('landing-page.shops.index',$result->slug))}}
+                                        </a>
+                                    </div>
+                                </div>
+
+                        <div class="row mb-2">
                             <div class="col-md-3">
                                 Author
                             </div>

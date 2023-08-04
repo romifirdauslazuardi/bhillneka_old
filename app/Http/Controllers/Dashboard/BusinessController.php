@@ -154,4 +154,20 @@ class BusinessController extends Controller
             return redirect()->route($this->route . 'index')->withInput();
         }
     }
+
+    public function qrcode($id)
+    {
+        $result = $this->businessService->show($id);
+        if (!$result->success) {
+            alert()->error('Gagal', $result->message);
+            return redirect()->route($this->route . 'index')->withInput();
+        }
+        $result = $result->data;
+
+        $data = [
+            'result' => $result
+        ];
+
+        return view($this->view . "qrcode", $data);
+    }
 }
