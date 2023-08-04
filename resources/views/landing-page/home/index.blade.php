@@ -40,15 +40,12 @@
                     <div class="modern-saas-absolute-right wow animate__animated animate__fadeInUp" data-wow-delay=".5s">
                         <div class="card rounded shadow">
                             <div class="p-3">
-                                <h5>Transaksi Sukses</h5>
-                                <div class="progress-box mt-5">
-                                    <p></p>
-                                    <div class="progress">
-                                        <div class="progress-bar position-relative bg-primary" style="width:{{$totalPresentase}}%;">
-                                            <div class="progress-value d-block text-muted h6 mt-1">{{$totalPresentase}}%</div>
-                                        </div>
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-1 ms-3">
+                                        <h6 class="mb-0 text-muted">Transaksi Berhasil</h6>
+                                        <p class="fs-5 text-dark fw-bold mb-0"><span>{{$totalOrderSuccess}}</span></p>
                                     </div>
-                                </div><!--end process box-->
+                                </div>
                             </div>
                         </div>
                     </div>

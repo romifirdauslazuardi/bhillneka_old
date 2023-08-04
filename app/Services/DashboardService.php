@@ -158,24 +158,12 @@ class DashboardService extends BaseService
         return $total;
     }
 
-    public function totalPresentase(){
+    public function totalOrderSuccess(){
         $orderSuccess = $this->order;
         $orderSuccess = $orderSuccess->where("status",OrderEnum::STATUS_SUCCESS);
         $orderSuccess = $orderSuccess->count();
 
-        $orderPembagi = $this->order;
-        $orderPembagi = $orderPembagi->where("status","!=",OrderEnum::STATUS_SUCCESS);
-        $orderPembagi = $orderPembagi->count();
-
-        if($orderSuccess >= 1 && $orderPembagi <= 0){
-            return 100;
-        }
-        
-        if($orderSuccess >= 1 && $orderPembagi >= 1){
-            return ceil(($orderSuccess/$orderPembagi) * 100);
-        }
-
-        return 0;
+        return $orderSuccess + self::totalVisitor();
     }
 
     private function orderSuccess(bool $latest = false){

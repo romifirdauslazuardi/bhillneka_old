@@ -52,7 +52,7 @@ class HomeController extends Controller
 
         $totalVisitor = $this->dashboardService->totalVisitor();
         
-        $totalPresentase = $this->dashboardService->totalPresentase();
+        $totalOrderSuccess = $this->dashboardService->totalOrderSuccess();
 
         $data = [
             'whyUs' => $whyUs,
@@ -61,7 +61,7 @@ class HomeController extends Controller
             'our_services' => $our_services,
             'partners' => $partners,
             'totalVisitor' => $totalVisitor,
-            'totalPresentase' => $totalPresentase,
+            'totalOrderSuccess' => $totalOrderSuccess,
         ];
 
         return view($this->view."index",$data);
