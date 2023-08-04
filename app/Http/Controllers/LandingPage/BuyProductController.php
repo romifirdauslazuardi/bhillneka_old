@@ -40,6 +40,11 @@ class BuyProductController extends Controller
         }
         $result = $result->data;
 
+        if($result->mikrotik == ProductEnum::MIKROTIK_PPPOE){
+            alert()->error('Gagal', "Fitur ini tidak berlaku pada produk mikrotik PPPOE");
+            return redirect()->route('landing-page.home.index')->withInput();
+        }
+
         $providers = $this->providerService->index(new Request(['status' => ProviderEnum::STATUS_TRUE]),false);
         $providers = $providers->data;
 
