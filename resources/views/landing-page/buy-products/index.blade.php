@@ -122,7 +122,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row mb-5">
                         <div class="col-12">
                             <div class="d-grid">
                                 <button type="submit" id="submit" name="send" class="btn btn-primary" disabled>Checkout</button>
