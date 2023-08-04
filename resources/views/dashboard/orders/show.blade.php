@@ -87,7 +87,7 @@
                                     </div>
                                 </div>
                             </div>
-                            @if(in_array($result->business->category->name,[\App\Enums\BusinessCategoryEnum::FNB]))
+                            @if(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::FNB]))
                             <div class="form-group row mb-3">
                                 <label class="col-md-5 col-form-label">Dine In/Take Away</label>
                                 <div class="col-md-7">
