@@ -113,7 +113,7 @@ class SettingHelper
                             $customer_total_fee = round($customer_total_fee);
                         }
                         else{
-                            $customer_total_fee = $order->value;
+                            $customer_total_fee = $row->value;
                         }
 
                         $customer_type_fee = $row->type;
@@ -126,8 +126,7 @@ class SettingHelper
                             $customer_total_fee = round($customer_total_fee);                  
                         }
                         else{
-                            Log::info($order);;
-                            $customer_total_fee = $order->value;
+                            $customer_total_fee = $row->value;
                         }
 
                         $customer_type_fee = $row->type;
