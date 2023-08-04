@@ -10,6 +10,7 @@ use App\Http\Requests\User\StoreRequest;
 use App\Http\Requests\User\UpdateRequest;
 use App\Services\UserService;
 use App\Enums\RoleEnum;
+use App\Helpers\SettingHelper;
 use Log;
 use Auth;
 
@@ -30,11 +31,25 @@ class UserController extends Controller
                 RoleEnum::AGEN,
                 RoleEnum::ADMIN_AGEN]) 
             && empty(Auth::user()->business_id)){
+                if($request->wantsJson()){
+                    return ResponseHelper::apiResponse(false, "Bisnis page belum diaktifkan");
+                }
                 alert()->error('Gagal', "Bisnis page belum diaktifkan");
                 return redirect()->route("dashboard.index");
             }
             return $next($request);
         },['only' => ['index','show','create','edit','store','update','destroy']]);
+
+        $this->middleware(function ($request, $next) {
+            if(SettingHelper::hasBankActive()==false){
+                if($request->wantsJson()){
+                    return ResponseHelper::apiResponse(false, "Tidak ada rekening bank yang sudah diverifikasi owner");
+                }
+                alert()->error('Gagal', "Tidak ada rekening bank anda yang sudah diverifikasi oleh owner");
+                return redirect()->route("dashboard.index");
+            }
+            return $next($request);
+        });
     }
 
     public function index(Request $request)

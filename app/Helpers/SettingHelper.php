@@ -226,17 +226,24 @@ class SettingHelper
     public static function hasBankActive(){
         $data = new UserBank();
         $data = $data->where("status",UserBankEnum::STATUS_APPROVED);
-        if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::OWNER])){
-            $data = $data->where("user_id",Auth::user()->id);
-        }
-        else if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
-            $data = $data->where("user_id",Auth::user()->user_id);
-        }
+        $data = $data->where("default",UserBankEnum::DEFAULT_TRUE);
+
         if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
             if(!empty(Auth::user()->business_id)){
                 $data = $data->where("business_id",Auth::user()->business_id);
             }
         }
+
+        if(Auth::user()->hasRole([RoleEnum::OWNER]) && empty(Auth::user()->business_id)){
+            $data = $data->whereHas("user",function($query2){
+                $query2->role([RoleEnum::OWNER]);
+            });
+        }
+
+        if(Auth::user()->hasRole([RoleEnum::OWNER]) && !empty(Auth::user()->business_id)){
+            $data = $data->where("business_id",Auth::user()->business_id);
+        }
+
         $data = $data->get();
 
         if(count($data) >= 1){

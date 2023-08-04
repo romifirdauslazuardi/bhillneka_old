@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Helpers\ResponseHelper;
+use App\Helpers\SettingHelper;
 use App\Http\Requests\Product\StoreRequest;
 use App\Http\Requests\Product\UpdateRequest;
 use App\Models\Product;
@@ -35,6 +36,9 @@ class ProductController extends Controller
 
         $this->middleware(function ($request, $next) {
             if(empty(Auth::user()->business_id)){
+                if($request->wantsJson()){
+                    return ResponseHelper::apiResponse(false, "Bisnis page belum diaktifkan");
+                }
                 alert()->error('Gagal', "Bisnis page belum diaktifkan");
                 return redirect()->route("dashboard.index");
             }
@@ -46,11 +50,25 @@ class ProductController extends Controller
                 RoleEnum::AGEN,
                 RoleEnum::ADMIN_AGEN]) 
             && empty(Auth::user()->business_id)){
+                if($request->wantsJson()){
+                    return ResponseHelper::apiResponse(false, "Bisnis page belum diaktifkan");
+                }
                 alert()->error('Gagal', "Bisnis page belum diaktifkan");
                 return redirect()->route("dashboard.index");
             }
             return $next($request);
         },['only' => ['index','show']]);
+
+        $this->middleware(function ($request, $next) {
+            if(SettingHelper::hasBankActive()==false){
+                if($request->wantsJson()){
+                    return ResponseHelper::apiResponse(false, "Tidak ada rekening bank anda yang sudah diverifikasi oleh owner");
+                }
+                alert()->error('Gagal', "Tidak ada rekening bank anda yang sudah diverifikasi oleh owner");
+                return redirect()->route("dashboard.index");
+            }
+            return $next($request);
+        });
     }
 
     public function index(Request $request)

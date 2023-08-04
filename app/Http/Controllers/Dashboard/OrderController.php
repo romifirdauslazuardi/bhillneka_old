@@ -17,6 +17,7 @@ use App\Services\OrderService;
 use App\Services\BusinessService;
 use App\Services\MikrotikConfigService;
 use App\Helpers\ResponseHelper;
+use App\Helpers\SettingHelper;
 use App\Http\Requests\Order\ProofOrderRequest;
 use App\Http\Requests\Order\UpdateProgressRequest;
 use App\Http\Requests\Order\UpdateStatusRequest;
@@ -47,6 +48,9 @@ class OrderController extends Controller
 
         $this->middleware(function ($request, $next) {
             if(empty(Auth::user()->business_id)){
+                if($request->wantsJson()){
+                    return ResponseHelper::apiResponse(false, "Bisnis page belum diaktifkan");
+                }
                 alert()->error('Gagal', "Bisnis page belum diaktifkan");
                 return redirect()->route("dashboard.index");
             }
@@ -58,11 +62,25 @@ class OrderController extends Controller
                 RoleEnum::AGEN,
                 RoleEnum::ADMIN_AGEN]) 
             && empty(Auth::user()->business_id)){
+                if($request->wantsJson()){
+                    return ResponseHelper::apiResponse(false, "Bisnis page belum diaktifkan");
+                }
                 alert()->error('Gagal', "Bisnis page belum diaktifkan");
                 return redirect()->route("dashboard.index");
             }
             return $next($request);
         },['only' => ['index','show']]);
+
+        $this->middleware(function ($request, $next) {
+            if(SettingHelper::hasBankActive()==false){
+                if($request->wantsJson()){
+                    return ResponseHelper::apiResponse(false, "Tidak ada rekening bank anda yang sudah diverifikasi oleh owner");
+                }
+                alert()->error('Gagal', "Tidak ada rekening bank anda yang sudah diverifikasi oleh owner");
+                return redirect()->route("dashboard.index");
+            }
+            return $next($request);
+        });
     }
 
     public function index(Request $request)
@@ -185,7 +203,7 @@ class OrderController extends Controller
                 return ResponseHelper::apiResponse(false, $response->message , null, null, $response->code);
             }
 
-            return ResponseHelper::apiResponse(false, $response->message , $response->data , null, $response->code);
+            return ResponseHelper::apiResponse(true, $response->message , $response->data , null, $response->code);
         } catch (\Throwable $th) {
             Log::emergency($th->getMessage());
 

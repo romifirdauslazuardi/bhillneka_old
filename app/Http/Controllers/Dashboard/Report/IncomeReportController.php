@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Services\Report\IncomeReportService;
 use Illuminate\Http\Request;
 use App\Exports\Report\IncomeReportExport;
+use App\Helpers\ResponseHelper;
+use App\Helpers\SettingHelper;
 use Illuminate\Support\Collection;
 use Excel;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +25,17 @@ class IncomeReportController extends Controller
         $this->route = "dashboard.reports.incomes.";
         $this->view = "dashboard.reports.incomes.";
         $this->incomeReportService = new IncomeReportService();
+
+        $this->middleware(function ($request, $next) {
+            if(SettingHelper::hasBankActive()==false){
+                if($request->wantsJson()){
+                    return ResponseHelper::apiResponse(false, "Tidak ada rekening bank yang sudah diverifikasi owner");
+                }
+                alert()->error('Gagal', "Tidak ada rekening bank anda yang sudah diverifikasi oleh owner");
+                return redirect()->route("dashboard.index");
+            }
+            return $next($request);
+        });
     }
 
     public function index(Request $request)

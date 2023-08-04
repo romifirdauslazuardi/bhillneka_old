@@ -6,6 +6,7 @@ use App\Enums\BusinessCategoryEnum;
 use App\Enums\OrderMikrotikEnum;
 use App\Enums\RoleEnum;
 use App\Helpers\ResponseHelper;
+use App\Helpers\SettingHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Report\UpdateOrderMikrotikRequest;
 use App\Services\Report\OrderMikrotikReportService;
@@ -36,6 +37,9 @@ class OrderMikrotikReportController extends Controller
                 RoleEnum::AGEN,
                 RoleEnum::ADMIN_AGEN]) 
             && empty(Auth::user()->business_id)){
+                if($request->wantsJson()){
+                    return ResponseHelper::apiResponse(false, "Bisnis page belum diaktifkan");
+                }
                 alert()->error('Gagal', "Bisnis page belum diaktifkan");
                 return redirect()->route("dashboard.index");
             }
@@ -49,6 +53,17 @@ class OrderMikrotikReportController extends Controller
 
             return $next($request);
         },['only' => ['index','show','edit']]);
+
+        $this->middleware(function ($request, $next) {
+            if(SettingHelper::hasBankActive()==false){
+                if($request->wantsJson()){
+                    return ResponseHelper::apiResponse(false, "Tidak ada rekening bank yang sudah diverifikasi owner");
+                }
+                alert()->error('Gagal', "Tidak ada rekening bank anda yang sudah diverifikasi oleh owner");
+                return redirect()->route("dashboard.index");
+            }
+            return $next($request);
+        });
     }
 
     public function index(Request $request)
