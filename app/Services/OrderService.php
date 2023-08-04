@@ -576,6 +576,8 @@ class OrderService extends BaseService
                 $settingFee = $settingFee["Data"];
             }
 
+            Log::info($settingFee);
+
             $order->update([
                 'owner_fee' => $settingFee["owner_fee"],
                 'agen_fee' => $settingFee["agen_fee"],
