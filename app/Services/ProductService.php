@@ -74,6 +74,9 @@ class ProductService extends BaseService
         if(isset($status)){
             $table = $table->where("status",$status);
         }
+        if(isset($is_using_stock)){
+            $table = $table->where("is_using_stock",$is_using_stock);
+        }
         if(!empty($business_id)){
             $table = $table->where("business_id",$business_id);
             if(request()->routeIs("landing-page.shops.index")){

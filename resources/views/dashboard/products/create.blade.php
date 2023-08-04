@@ -32,7 +32,7 @@
                                 <a class="nav-link active" data-bs-toggle="tab" href="#product">Data Produk</a>
                             </li>
 
-                            @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                            @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                             <li class="nav-item">
                                 <a class="nav-link" data-bs-toggle="tab" href="#configuration">Konfigurasi User Mikrotik</a>
                             </li>
@@ -47,11 +47,11 @@
                                         <div class="form-group row mb-3">
                                             <label class="col-md-3 col-form-label">
                                                 Foto
-                                                @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
+                                                @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
                                                     {{" Produk "}}
-                                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
+                                                @elseif(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::JASA]))
                                                     {{" Jasa "}}
-                                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                                @elseif(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                                                     {{" Mikrotik "}}
                                                 @endif
                                             </label>
@@ -62,11 +62,11 @@
                                         <div class="form-group row mb-3">
                                             <label class="col-md-3 col-form-label">
                                                 Kode 
-                                                @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
+                                                @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
                                                     {{" Produk "}}
-                                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
+                                                @elseif(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::JASA]))
                                                     {{" Jasa "}}
-                                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                                @elseif(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                                                     {{" Mikrotik "}}
                                                 @endif
                                                 <span class="text-danger">*</span>
@@ -78,11 +78,11 @@
                                         <div class="form-group row mb-3">
                                             <label class="col-md-3 col-form-label">
                                                 Nama 
-                                                @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
+                                                @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
                                                     {{" Produk "}}
-                                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
+                                                @elseif(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::JASA]))
                                                     {{" Jasa "}}
-                                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                                @elseif(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                                                     {{" Mikrotik "}}
                                                 @endif
                                                 <span class="text-danger">*</span>
@@ -94,11 +94,11 @@
                                         <div class="form-group row mb-3">
                                             <label class="col-md-3 col-form-label">
                                                 Harga 
-                                                @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
+                                                @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
                                                     {{" Produk "}}
-                                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
+                                                @elseif(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::JASA]))
                                                     {{" Jasa "}}
-                                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                                @elseif(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                                                     {{" Mikrotik "}}
                                                 @endif
                                                 <span class="text-danger">*</span>
@@ -110,11 +110,11 @@
                                         <div class="form-group row mb-3">
                                             <label class="col-md-3 col-form-label">
                                                 Deskripsi 
-                                                @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
+                                                @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
                                                     {{" Produk "}}
-                                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::JASA]))
+                                                @elseif(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::JASA]))
                                                     {{" Jasa "}}
-                                                @elseif(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                                @elseif(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                                                     {{" Mikrotik "}}
                                                 @endif
                                             </label>
@@ -122,7 +122,7 @@
                                                 <textarea class="form-control" rows="5" name="description">{{old('description')}}</textarea>
                                             </div>
                                         </div>
-                                        @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                        @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                                         <div class="form-group row mb-3">
                                             <label class="col-md-3 col-form-label">Tipe Mikrotik<span class="text-danger">*</span></label>
                                             <div class="col-md-9">
@@ -135,7 +135,7 @@
                                             </div>
                                         </div>
                                         @endif
-                                        @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG]))
+                                        @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG]))
                                         <div class="form-group row mb-3">
                                             <label class="col-md-3 col-form-label">
                                                 Berat Produk
@@ -163,7 +163,7 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB,\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                                        @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB,\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                                         <div class="form-group row mb-3">
                                             <label class="col-md-3 col-form-label">Apakah Produk Stok ? <span class="text-danger">*</span></label>
                                             <div class="col-md-9">
@@ -187,7 +187,7 @@
                                     </div>
                                 </div>
                             </div>
-                            @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                            @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                             <div class="tab-pane container fade" id="configuration">
                                 <div class="row mt-3">
                                     <div class="col-12">

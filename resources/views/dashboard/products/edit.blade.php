@@ -31,7 +31,7 @@
                         <a class="nav-link active" data-bs-toggle="tab" href="#product">Data Produk</a>
                     </li>
 
-                    @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                    @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="tab" href="#configuration">Konfigurasi User Mikrotik</a>
                     </li>
@@ -180,7 +180,7 @@
                             </div>
                         </div>
                     </div>
-                    @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                    @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                     <div class="tab-pane container fade" id="configuration">
                         <div class="row mt-3">
                             <div class="col-12">

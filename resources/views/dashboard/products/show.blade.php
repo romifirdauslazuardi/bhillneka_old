@@ -34,7 +34,7 @@
                         <a class="nav-link active" data-bs-toggle="tab" href="#product">Data Produk</a>
                     </li>
 
-                    @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                    @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="tab" href="#configuration">Konfigurasi User Mikrotik</a>
                     </li>
@@ -45,7 +45,7 @@
                     <div class="tab-pane container active" id="product">
                         <div class="row">
                             <div class="col-12">
-                                @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::FNB]))
+                                @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::FNB]))
                                 <div class="row mb-2">
                                     <div class="col-md-3">
                                         Foto Produk
@@ -121,7 +121,7 @@
                                     </div>
                                 </div>
 
-                                @if(in_array(Auth::user()->business->category->name,[\App\Enums\BusinessCategoryEnum::BARANG]))
+                                @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG]))
                                 <div class="row mb-2">
                                     <div class="col-md-3">
                                         Berat Produk
@@ -199,7 +199,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane container active" id="configuration">
+
+                    <div class="tab-pane container" id="configuration">
                         <div class="row">
                             <div class="col-12">
                                 <div class="row mb-2">
