@@ -34,7 +34,7 @@
                         <a class="nav-link active" data-bs-toggle="tab" href="#product">Data Produk</a>
                     </li>
 
-                    @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
+                    @if(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="tab" href="#configuration">Konfigurasi User Mikrotik</a>
                     </li>
@@ -45,7 +45,7 @@
                     <div class="tab-pane container active" id="product">
                         <div class="row">
                             <div class="col-12">
-                                @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::FNB]))
+                                @if(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::FNB]))
                                 <div class="row mb-2">
                                     <div class="col-md-3">
                                         Foto Produk
@@ -121,7 +121,7 @@
                                     </div>
                                 </div>
 
-                                @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG]))
+                                @if(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG]))
                                 <div class="row mb-2">
                                     <div class="col-md-3">
                                         Berat Produk
@@ -287,7 +287,7 @@
                     <div class="col-12">
                         <div class="d-flex justify-content-start mt-3">
                             <a href="{{route('dashboard.products.index')}}" class="btn btn-warning btn-sm" style="margin-right: 10px;"><i class="fa fa-arrow-left"></i> Kembali</a>
-                            @if(!empty(Auth::user()->business_id))
+                            @if(!empty($result->business_id))
                             <a href="{{route('dashboard.products.edit',$result->id)}}" class="btn btn-primary btn-sm" style="margin-right: 10px;"><i class="fa fa-edit"></i> Edit</a>
                             <a href="#" class="btn btn-danger btn-sm btn-delete" data-id="{{$result->id}}"><i class="fa fa-trash"></i> Hapus</a>
                             @endif
