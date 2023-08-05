@@ -125,13 +125,6 @@ class NewsService extends BaseService
                     ]);
 
                     $message = $create->note;
-                    $message .= "\r\n";
-                    $message .= "\r\n";
-
-                    $message .= "Penyedia Layanan / www.bhilnekka.com";
-                    $message .= "\r\n";
-                    $message .= "TERIMAKASIH";
-                    $message .= "\r\n";
 
                     WhatsappHelper::send($recipient->user->phone ?? null,$recipient->user->name ?? null,["title" => $create->title ,"message" => $message],true);
                 }

@@ -12,12 +12,13 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('order:expired')->daily()->at('00:00')->timezone('Asia/Jakarta');
+        $schedule->command('order:expired')->everyMinute()->timezone('Asia/Jakarta');
         $schedule->command('order:repeat')->daily()->at('00:00')->timezone('Asia/Jakarta');
         $schedule->command('order-due-date:expired-mikrotik')->daily()->at("00:00")->timezone('Asia/Jakarta');
         $schedule->command('order-on-time-pay:expired-mikrotik')->daily()->at("00:00")->timezone('Asia/Jakarta');
         $schedule->command('sync:mikrotik-to-database')->daily()->at("00:00")->timezone('Asia/Jakarta');
         $schedule->command('product:empty-stock')->everyTenMinutes()->timezone('Asia/Jakarta');
+        $schedule->command('order:reminder-unpaid')->daily()->at("00:00")->timezone('Asia/Jakarta');
     }
 
     /**

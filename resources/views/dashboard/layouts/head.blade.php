@@ -77,5 +77,15 @@
     .table-success{
         background-color: green;
     }
+    
+    @media (max-width: 575.98px) { 
+        .business-setting-medium-screen{
+            display: none !important;
+        }
+        .business-setting-small-screen{
+            display: block !important;
+        }
+    }
+
 </style>
 @yield("css")

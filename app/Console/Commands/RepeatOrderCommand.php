@@ -64,16 +64,22 @@ class RepeatOrderCommand extends Command
                 $checkOtherOrder = $checkOtherOrder->count();
 
                 if(empty($order->repeat_order_at) && $checkOtherOrder == 0){
-                    $date30plusDay = date("Y-m-d",strtotime($order->created_at."+ 30 day"));
+                    $date30plusDay = date("Y-m-d",strtotime($order->created_at." + 30 day"));
+                    $date7minDay = date("Y-m-d",strtotime($date30plusDay." -7 day"));
 
-                    if($date30plusDay == date("Y-m-d")){
+                    if($date7minDay == date("Y-m-d")){
                         $generateOrder = self::generateOrder($order);
                     }
                 }
                 
                 if(!empty($order->repeat_order_at) && $checkOtherOrder == 0){
                     if(((int)date("d")) == $order->repeat_order_at){
-                        $generateOrder = self::generateOrder($order);
+
+                        $date7minDay = date("Y-m-d",strtotime(date("Y-m-d")." -7 day"));
+
+                        if($date7minDay == date("Y-m-d")){
+                            $generateOrder = self::generateOrder($order);
+                        }
                     }
                 }
 
@@ -175,7 +181,7 @@ class RepeatOrderCommand extends Command
                         }
                     }
 
-                    OrderExpiredJob::dispatch($generateOrder->id)->delay(now()->addMinutes(env("DOKU_DUE_DATE")));
+                    OrderExpiredJob::dispatch($generateOrder->id)->delay(now()->addMinutes(10080+1));
 
                     WhatsappHelper::sendWhatsappOrderTemplate($generateOrder->id,"pesanan");
                 }
@@ -208,7 +214,7 @@ class RepeatOrderCommand extends Command
             'status' => OrderEnum::STATUS_WAITING_PAYMENT,
             'progress' => OrderEnum::PROGRESS_DRAFT,
             'author_id' => $order->author_id,
-            'expired_date' => date("YmdHis",strtotime(date("Y-m-d H:i:s")." + ".env("DOKU_DUE_DATE")."minutes")),
+            'expired_date' => date("YmdHis",strtotime(date("Y-m-d H:i:s")." + 7 day")),
             'business_id' => $order->business_id,
             'type' => $order->type,
             'fnb_type' => $order->fnb_type,

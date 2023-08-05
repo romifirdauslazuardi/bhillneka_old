@@ -163,7 +163,7 @@ class DashboardService extends BaseService
         $orderSuccess = $orderSuccess->where("status",OrderEnum::STATUS_SUCCESS);
         $orderSuccess = $orderSuccess->count();
 
-        return $orderSuccess + self::totalVisitor();
+        return $orderSuccess + 259;
     }
 
     private function orderSuccess(bool $latest = false){

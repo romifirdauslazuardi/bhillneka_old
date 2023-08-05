@@ -51,15 +51,15 @@ class SyncMikrotikToDatabaseCommand extends Command
                 foreach($order->items as $i => $orderItem){
                     if(!empty($orderItem->order_mikrotik->mikrotik_id)){
                         $mikrotikConfig = SettingHelper::mikrotikConfig($order->business_id,$order->business->user_id);
-                        $ip = $mikrotikConfig->ip ?? null;
-                        $username = $mikrotikConfig->username ?? null;
-                        $password = $mikrotikConfig->password ?? null;
-                        $port = $mikrotikConfig->port ?? null;
+                        $ipConfig = $mikrotikConfig->ip ?? null;
+                        $usernameConfig = $mikrotikConfig->username ?? null;
+                        $passwordConfig = $mikrotikConfig->password ?? null;
+                        $portConfig = $mikrotikConfig->port ?? null;
                         
                         $connect = new RouterosAPI();
                         $connect->debug("false");
         
-                        if($connect->connect($ip,$username,$password,$port)){
+                        if($connect->connect($ipConfig,$usernameConfig,$passwordConfig,$portConfig)){
                             if($orderItem->order_mikrotik->type == OrderMikrotikEnum::TYPE_PPPOE){
                                 $connect = $connect->comm('/ppp/secret/print',[
                                     '?.id' => $orderItem->order_mikrotik->mikrotik_id

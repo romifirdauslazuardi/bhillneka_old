@@ -20,11 +20,18 @@ class WhatsappHelper
             $message = "";
             if($header == true){
                 $message .= 'Hi *'.$name."*,\r\n";
-                $message .= "Pesan otomatis dari *".config('app.name')."*\r\n\r\n";
+                $message .= "Pesan otomatis dari *www.bhilnekka.com*\r\n\r\n";
             }
             $message .= $content['title'].".\r\n";
             $message .= ".\r\n";
             $message .= self::convertHtml($content['message']);
+
+            $message .= "\r\n";
+            $message .= "\r\n";
+            $message .= "Penyedia Layanan / www.bhilnekka.com";
+            $message .= "\r\n";
+            $message .= "TERIMAKASIH";
+            $message .= "\r\n";
 
             $send = Http::timeout(60)->connectTimeout(60)->withHeaders([
                 'Content-Type' => 'application/json',
@@ -99,6 +106,8 @@ class WhatsappHelper
         $message .= "\r\n";
         $message .= "Discount : ".number_format($order->discount,0,',','.');
         $message .= "\r\n";
+        $message .= "Biaya Layanan : ".number_format($order->customer_total_fee,0,',','.');
+        $message .= "\r\n";
         $message .= "Total : ".number_format($order->totalNeto(),0,',','.');
         $message .= "\r\n";
         if($order->status == OrderEnum::STATUS_SUCCESS){
@@ -124,14 +133,6 @@ class WhatsappHelper
         else{
             $message .= "Link Invoice : ".route('landing-page.orders.index',['code' => $order->code]);
         }
-
-        $message .= "\r\n";
-        $message .= "\r\n";
-
-        $message .= "Penyedia Layanan / www.bhilnekka.com";
-        $message .= "\r\n";
-        $message .= "TERIMAKASIH";
-        $message .= "\r\n";
 
         if(!empty($order->customer_id)){
             return self::send($order->customer->phone,$order->customer->name,["title" => "Notifikasi Pesanan" ,"message" => $message],true);
