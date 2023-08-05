@@ -221,6 +221,7 @@ class OrderService extends BaseService
             $customer_id = (empty($request->customer_id)) ? null : trim(strip_tags($request->customer_id));
             $customer_name = (empty($request->customer_name)) ? null : trim(strip_tags($request->customer_name));
             $customer_phone = (empty($request->customer_phone)) ? null : trim(strip_tags($request->customer_phone));
+            $customer_email = (empty($request->customer_email)) ? null : trim(strip_tags($request->customer_email));
             $provider_id = (empty($request->provider_id)) ? null : trim(strip_tags($request->provider_id));
             $note = (empty($request->note)) ? null : trim(strip_tags($request->note));
             $repeater = $request->repeater;
@@ -274,6 +275,7 @@ class OrderService extends BaseService
                 'customer_id' => $customer_id,
                 'customer_name' => $customer_name,
                 'customer_phone' => $customer_phone,
+                'customer_email' => $customer_email,
                 'provider_id' => $provider_id,
                 'note' => $note,
                 'discount' => (!empty($discount)) ? $discount : 0,
@@ -631,6 +633,7 @@ class OrderService extends BaseService
             $customer_id = (empty($request->customer_id)) ? null : trim(strip_tags($request->customer_id));
             $customer_name = (empty($request->customer_name)) ? null : trim(strip_tags($request->customer_name));
             $customer_phone = (empty($request->customer_phone)) ? null : trim(strip_tags($request->customer_phone));
+            $customer_email = (empty($request->customer_email)) ? null : trim(strip_tags($request->customer_email));
             $provider_id = (empty($request->provider_id)) ? null : trim(strip_tags($request->provider_id));
             $note = (empty($request->note)) ? null : trim(strip_tags($request->note));
             $repeater = $request->repeater;
@@ -660,6 +663,7 @@ class OrderService extends BaseService
                 'customer_id' => $customer_id,
                 'customer_name' => $customer_name,
                 'customer_phone' => $customer_phone,
+                'customer_email' => $customer_email,
                 'provider_id' => $provider_id,
                 'note' => $note,
                 'discount' => (!empty($discount)) ? $discount : 0,

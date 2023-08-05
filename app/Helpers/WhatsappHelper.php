@@ -85,7 +85,7 @@ class WhatsappHelper
         foreach($order->items as $index => $row){
             $message .= $row->product_name;
             $message .= "\r\n";
-            $message .= $row->qty." x ".number_format($row->product_price,0,',','.')." = ".number_format($row->totalNeto(),0,',','.');
+            $message .= $row->qty." x ".number_format($row->product_price,0,',','.')." = ".number_format($row->totalBruto(),0,',','.');
             if(!empty($row->order_mikrotik) && $order->business->category->name == BusinessCategoryEnum::MIKROTIK){
                 if($order->status == OrderEnum::STATUS_SUCCESS){
                     $message .= "\r\n";
@@ -102,9 +102,9 @@ class WhatsappHelper
             $message .= "=====";
             $message .= "\r\n";
         }
-        $message .= "Subtotal : ".number_format($order->totalNeto() + $order->discount,0,',','.');
+        $message .= "Subtotal : ".number_format($order->subTotalItemBruto(),0,',','.');
         $message .= "\r\n";
-        $message .= "Discount : ".number_format($order->discount,0,',','.');
+        $message .= "Discount : ".number_format($order->totalDiscount(),0,',','.');
         $message .= "\r\n";
         $message .= "Biaya Layanan : ".number_format($order->customer_total_fee,0,',','.');
         $message .= "\r\n";

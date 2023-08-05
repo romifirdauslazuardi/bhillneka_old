@@ -19,6 +19,7 @@ class Order extends Model
         'customer_id',
         'customer_name',
         'customer_phone',
+        'customer_email',
         'discount',
         'type_fee',
         'owner_fee',
@@ -287,17 +288,6 @@ class Order extends Model
         return (int)$value;
     }
 
-    public function totalBruto(){
-        $total = 0;
-
-        foreach($this->items()->get() as $index => $row){
-            $total += $row->qty * $row->product_price;
-        }
-
-        $total += $this->customer_total_fee + $this->doku_fee;
-        return (int)$total;
-    }
-
     public function totalNeto(){
         $total = 0;
         foreach($this->items()->get() as $index => $row){
@@ -306,6 +296,15 @@ class Order extends Model
 
         $total = $total - $this->discount;
         $total += $this->customer_total_fee;
+
+        return (int)$total;
+    }
+
+    public function subTotalItemBruto(){
+        $total = 0;
+        foreach($this->items()->get() as $index => $row){
+            $total += ($row->qty * $row->product_price);
+        }
 
         return (int)$total;
     }
@@ -339,5 +338,16 @@ class Order extends Model
     public function incomeOwnerBruto(){
         $total = $this->total_owner_fee + $this->doku_fee;
         return $total;
+    }
+
+    public function totalDiscount(){
+        $total = 0;
+        foreach($this->items()->get() as $index => $row){
+            $total += $row->discount;
+        }
+
+        $total = $total + $this->discount;
+
+        return (int)$total;
     }
 }

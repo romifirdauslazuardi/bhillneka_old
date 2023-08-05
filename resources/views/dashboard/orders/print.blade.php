@@ -95,7 +95,7 @@ border: 1px solid black;
                         </div>
                     </td>
                     <td style="float: right;">
-                        <p style="margin-top: 0;margin-bottom:0;padding-top: 0;padding-bottom:0;">{{number_format($row->totalNeto(),0,',','.')}}</p>
+                        <p style="margin-top: 0;margin-bottom:0;padding-top: 0;padding-bottom:0;">{{number_format($row->totalBruto(),0,',','.')}}</p>
                     </td>
                 </tr>
                 @endforeach
@@ -108,7 +108,7 @@ border: 1px solid black;
                             SUBTOTAL
                         </div> 
                         <div style="float: right;">
-                            {{number_format($result->totalNeto()+$result->discount,0,',','.')}}
+                            {{number_format($result->subTotalItemBruto(),0,',','.')}}
                         </div> 
                     </td>
                 </tr>
@@ -118,7 +118,17 @@ border: 1px solid black;
                             DISCOUNT
                         </div> 
                         <div style="float: right;">
-                            {{number_format($result->discount,0,',','.')}}
+                            {{number_format($result->totalDiscount(),0,',','.')}}
+                        </div> 
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="float: left;">
+                            BIAYA LAYANAN
+                        </div> 
+                        <div style="float: right;">
+                            {{number_format($result->customer_total_fee,0,',','.')}}
                         </div> 
                     </td>
                 </tr>

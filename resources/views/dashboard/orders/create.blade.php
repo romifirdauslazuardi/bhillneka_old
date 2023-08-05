@@ -60,6 +60,12 @@
                                         <input type="text" class="form-control" name="customer_phone" placeholder="Telp. Customer">
                                     </div>
                                 </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-5 col-form-label">Email Customer</label>
+                                    <div class="col-md-7">
+                                        <input type="email" class="form-control" name="customer_email" placeholder="Email Customer">
+                                    </div>
+                                </div>
                             </div>
                             @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::FNB]))
                             <div class="form-group row mb-3">

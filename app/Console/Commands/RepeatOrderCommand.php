@@ -208,6 +208,7 @@ class RepeatOrderCommand extends Command
             'customer_id' => $order->customer_id,
             'customer_name' => $order->customer_name,
             'customer_phone' => $order->customer_phone,
+            'customer_email' => $order->customer_email,
             'provider_id' => $order->provider_id,
             'note' => $order->note,
             'discount' => $order->discount,

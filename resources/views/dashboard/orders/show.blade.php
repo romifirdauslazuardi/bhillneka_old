@@ -86,6 +86,12 @@
                                         <input type="text" class="form-control" value="{{$result->customer_phone}}" readonly disabled>
                                     </div>
                                 </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-5 col-form-label">Email Customer</label>
+                                    <div class="col-md-7">
+                                        <input type="text" class="form-control" value="{{$result->customer_email}}" readonly disabled>
+                                    </div>
+                                </div>
                             </div>
                             @if(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::FNB]))
                             <div class="form-group row mb-3">
