@@ -16,9 +16,6 @@
 | Metode Pembayaran | {!! $order->provider->name ?? null !!} |
 @endif
 | Status | {!! $order->status()->msg ?? null !!} |
-@foreach($order->items as $index => $row)
-| {!!$row->product_name!!} x{!!$row->qty!!} | {!! number_format($row->totalBruto(),0,',','.') !!} |
-@endforeach
 | Subtotal | {!! number_format($order->subTotalItemBruto(),0,',','.') !!} |
 | Discount | {!! number_format($order->totalDiscount(),0,',','.') !!} |
 | Biaya Layanan | {!! number_format($order->customer_total_fee,0,',','.') !!} |
@@ -31,6 +28,18 @@
 | Kembalian | {!! number_format(0,0,',','.') !!} |
 @endcomponent
 @endcomponent
+
+@component('mail::panel')
+# Detail Pembelian:
+@component('mail::table')
+| Produk | Harga |
+| :------------- | :------------- |
+@foreach($order->items as $index => $row)
+| {!!$row->product_name!!} x{!!$row->qty!!} | {!! number_format($row->totalBruto(),0,',','.') !!} |
+@endforeach
+@endcomponent
+@endcomponent
+
 
 @component('mail::button', ['url' => url($url)])
 BUKA WEBSITE

@@ -176,7 +176,7 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
 		Route::put('/proof_order/{id}', 'OrderController@proofOrder')->name("proofOrder")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
 		Route::get('/export/excel', 'OrderController@exportExcel')->name("exportExcel")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
 		Route::put('/update-progress/{id}', 'OrderController@updateProgress')->name("updateProgress")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
-		Route::put('/update-status/{id}', 'OrderController@updateStatus')->name("updateStatus")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
+		Route::put('/update-status/{id}', 'OrderController@updateStatus')->name("updateStatus")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
 		Route::get('/print/{id}', 'OrderController@print')->name("print")->middleware(['role:' . implode('|', [RoleEnum::OWNER,RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])]);
 	});
 

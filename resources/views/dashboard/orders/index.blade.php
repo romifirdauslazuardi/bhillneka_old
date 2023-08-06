@@ -76,11 +76,11 @@
                                                         @if(!empty(Auth::user()->business_id))
                                                             <a href="{{route('dashboard.orders.edit',$row->id)}}" class="dropdown-item"><i class="fa fa-edit"></i> Edit</a>
                                                             <a href="#" class="dropdown-item btn-delete" data-id="{{$row->id}}"><i class="fa fa-trash"></i> Hapus</a>
-                                                            <a href="#" class="dropdown-item btn-status" data-id="{{$row->id}}" data-status="{{$row->status}}"><i class="fa fa-edit"></i> Edit Status Pembayaran</a>
                                                         @endif
                                                     @endif
                                                     @if(Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]))
                                                         @if(!empty(Auth::user()->business_id))
+                                                        <a href="#" class="dropdown-item btn-status" data-id="{{$row->id}}" data-status="{{$row->status}}"><i class="fa fa-edit"></i> Edit Status Pembayaran</a>
                                                         <a href="#" class="dropdown-item btn-progress" data-id="{{$row->id}}" data-progress="{{$row->progress}}"><i class="fa fa-edit"></i> Edit Progress Pesanan</a>
                                                         @endif
                                                         <a href="{{route('dashboard.orders.print',$row->id)}}" class="dropdown-item"><i class="fa fa-print"></i> Print</a>

@@ -93,6 +93,19 @@ class OrderController extends Controller
         $providers = $this->providerService->index(new Request([]),false);
         $providers = $providers->data;
 
+        foreach($providers as $index => $row){
+            if($row->type == ProviderEnum::TYPE_PAY_LATER){
+                if(empty(Auth::user()->business_id) && Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
+                    unset($providers[$index]);
+                }
+                else{
+                    if(empty(Auth::user()->business->user_pay_later->status)){
+                        unset($providers[$index]);
+                    }
+                }
+            }
+        }
+
         $business = $this->businessService->index(new Request([]),false);
         $business = $business->data;
 

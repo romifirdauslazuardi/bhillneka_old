@@ -38,7 +38,7 @@ class ProductService extends BaseService
         $this->productStock = new ProductStock();
     }
 
-    public function index(Request $request, bool $paginate = true)
+    public function index(Request $request, bool $paginate = true,$public = false)
     {
         $search = (empty($request->search)) ? null : trim(strip_tags($request->search));
         $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
@@ -46,7 +46,7 @@ class ProductService extends BaseService
         $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
         $is_using_stock = (empty($request->is_using_stock)) ? null : trim(strip_tags($request->is_using_stock));
 
-        if(Auth::check()){
+        if($public == false){
             if(Auth::user()->hasRole([RoleEnum::AGEN])){
                 $user_id = Auth::user()->id;
             }

@@ -142,8 +142,11 @@ class PaymentNotification extends Notification implements ShouldQueue
                 $message .= "Link Pembayaran : ".route('landing-page.manual-payments.index',$order->code);
             }
         }
-        else{
+        else if($order->status == OrderEnum::STATUS_SUCCESS){
             $message .= "Link Invoice : ".route('landing-page.orders.index',['code' => $order->code]);
+        }
+        else{
+            $message .= "Link Detail Pesanan : ".route('landing-page.orders.index',['code' => $order->code]);
         }
 
         return $message;

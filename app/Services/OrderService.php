@@ -1051,7 +1051,7 @@ class OrderService extends BaseService
                 ]);
             }
 
-            WhatsappHelper::sendWhatsappOrderTemplate($result->id);
+            WhatsappHelper::sendWhatsappOrderTemplate($result->id,"pesanan");
 
             DB::commit();
 

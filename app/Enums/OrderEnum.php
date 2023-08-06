@@ -54,7 +54,7 @@ final class OrderEnum extends Enum
             self::STATUS_REFUNDED => 'REFUNDED',
             self::STATUS_REDIRECT => 'REDIRECT',
             self::STATUS_TIMEOUT => 'TIMEOUT',
-            SELF::STATUS_PAY_LATER => 'BAYAR NANTI',
+            self::STATUS_PAY_LATER => 'BAYAR NANTI',
         ];
 
         return $data;

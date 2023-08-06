@@ -210,13 +210,10 @@ class UserBankService extends BaseService
                 }
             }
 
-            if($status == UserBankEnum::STATUS_APPROVED && $oldStatus != $status){
+            if($status == UserBankEnum::STATUS_APPROVED){
                 if($result->user->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
-                    $owners = $this->user;
-                    $owners = $owners->role([RoleEnum::OWNER]);
-                    $owners = $owners->get();
 
-                    Notification::send($owners,new UserBankNotification(route('dashboard.user-banks.show',$result->id),"Rekening Berhasil Disetujui","Pengajuan rekening baru berhasil disetujui penyedia layanan "));
+                    Notification::send($result->user,new UserBankNotification(route('dashboard.user-banks.show',$result->id),"Rekening Berhasil Disetujui","Pengajuan rekening baru berhasil disetujui penyedia layanan "));
                 }
             }
 

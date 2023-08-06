@@ -65,7 +65,7 @@ class ShopController extends Controller
             'status' => ProductEnum::STATUS_TRUE
         ]);
 
-        $products = $this->productService->index($request,false);
+        $products = $this->productService->index($request,false,true);
         $products = $products->data;
 
         $providers = $this->providerService->index(new Request(['status' => ProviderEnum::STATUS_TRUE]),false);

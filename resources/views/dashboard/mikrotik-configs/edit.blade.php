@@ -46,9 +46,9 @@
                             </div>
                         </div>
                         <div class="form-group row mb-3">
-                            <label class="col-md-3 col-form-label">Port <span class="text-danger">*</span></label>
+                            <label class="col-md-3 col-form-label">Port API <span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" name="port" placeholder="Port" value="{{old('port',$result->port)}}" >
+                                <input type="text" class="form-control" name="port" placeholder="Port API" value="{{old('port',$result->port)}}" >
                             </div>
                         </div>
                     </div>

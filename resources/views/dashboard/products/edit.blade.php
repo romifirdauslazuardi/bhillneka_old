@@ -1,3 +1,18 @@
+<?php
+    $label = "";
+    if(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG])){
+        $label = " Produk";
+    }
+    else if(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::JASA])){
+        $label = " Jasa";
+    }
+    else if(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::FNB])){
+        $label = " Produk FNB";
+    }
+    else if(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK])){
+        $label = " Produk Mikrotik";
+    }
+?>
 @extends("dashboard.layouts.main")
 
 @section("title","Produk")
@@ -45,14 +60,7 @@
                                 <div class="col-lg-12">
                                     <div class="form-group row mb-3">
                                         <label class="col-md-3 col-form-label">
-                                            Foto
-                                            @if(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
-                                                {{" Produk "}}
-                                            @elseif(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::JASA]))
-                                                {{" Jasa "}}
-                                            @elseif(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
-                                                {{" Mikrotik "}}
-                                            @endif
+                                            Foto {{$label}}
                                         </label>
                                         <div class="col-md-9">
                                             <input type="file" class="form-control" name="image" accept="image/*">
@@ -61,65 +69,37 @@
                                     </div>
                                     <div class="form-group row mb-3">
                                         <label class="col-md-3 col-form-label">
-                                            Kode 
-                                            @if(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
-                                                {{" Produk "}}
-                                            @elseif(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::JASA]))
-                                                {{" Jasa "}}
-                                            @elseif(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
-                                                {{" Mikrotik "}}
-                                            @endif
+                                            Kode {{$label}}
                                             <span class="text-danger">*</span>
                                         </label>
                                         <div class="col-md-9">
-                                            <input type="text" class="form-control" name="code" placeholder="Kode Produk" value="{{old('code',$result->code)}}" >
+                                            <input type="text" class="form-control" name="code" placeholder="Kode {{$label}}" value="{{old('code',$result->code)}}" >
                                         </div>
                                     </div>
                                     <div class="form-group row mb-3">
                                         <label class="col-md-3 col-form-label">
-                                            Nama 
-                                            @if(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
-                                                {{" Produk "}}
-                                            @elseif(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::JASA]))
-                                                {{" Jasa "}}
-                                            @elseif(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
-                                                {{" Mikrotik "}}
-                                            @endif
+                                            Nama {{$label}}
                                             <span class="text-danger">*</span>
                                         </label>
                                         <div class="col-md-9">
-                                            <input type="text" class="form-control" name="name" placeholder="Nama Produk" value="{{old('name',$result->name)}}" >
+                                            <input type="text" class="form-control" name="name" placeholder="Nama {{$label}}" value="{{old('name',$result->name)}}" >
                                         </div>
                                     </div>
                                     <div class="form-group row mb-3">
                                         <label class="col-md-3 col-form-label">
-                                            Harga 
-                                            @if(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
-                                                {{" Produk "}}
-                                            @elseif(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::JASA]))
-                                                {{" Jasa "}}
-                                            @elseif(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
-                                                {{" Mikrotik "}}
-                                            @endif
+                                            Harga {{$label}}
                                             <span class="text-danger">*</span>
                                         </label>
                                         <div class="col-md-9">
-                                            <input type="number" class="form-control" name="price" placeholder="Harga Produk" value="{{old('price',$result->price)}}" >
+                                            <input type="number" class="form-control" name="price" placeholder="Harga {{$label}}" value="{{old('price',$result->price)}}" >
                                         </div>
                                     </div>
                                     <div class="form-group row mb-3">
                                         <label class="col-md-3 col-form-label">
-                                            Deskripsi 
-                                            @if(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB]))
-                                                {{" Produk "}}
-                                            @elseif(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::JASA]))
-                                                {{" Jasa "}}
-                                            @elseif(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
-                                                {{" Mikrotik "}}
-                                            @endif
+                                            Deskripsi {{$label}}
                                         </label>
                                         <div class="col-md-9">
-                                            <textarea class="form-control" rows="5" name="description">{{old('description',$result->description)}}</textarea>
+                                            <textarea class="form-control" rows="5" name="description" placeholder="Deskripsi {{$label}}">{{old('description',$result->description)}}</textarea>
                                         </div>
                                     </div>
                                     @if(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
@@ -153,7 +133,7 @@
                                     </div>
                                     @endif
                                     <div class="form-group row mb-3">
-                                        <label class="col-md-3 col-form-label">Status<span class="text-danger">*</span></label>
+                                        <label class="col-md-3 col-form-label">Status {{$label}}<span class="text-danger">*</span></label>
                                         <div class="col-md-9">
                                             <select class="form-control select2" name="status" >
                                                 <option value="">==Pilih Status==</option>
