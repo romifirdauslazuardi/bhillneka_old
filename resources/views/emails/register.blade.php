@@ -7,7 +7,7 @@ Selamat akun anda berhasil didaftarkan sebagai Agen. Berikut kami informasikan e
 | <!-- -->    | <!-- -->    |
 |-------------|-------------|
 @foreach($settingFee as $index => $row)
-| Penjualan {{$row->mark()}} {{number_format($row->limit,0,',','.')}}
+| Transaksi {{$row->mark()}} {{number_format($row->limit,0,',','.')}}
 | Jasa Layanan & Aplikasi         | {{ $row->owner_fee ?? null }}%        |
 | Pendapatan Agen        | {{ $row->agen_fee ?? null }}%       |
 @endforeach
