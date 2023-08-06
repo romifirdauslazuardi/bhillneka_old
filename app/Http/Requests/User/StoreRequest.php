@@ -26,7 +26,7 @@ class StoreRequest extends FormRequest
         $this->merge($merge);
 
         if($this->roles == RoleEnum::CUSTOMER){
-            if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
+            if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN,RoleEnum::OWNER])){
                 $this->merge(["business_id" => Auth::user()->business_id]);
             }
         }
@@ -65,6 +65,7 @@ class StoreRequest extends FormRequest
                 'min:8',
             ],
             'email_verified_at' => [
+                'nullable',
                 'date_format:Y-m-d H:i:s'
             ],
             'user_id' => [
