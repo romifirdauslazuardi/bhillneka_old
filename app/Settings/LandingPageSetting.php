@@ -12,6 +12,10 @@ class LandingPageSetting extends Settings
 
     public ?string $title;
 
+    public ?string $keyword;
+
+    public ?string $favicon;
+
     public ?string $footer;
 
     public ?string $email;

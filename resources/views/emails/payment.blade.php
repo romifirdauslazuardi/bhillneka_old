@@ -7,12 +7,28 @@
 @component('mail::table')
 | Deskripsi | Keterangan |
 | :------------- | :------------- |
-| Pemilik Usaha | {!! $order->user->name ?? null !!} |
+| Nama Usaha | {!! $order->business->name ?? null !!} |
 | Nomor Pesanan | {!! $order->code !!} |
 | Tanggal Pesanan | {!! date('d-m-Y H:i:s',strtotime($order->created_at)) !!} |
+@if($order->provider->type == \App\Enums\ProviderEnum::TYPE_DOKU)
+| Metode Pembayaran | {!! str_replace("_"," ",$order->doku_channel_id) !!} |
+@else
 | Metode Pembayaran | {!! $order->provider->name ?? null !!} |
-| Total | {!! number_format($order->totalNeto(),0,',','.') !!} |
+@endif
 | Status | {!! $order->status()->msg ?? null !!} |
+@foreach($order->items as $index => $row)
+| {!!$row->product_name!!} x{!!$row->qty!!} | {!! number_format($row->totalBruto(),0,',','.') !!} |
+@endforeach
+| Subtotal | {!! number_format($order->subTotalItemBruto(),0,',','.') !!} |
+| Discount | {!! number_format($order->totalDiscount(),0,',','.') !!} |
+| Biaya Layanan | {!! number_format($order->customer_total_fee,0,',','.') !!} |
+| Total | {!! number_format($order->totalNeto(),0,',','.') !!} |
+@if($order->status == \App\Enums\OrderEnum::STATUS_SUCCESS)
+| Bayar | {!! number_format($order->totalNeto(),0,',','.') !!} |
+@else
+| Bayar | {!! number_format(0,0,',','.') !!} |
+@endif
+| Kembalian | {!! number_format(0,0,',','.') !!} |
 @endcomponent
 @endcomponent
 

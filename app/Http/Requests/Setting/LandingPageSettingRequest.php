@@ -18,6 +18,9 @@ class LandingPageSettingRequest extends FormRequest
             'description' => [
                 'required'
             ],
+            'keyword' => [
+                'required'
+            ],
             'email' => [
                 'required'
             ],
@@ -61,15 +64,19 @@ class LandingPageSettingRequest extends FormRequest
             'title.required' => 'Judul harus diisi.',
             'title.max' => 'Judul maksimal 255 karakter.',
             'description.required' => 'Deskripsi harus diisi.',
+            'keyword.required' => 'Kata kunci harus diisi.',
             'email.required' => 'Email harus diisi.',
             'phone.required' => 'Phone harus diisi.',
             'location.required' => 'Lokasi harus diisi.',
             'logo.image' => 'Logo harus berupa gambar',
             'logo.mimes' => 'Logo harus berupa jpeg,png,jpg,svg',
             'logo.max' => 'Logo tidak boleh lebih dari 2MB',
-            'logo.image' => 'Logo dark harus berupa gambar',
-            'logo.mimes' => 'Logo dark harus berupa jpeg,png,jpg,svg',
-            'logo.max' => 'Logo dark tidak boleh lebih dari 2MB',
+            'logo_dark.image' => 'Logo dark harus berupa gambar',
+            'logo_dark.mimes' => 'Logo dark harus berupa jpeg,png,jpg,svg',
+            'logo_dark.max' => 'Logo dark tidak boleh lebih dari 2MB',
+            'favicon.image' => 'Favicon harus berupa gambar',
+            'favicon.mimes' => 'Favicon harus berupa jpeg,png,jpg,svg',
+            'favicon.max' => 'Favicon tidak boleh lebih dari 2MB',
             'footer.required' => 'Footer harus diisi.',
             'footer.max' => 'Footer maksimal 255 karakter.',
         ];

@@ -36,6 +36,7 @@ class LandingPageSettingController extends Controller
         try {
             $title = $request->title;
             $description = $request->description;
+            $keyword = $request->keyword;
             $email = $request->email;
             $phone = $request->phone;
             $location = $request->location;
@@ -45,6 +46,7 @@ class LandingPageSettingController extends Controller
             $footer = $request->footer;
             $logo = $request->file("logo");
             $logo_dark = $request->file("logo_dark");
+            $favicon = $request->file("favicon");
 
             if ($logo) {
                 $upload = UploadHelper::upload_file($logo, 'settings/landing-page', LandingPageSettingEnum::LOGO_EXT);
@@ -66,6 +68,16 @@ class LandingPageSettingController extends Controller
                 $logo_dark = $upload["Path"];
             }
 
+            if ($favicon) {
+                $upload = UploadHelper::upload_file($favicon, 'settings/landing-page', LandingPageSettingEnum::LOGO_EXT);
+
+                if ($upload["IsError"] == TRUE) {
+                    return ResponseHelper::apiResponse(false, $upload["Message"] , null, null, 422);
+                }
+
+                $favicon = $upload["Path"];
+            }
+
             $landingPageSetting = new LandingPageSetting();
             if ($logo) {
                 $landingPageSetting->logo = $logo;
@@ -73,8 +85,12 @@ class LandingPageSettingController extends Controller
             if ($logo_dark) {
                 $landingPageSetting->logo_dark = $logo_dark;
             }
+            if ($favicon) {
+                $landingPageSetting->favicon = $favicon;
+            }
             $landingPageSetting->title = $title;
             $landingPageSetting->description = $description;
+            $landingPageSetting->keyword = $keyword;
             $landingPageSetting->email = $email;
             $landingPageSetting->phone = $phone;
             $landingPageSetting->location = $location;

@@ -41,10 +41,11 @@ class RegisterRequest extends FormRequest
             'email.unique' => 'Email sudah digunakan',
             'password.required' => 'Password harus diisi',
             'password.min' => 'Password minimal 8 karakter',
-            'password.required' => 'Phone harus diisi',
+            'password.required' => 'Password harus diisi',
             'password.confirmed' => 'Password tidak sesuai',
-            'phone.min' => 'Phone minimal 8 karakter',
-            'phone.numeric' => 'Phone harus berupa angka',
+            'phone.min' => 'No.telp minimal 8 karakter',
+            'phone.numeric' => 'No.telp harus berupa angka',
+            'phone.unique' => 'No.telp sudah digunakan',
         ];
     }
 

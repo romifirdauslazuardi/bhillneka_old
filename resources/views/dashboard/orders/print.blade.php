@@ -171,7 +171,7 @@ border: 1px solid black;
                 </tr>
             </table>
             <table style='width:300px; font-size:12pt;' cellspacing='2'>
-                <tr></br><td align='center'>Penyedia Layanan / www.bhilnekka.com</br></td></tr>
+                <tr></br><td align='center'>Penyedia Layanan / www.bhillneka.com</br></td></tr>
                 <tr></br><td align='center'>Billing Digital</br></td></tr>
             </table>
             <table style='width:300px; font-size:12pt;' cellspacing='2'>

@@ -82,7 +82,6 @@ class PaymentNotification extends Notification implements ShouldQueue
 
     private function sendWhatsapp($order){
         $message = "";
-        $message .= "\r\n";
         $message .= $order->business->name;
         $message .= "\r\n";
         $message .= $order->business->location;
@@ -146,14 +145,6 @@ class PaymentNotification extends Notification implements ShouldQueue
         else{
             $message .= "Link Invoice : ".route('landing-page.orders.index',['code' => $order->code]);
         }
-
-        $message .= "\r\n";
-        $message .= "\r\n";
-
-        $message .= "Penyedia Layanan / www.bhilnekka.com";
-        $message .= "\r\n";
-        $message .= "TERIMAKASIH";
-        $message .= "\r\n";
 
         return $message;
     }

@@ -35,9 +35,12 @@ class DashboardSettingController extends Controller
     {
         try {
             $title = $request->title;
+            $description = $request->description;
+            $keyword = $request->keyword;
             $footer = $request->footer;
             $logo = $request->file("logo");
             $logo_icon = $request->file("logo_icon");
+            $favicon = $request->file("favicon");
 
             if ($logo) {
                 $upload = UploadHelper::upload_file($logo, 'settings/dashboard', DashboardSettingEnum::LOGO_EXT);
@@ -59,6 +62,16 @@ class DashboardSettingController extends Controller
                 $logo_icon = $upload["Path"];
             }
 
+            if ($favicon) {
+                $upload = UploadHelper::upload_file($favicon, 'settings/dashboard', DashboardSettingEnum::LOGO_EXT);
+
+                if ($upload["IsError"] == TRUE) {
+                    return ResponseHelper::apiResponse(false, $upload["Message"] , null, null, 422);
+                }
+
+                $favicon = $upload["Path"];
+            }
+
             $dashboardSetting = new DashboardSetting();
             if ($logo) {
                 $dashboardSetting->logo = $logo;
@@ -66,7 +79,12 @@ class DashboardSettingController extends Controller
             if ($logo_icon) {
                 $dashboardSetting->logo_icon = $logo_icon;
             }
+            if ($favicon) {
+                $dashboardSetting->favicon = $favicon;
+            }
             $dashboardSetting->title = $title;
+            $dashboardSetting->description = $description;
+            $dashboardSetting->keyword = $keyword;
             $dashboardSetting->footer = $footer;
             $dashboardSetting->save();
 

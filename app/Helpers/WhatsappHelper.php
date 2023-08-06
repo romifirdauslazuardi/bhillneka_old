@@ -20,7 +20,7 @@ class WhatsappHelper
             $message = "";
             if($header == true){
                 $message .= 'Hi *'.$name."*,\r\n";
-                $message .= "Pesan otomatis dari *www.bhilnekka.com*\r\n\r\n";
+                $message .= "Pesan otomatis dari *www.bhillneka.com*\r\n\r\n";
             }
             $message .= $content['title'].".\r\n";
             $message .= ".\r\n";
@@ -28,7 +28,7 @@ class WhatsappHelper
 
             $message .= "\r\n";
             $message .= "\r\n";
-            $message .= "Penyedia Layanan / www.bhilnekka.com";
+            $message .= "Penyedia Layanan / www.bhillneka.com";
             $message .= "\r\n";
             $message .= "TERIMAKASIH";
             $message .= "\r\n";
@@ -57,18 +57,20 @@ class WhatsappHelper
             if($order->status == OrderEnum::STATUS_WAITING_PAYMENT){
                 $message .= "Selesaikan Pembayaran Anda sebelum ".date("d F Y H:i:s",strtotime($order->expired_date))." WIB";
                 $message .= "\r\n";
+                $message .= "\r\n";
             }
             if($order->status == OrderEnum::STATUS_EXPIRED){
                 $message .= "Maaf, pesanan dibatalkan. Anda telah mencapai batas pembayaran yang sudah ditentukan pada ".date("d F Y H:i:s",strtotime($order->expired_date))." WIB";
+                $message .= "\r\n";
                 $message .= "\r\n";
             }
         }
         else if($type == "progress"){
             $message = "Progress pesanan anda diubah menjadi *".$order->progress()->msg."*";
             $message .= "\r\n";
+            $message .= "\r\n";
         }
         
-        $message .= "\r\n";
         $message .= $order->business->name;
         $message .= "\r\n";
         $message .= $order->business->location;

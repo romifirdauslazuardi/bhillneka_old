@@ -39,6 +39,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use App\Jobs\OrderExpiredJob;
+use App\Mail\OrderMail;
 use App\Models\Business;
 use Auth;
 use DB;

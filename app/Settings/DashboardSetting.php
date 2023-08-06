@@ -10,7 +10,13 @@ class DashboardSetting extends Settings
 
     public ?string $logo_icon;
 
+    public ?string $favicon;
+
     public ?string $title;
+
+    public ?string $description;
+
+    public ?string $keyword;
 
     public ?string $footer;
 

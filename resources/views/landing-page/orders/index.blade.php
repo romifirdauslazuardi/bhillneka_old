@@ -96,12 +96,12 @@
                                             <tr>
                                                 <td style="width:25%;">SubTotal</td>
                                                 <td class="text-center">:</td>
-                                                <td>{{number_format($result->totalNetoWithoutCustomerFee()+$result->discount,0,',','.')}}</td>
+                                                <td>{{number_format($result->subTotalItemBruto(),0,',','.')}}</td>
                                             </tr>
                                             <tr>
                                                 <td style="width:25%;">Diskon</td>
                                                 <td class="text-center">:</td>
-                                                <td>{{number_format($result->discount,0,',','.')}}</td>
+                                                <td>{{number_format($result->totalDiscount(),0,',','.')}}</td>
                                             </tr>
                                             <tr>
                                                 <td style="width:25%;">Biaya Layanan</td>
@@ -113,6 +113,13 @@
                                                 <td class="text-center">:</td>
                                                 <td>{{number_format($result->totalNeto(),0,',','.')}}</td>
                                             </tr>
+                                            @if($result->business->category->name == \App\Enums\BusinessCategoryEnum::FNB)
+                                            <tr>
+                                                <td style="width:25%;">Nomor Meja</td>
+                                                <td class="text-center">:</td>
+                                                <td>{{$result->table_id->name ?? null}}</td>
+                                            </tr>
+                                            @endif
                                             @if($result->provider->type == \App\Enums\ProviderEnum::TYPE_DOKU && $result->status == \App\Enums\OrderEnum::STATUS_WAITING_PAYMENT)
                                             <tr>
                                                 <td style="width:25%;">Link Pembayaran</td>

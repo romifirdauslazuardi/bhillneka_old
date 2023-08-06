@@ -34,6 +34,18 @@
                             </div>
                         </div>
                         <div class="form-group row mb-3">
+                            <label class="col-md-3 col-form-label">Deskripsi <span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <textarea class="form-control" placeholder="Deskripsi" name="description">{{$result->description}}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
+                            <label class="col-md-3 col-form-label">Kata Kunci <span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="keyword" placeholder="Kata Kunci" value="{{old('keyword',$result->keyword)}}">
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Logo</label>
                             <div class="col-md-9">
                                 @if(!empty($result->logo))
@@ -55,6 +67,19 @@
                                 </div>
                                 @endif
                                 <input type="file" class="form-control" name="logo_icon">
+                                <p class="text-success" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;"><small><i>Ukuran direkomendasikan 200px x 200px</i></small></p>
+                                <p class="text-info" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;"><small><i>Kosongkan jika tidak diubah</i></small></p>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
+                            <label class="col-md-3 col-form-label">Favicon</label>
+                            <div class="col-md-9">
+                                @if(!empty($result->favicon))
+                                <div class="mb-2">
+                                    <img src="{{asset($result->favicon)}}" style="width: 64px;height: 64px;">
+                                </div>
+                                @endif
+                                <input type="file" class="form-control" name="favicon">
                                 <p class="text-success" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;"><small><i>Ukuran direkomendasikan 200px x 200px</i></small></p>
                                 <p class="text-info" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;"><small><i>Kosongkan jika tidak diubah</i></small></p>
                             </div>

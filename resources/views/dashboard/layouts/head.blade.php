@@ -7,15 +7,15 @@
 @endif
 </title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Premium Bootstrap 5 Landing Page Template" />
-<meta name="keywords" content="Saas, Software, multi-uses, HTML, Clean, Modern" />
+<meta name="description" content="{{\SettingHelper::settings('dashboard', 'description')}}" />
+<meta name="keywords" content="{{\SettingHelper::settings('dashboard', 'keyword')}}" />
 <meta name="author" content="Shreethemes" />
 <meta name="email" content="support@shreethemes.in" />
 <meta name="website" content="https://shreethemes.in" />
 <meta name="Version" content="v4.7.0" />
 
 <!-- favicon -->
-<link rel="shortcut icon" href="{{URL::to('/')}}/templates/dashboard/assets/images/favicon.ico" />
+<link rel="shortcut icon" href="{{!empty(\SettingHelper::settings('dashboard', 'favicon')) ? asset(\SettingHelper::settings('dashboard', 'favicon')) : URL::to('/').'/templates/dashboard/assets/images/favicon.ico'}}" />
 <!-- Css -->
 <link href="{{URL::to('/')}}/templates/dashboard/assets/libs/simplebar/simplebar.min.css" rel="stylesheet">
 <!-- Bootstrap Css -->
