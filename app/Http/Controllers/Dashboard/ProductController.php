@@ -15,6 +15,7 @@ use App\Models\Product;
 use App\Services\ProductService;
 use App\Services\UserService;
 use App\Services\BusinessService;
+use App\Services\MikrotikConfigService;
 use Log;
 use Auth;
 
@@ -25,6 +26,7 @@ class ProductController extends Controller
     protected $productService;
     protected $userService;
     protected $businessService;
+    protected $mikrotikConfigService;
 
     public function __construct()
     {
@@ -33,35 +35,39 @@ class ProductController extends Controller
         $this->productService = new ProductService();
         $this->userService = new UserService();
         $this->businessService = new BusinessService();
+        $this->mikrotikConfigService = new MikrotikConfigService();
 
         $this->middleware(function ($request, $next) {
-            if(empty(Auth::user()->business_id)){
-                if($request->wantsJson()){
+            if (empty(Auth::user()->business_id)) {
+                if ($request->wantsJson()) {
                     return ResponseHelper::apiResponse(false, "Bisnis page belum diaktifkan");
                 }
                 alert()->error('Gagal', "Bisnis page belum diaktifkan");
                 return redirect()->route("dashboard.index");
             }
             return $next($request);
-        },['only' => ['create','edit','store','destroy']]);
+        }, ['only' => ['create', 'edit', 'store', 'destroy']]);
 
         $this->middleware(function ($request, $next) {
-            if(Auth::user()->hasRole([
-                RoleEnum::AGEN,
-                RoleEnum::ADMIN_AGEN]) 
-            && empty(Auth::user()->business_id)){
-                if($request->wantsJson()){
+            if (
+                Auth::user()->hasRole([
+                    RoleEnum::AGEN,
+                    RoleEnum::ADMIN_AGEN
+                ])
+                && empty(Auth::user()->business_id)
+            ) {
+                if ($request->wantsJson()) {
                     return ResponseHelper::apiResponse(false, "Bisnis page belum diaktifkan");
                 }
                 alert()->error('Gagal', "Bisnis page belum diaktifkan");
                 return redirect()->route("dashboard.index");
             }
             return $next($request);
-        },['only' => ['index','show']]);
+        }, ['only' => ['index', 'show']]);
 
         $this->middleware(function ($request, $next) {
-            if(SettingHelper::hasBankActive()==false){
-                if($request->wantsJson()){
+            if (SettingHelper::hasBankActive() == false) {
+                if ($request->wantsJson()) {
                     return ResponseHelper::apiResponse(false, "Tidak ada rekening bank anda yang sudah diverifikasi oleh owner");
                 }
                 alert()->error('Gagal', "Tidak ada rekening bank anda yang sudah diverifikasi oleh owner");
@@ -75,7 +81,7 @@ class ProductController extends Controller
     {
         $response = $this->productService->index($request);
 
-        $users = $this->userService->index(new Request(['role' => RoleEnum::AGEN]),false);
+        $users = $this->userService->index(new Request(['role' => RoleEnum::AGEN]), false);
         $users = $users->data;
 
         $status = ProductEnum::status();
@@ -96,10 +102,14 @@ class ProductController extends Controller
 
         $mikrotik = ProductEnum::mikrotik();
 
+        $mikrotik_configs = $this->mikrotikConfigService->index(new Request([]), false);
+        $mikrotik_configs = $mikrotik_configs->data;
+
         $data = [
             'status' => $status,
             'is_using_stock' => $is_using_stock,
             'mikrotik' => $mikrotik,
+            'mikrotik_configs' => $mikrotik_configs,
         ];
 
         return view($this->view . "create", $data);
@@ -135,11 +145,15 @@ class ProductController extends Controller
 
         $mikrotik = ProductEnum::mikrotik();
 
+        $mikrotik_configs = $this->mikrotikConfigService->index(new Request([]), false);
+        $mikrotik_configs = $mikrotik_configs->data;
+
         $data = [
             'result' => $result,
             'status' => $status,
             'is_using_stock' => $is_using_stock,
             'mikrotik' => $mikrotik,
+            'mikrotik_configs' => $mikrotik_configs,
         ];
 
         return view($this->view . "edit", $data);
@@ -150,14 +164,14 @@ class ProductController extends Controller
         try {
             $response = $this->productService->store($request);
             if (!$response->success) {
-                return ResponseHelper::apiResponse(false, $response->message , null, null, $response->code);
+                return ResponseHelper::apiResponse(false, $response->message, null, null, $response->code);
             }
 
-            return ResponseHelper::apiResponse(true, $response->message , $response->data , null, $response->code);
+            return ResponseHelper::apiResponse(true, $response->message, $response->data, null, $response->code);
         } catch (\Throwable $th) {
             Log::emergency($th->getMessage());
 
-            return ResponseHelper::apiResponse(false, $th->getMessage() , null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
+            return ResponseHelper::apiResponse(false, $th->getMessage(), null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -166,14 +180,14 @@ class ProductController extends Controller
         try {
             $response = $this->productService->update($request, $id);
             if (!$response->success) {
-                return ResponseHelper::apiResponse(false, $response->message , null, null, $response->code);
+                return ResponseHelper::apiResponse(false, $response->message, null, null, $response->code);
             }
-            
-            return ResponseHelper::apiResponse(true, $response->message , $response->data , null, $response->code);
+
+            return ResponseHelper::apiResponse(true, $response->message, $response->data, null, $response->code);
         } catch (\Throwable $th) {
             Log::emergency($th->getMessage());
 
-            return ResponseHelper::apiResponse(false, $th->getMessage() , null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
+            return ResponseHelper::apiResponse(false, $th->getMessage(), null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

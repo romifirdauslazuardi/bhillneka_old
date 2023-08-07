@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             BankSeeder::class,
             BusinessSlugSeeder::class,
             TableCodeSeeder::class,
+            ProductMikrotikEmptyMikrotikConfigIdSeeder::class,
             ProvincesSeeder::class,
             CitiesSeeder::class,
             DistrictsSeeder::class,

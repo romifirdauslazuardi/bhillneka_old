@@ -33,15 +33,15 @@ class MikrotikConfigService extends BaseService
         $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
         $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
 
-        if(Auth::user()->hasRole([RoleEnum::AGEN])){
+        if (Auth::user()->hasRole([RoleEnum::AGEN])) {
             $user_id = Auth::user()->id;
         }
 
-        if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
+        if (Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])) {
             $user_id = Auth::user()->user_id;
         }
 
-        if(!empty(Auth::user()->business_id)){
+        if (!empty(Auth::user()->business_id)) {
             $business_id = Auth::user()->business_id;
         }
 
@@ -53,11 +53,11 @@ class MikrotikConfigService extends BaseService
                 $query2->orWhere('password', 'like', '%' . $search . '%');
             });
         }
-        if(!empty($user_id)){
-            $table = $table->where("user_id",$user_id);
+        if (!empty($user_id)) {
+            $table = $table->where("user_id", $user_id);
         }
-        if(!empty($business_id)){
-            $table = $table->where("business_id",$business_id);
+        if (!empty($business_id)) {
+            $table = $table->where("business_id", $business_id);
         }
         $table = $table->orderBy('created_at', 'DESC');
 
@@ -75,16 +75,16 @@ class MikrotikConfigService extends BaseService
     {
         try {
             $result = $this->mikrotikConfig;
-            if(Auth::user()->hasRole([RoleEnum::AGEN])){
-                $result = $result->where("user_id",Auth::user()->id);
+            if (Auth::user()->hasRole([RoleEnum::AGEN])) {
+                $result = $result->where("user_id", Auth::user()->id);
             }
-            if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
-                $result = $result->where("user_id",Auth::user()->user_id);
+            if (Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])) {
+                $result = $result->where("user_id", Auth::user()->user_id);
             }
-            $result = $result->where('id',$id);
+            $result = $result->where('id', $id);
             $result = $result->first();
 
-            if(!$result){
+            if (!$result) {
                 return $this->response(false, "Data tidak ditemukan");
             }
 
@@ -99,6 +99,8 @@ class MikrotikConfigService extends BaseService
     public function store(StoreRequest $request)
     {
         try {
+            $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
+            $description = (empty($request->description)) ? null : trim(strip_tags($request->description));
             $ip = (empty($request->ip)) ? null : trim(strip_tags($request->ip));
             $username = (empty($request->username)) ? null : trim(strip_tags($request->username));
             $password = (empty($request->password)) ? null : trim(strip_tags($request->password));
@@ -106,26 +108,19 @@ class MikrotikConfigService extends BaseService
             $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
             $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
 
-            $checkExist = $this->mikrotikConfig;
-            $checkExist = $checkExist->where("user_id",$user_id);
-            $checkExist = $checkExist->where("business_id",$business_id);
-            $checkExist = $checkExist->first();
-
-            if($checkExist){
-                return $this->response(false, "Tidak dapat menambahkan lebih dari 1 konfigurasi pada bisnis yang sama");
-            }
-
             $connect = $this->routerosApi;
             $connect->debug("false");
 
-            if(!$connect->connect($ip,$username,$password,$port)){
+            if (!$connect->connect($ip, $username, $password, $port)) {
                 return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
             }
 
             $create = $this->mikrotikConfig->updateOrCreate([
                 'user_id' => $user_id,
                 'business_id' => $business_id,
-            ],[
+            ], [
+                'name' => $name,
+                'description' => $description,
                 'ip' => $ip,
                 'username' => $username,
                 'password' => $password,
@@ -135,7 +130,7 @@ class MikrotikConfigService extends BaseService
                 'author_id' => Auth::user()->id,
             ]);
 
-            return $this->response(true, 'Berhasil menambahkan data',$create);
+            return $this->response(true, 'Berhasil menambahkan data', $create);
         } catch (Throwable $th) {
             Log::emergency($th->getMessage());
 
@@ -146,6 +141,8 @@ class MikrotikConfigService extends BaseService
     public function update(UpdateRequest $request, $id)
     {
         try {
+            $name = (empty($request->name)) ? null : trim(strip_tags($request->name));
+            $description = (empty($request->description)) ? null : trim(strip_tags($request->description));
             $ip = (empty($request->ip)) ? null : trim(strip_tags($request->ip));
             $username = (empty($request->username)) ? null : trim(strip_tags($request->username));
             $password = (empty($request->password)) ? null : trim(strip_tags($request->password));
@@ -158,11 +155,13 @@ class MikrotikConfigService extends BaseService
             $connect = $this->routerosApi;
             $connect->debug("false");
 
-            if(!$connect->connect($ip,$username,$password,$port)){
+            if (!$connect->connect($ip, $username, $password, $port)) {
                 return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
             }
 
             $result->update([
+                'name' => $name,
+                'description' => $description,
                 'ip' => $ip,
                 'username' => $username,
                 'password' => $password,
@@ -171,7 +170,7 @@ class MikrotikConfigService extends BaseService
                 'business_id' => $business_id,
             ]);
 
-            return $this->response(true, 'Berhasil mengubah data',$result);
+            return $this->response(true, 'Berhasil mengubah data', $result);
         } catch (Throwable $th) {
             Log::emergency($th->getMessage());
 
@@ -193,28 +192,29 @@ class MikrotikConfigService extends BaseService
         }
     }
 
-    public function profilePppoe(){
+    public function profilePppoe($mikrotik_id)
+    {
         try {
-            $mikrotikConfig = SettingHelper::mikrotikConfig();
+            $mikrotikConfig = SettingHelper::mikrotikConfig($mikrotik_id);
             $ip = $mikrotikConfig->ip ?? null;
             $username = $mikrotikConfig->username ?? null;
             $password = $mikrotikConfig->password ?? null;
             $port = $mikrotikConfig->port ?? null;
 
-            if(!$ip || !$username || !$password || !$port){
+            if (!$ip || !$username || !$password || !$port) {
                 return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
             }
 
             $connect = $this->routerosApi;
             $connect->debug("false");
 
-            if(!$connect->connect($ip,$username,$password,$port)){
+            if (!$connect->connect($ip, $username, $password, $port)) {
                 return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
             }
 
             $data = $connect->comm('/ppp/profile/print');
 
-            return $this->response(true, 'Berhasil medapatkan data',$data);
+            return $this->response(true, 'Berhasil medapatkan data', $data);
         } catch (Throwable $th) {
             Log::emergency($th->getMessage());
 
@@ -222,28 +222,29 @@ class MikrotikConfigService extends BaseService
         }
     }
 
-    public function profileHotspot(){
+    public function profileHotspot($mikrotik_id)
+    {
         try {
-            $mikrotikConfig = SettingHelper::mikrotikConfig();
+            $mikrotikConfig = SettingHelper::mikrotikConfig($mikrotik_id);
             $ip = $mikrotikConfig->ip ?? null;
             $username = $mikrotikConfig->username ?? null;
             $password = $mikrotikConfig->password ?? null;
             $port = $mikrotikConfig->port ?? null;
 
-            if(!$ip || !$username || !$password || !$port){
+            if (!$ip || !$username || !$password || !$port) {
                 return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
             }
 
             $connect = $this->routerosApi;
             $connect->debug("false");
 
-            if(!$connect->connect($ip,$username,$password,$port)){
+            if (!$connect->connect($ip, $username, $password, $port)) {
                 return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
             }
 
             $data = $connect->comm('/ip/hotspot/profile/print');
 
-            return $this->response(true, 'Berhasil medapatkan data',$data);
+            return $this->response(true, 'Berhasil medapatkan data', $data);
         } catch (Throwable $th) {
             Log::emergency($th->getMessage());
 
@@ -251,28 +252,29 @@ class MikrotikConfigService extends BaseService
         }
     }
 
-    public function serverHotspot(){
+    public function serverHotspot($mikrotik_id)
+    {
         try {
-            $mikrotikConfig = SettingHelper::mikrotikConfig();
+            $mikrotikConfig = SettingHelper::mikrotikConfig($mikrotik_id);
             $ip = $mikrotikConfig->ip ?? null;
             $username = $mikrotikConfig->username ?? null;
             $password = $mikrotikConfig->password ?? null;
             $port = $mikrotikConfig->port ?? null;
 
-            if(!$ip || !$username || !$password || !$port){
+            if (!$ip || !$username || !$password || !$port) {
                 return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
             }
 
             $connect = $this->routerosApi;
             $connect->debug("false");
 
-            if(!$connect->connect($ip,$username,$password,$port)){
+            if (!$connect->connect($ip, $username, $password, $port)) {
                 return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
             }
 
             $data = $connect->comm('/ip/hotspot/print');
 
-            return $this->response(true, 'Berhasil medapatkan data',$data);
+            return $this->response(true, 'Berhasil medapatkan data', $data);
         } catch (Throwable $th) {
             Log::emergency($th->getMessage());
 
@@ -280,22 +282,23 @@ class MikrotikConfigService extends BaseService
         }
     }
 
-    public function detailProfilePppoe($name){
+    public function detailProfilePppoe($mikrotik_id, $name)
+    {
         try {
-            $mikrotikConfig = SettingHelper::mikrotikConfig();
+            $mikrotikConfig = SettingHelper::mikrotikConfig($mikrotik_id);
             $ip = $mikrotikConfig->ip ?? null;
             $username = $mikrotikConfig->username ?? null;
             $password = $mikrotikConfig->password ?? null;
             $port = $mikrotikConfig->port ?? null;
 
-            if(!$ip || !$username || !$password || !$port){
+            if (!$ip || !$username || !$password || !$port) {
                 return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
             }
 
             $connect = $this->routerosApi;
             $connect->debug("false");
 
-            if(!$connect->connect($ip,$username,$password,$port)){
+            if (!$connect->connect($ip, $username, $password, $port)) {
                 return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
             }
 
@@ -303,13 +306,13 @@ class MikrotikConfigService extends BaseService
 
             $connectLog = LogHelper::mikrotikLog($connect);
 
-            if($connectLog["IsError"] == TRUE){
+            if ($connectLog["IsError"] == TRUE) {
                 return $this->response(false, $connectLog["Message"]);
             }
 
             $data = [];
-            foreach($connect as $index => $row){
-                if($row["name"] === $name){
+            foreach ($connect as $index => $row) {
+                if ($row["name"] === $name) {
                     $data = [
                         'local_address' => $row["local-address"] ?? null,
                         'remote_address' => $row["remote-address"] ?? null,
@@ -317,12 +320,11 @@ class MikrotikConfigService extends BaseService
                 }
             }
 
-            return $this->response(true, 'Berhasil medapatkan data',$data);
+            return $this->response(true, 'Berhasil medapatkan data', $data);
         } catch (Throwable $th) {
             Log::emergency($th->getMessage());
 
             return $this->response(false, "Terjadi kesalahan saat memproses data");
         }
     }
-    
 }

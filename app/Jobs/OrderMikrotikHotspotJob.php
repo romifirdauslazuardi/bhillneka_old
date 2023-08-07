@@ -42,49 +42,51 @@ class OrderMikrotikHotspotJob implements ShouldQueue
     public function handle()
     {
         DB::beginTransaction();
-        try{
+        try {
             $order = new Order();
             $order = $order->where('id', $this->id);
-            $order = $order->whereHas("business",function($query2){
-                $query2->where("category_id",BusinessCategoryEnum::MIKROTIK);
+            $order = $order->whereHas("business", function ($query2) {
+                $query2->where("category_id", BusinessCategoryEnum::MIKROTIK);
             });
             $order = $order->first();
 
-            if($order){
-                $mikrotikConfig = SettingHelper::mikrotikConfig($order->business_id,$order->business->user_id ?? null);
-                $ip = $mikrotikConfig->ip ?? null;
-                $username = $mikrotikConfig->username ?? null;
-                $password = $mikrotikConfig->password ?? null;
-                $port = $mikrotikConfig->port ?? null;
-
-                $connect = new RouterosAPI();
-                $connect->debug("false");
-
-                if(!$connect->connect($ip,$username,$password,$port)){
-                    Log::emergency('OrdferMikrotikHotspotJob : Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda '.$order->code);
-                }
+            if ($order) {
 
                 $message = "Maaf, penggunaan hotspot sudah habis";
                 $message .= "\r\n";
                 $message .= "=====";
                 $message .= "\r\n";
 
-                foreach($order->items as $index => $row){
-                    if(!empty($row->order_mikrotik)){
-                        if($row->order_mikrotik->type == OrderMikrotikEnum::TYPE_HOTSPOT){
+                foreach ($order->items as $index => $row) {
 
-                            if(!empty($row->order_mikrotik->mikrotik_id)){
-                                $connect = $connect->comm('/ip/hotspot/user/remove',[
+                    $mikrotikConfig = SettingHelper::mikrotikConfig($row->product->mikrotik_config_id ?? null);
+                    $ip = $mikrotikConfig->ip ?? null;
+                    $username = $mikrotikConfig->username ?? null;
+                    $password = $mikrotikConfig->password ?? null;
+                    $port = $mikrotikConfig->port ?? null;
+
+                    $connect = new RouterosAPI();
+                    $connect->debug("false");
+
+                    if (!$connect->connect($ip, $username, $password, $port)) {
+                        Log::emergency('OrdferMikrotikHotspotJob : Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda ' . $order->code);
+                    }
+
+                    if (!empty($row->order_mikrotik)) {
+                        if ($row->order_mikrotik->type == OrderMikrotikEnum::TYPE_HOTSPOT) {
+
+                            if (!empty($row->order_mikrotik->mikrotik_id)) {
+                                $connect = $connect->comm('/ip/hotspot/user/remove', [
                                     '.id' => $row->order_mikrotik->mikrotik_id ?? null,
                                 ]);
-    
+
                                 $connectLog = LogHelper::mikrotikLog($connect);
-    
-                                if($connectLog["IsError"] == TRUE){
-                                    Log::emergency("OrderMikrotikHotspotJob : ".$connectLog["Message"]. " #". $order->code);
+
+                                if ($connectLog["IsError"] == TRUE) {
+                                    Log::emergency("OrderMikrotikHotspotJob : " . $connectLog["Message"] . " #" . $order->code);
                                 }
 
-                                if($connectLog["IsError"] == FALSE){
+                                if ($connectLog["IsError"] == FALSE) {
                                     $row->order_mikrotik()->update([
                                         'mikrotik_id' => null
                                     ]);
@@ -97,32 +99,29 @@ class OrderMikrotikHotspotJob implements ShouldQueue
                         }
                     }
 
-                    $message .= "SSID : ".$row->order_mikrotik->server ?? null;
+                    $message .= "SSID : " . $row->order_mikrotik->server ?? null;
                     $message .= "\r\n";
-                    $message .= "username = ".$row->order_mikrotik->username ?? null;
+                    $message .= "username = " . $row->order_mikrotik->username ?? null;
                     $message .= "\r\n";
-                    $message .= "password = ".$row->order_mikrotik->password ?? null;
+                    $message .= "password = " . $row->order_mikrotik->password ?? null;
                     $message .= "\r\n";
                     $message .= "=====";
                     $message .= "\r\n";
                 }
 
-                if(!empty($order->customer_id)){
-                    return WhatsappHelper::send($order->customer->phone,$order->customer->name,["title" => "Penggunaan Hotspot Habis" ,"message" => $message],true);
-                }
-                else{
-                    if(!empty($order->customer_name) && !empty($order->customer_phone)){
-                        return WhatsappHelper::send($order->customer_phone,$order->customer_name,["title" => "Penggunaan Hotspot Habis" ,"message" => $message],true);
+                if (!empty($order->customer_id)) {
+                    return WhatsappHelper::send($order->customer->phone, $order->customer->name, ["title" => "Penggunaan Hotspot Habis", "message" => $message], true);
+                } else {
+                    if (!empty($order->customer_name) && !empty($order->customer_phone)) {
+                        return WhatsappHelper::send($order->customer_phone, $order->customer_name, ["title" => "Penggunaan Hotspot Habis", "message" => $message], true);
                     }
                 }
             }
 
             DB::commit();
-
-       }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             DB::rollBack();
             Log::emergency($th->getMessage());
-       }
-        
+        }
     }
 }

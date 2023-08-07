@@ -9,9 +9,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MikrotikConfig extends Model
 {
-    use HasFactory, Loggable,SoftDeletes;
+    use HasFactory, Loggable, SoftDeletes;
     protected $table = "mikrotik_configs";
     protected $fillable = [
+        'name',
+        'description',
         'ip',
         'username',
         'password',

@@ -38,7 +38,7 @@ class ProductService extends BaseService
         $this->productStock = new ProductStock();
     }
 
-    public function index(Request $request, bool $paginate = true,$public = false)
+    public function index(Request $request, bool $paginate = true, $public = false)
     {
         $search = (empty($request->search)) ? null : trim(strip_tags($request->search));
         $user_id = (empty($request->user_id)) ? null : trim(strip_tags($request->user_id));
@@ -46,16 +46,16 @@ class ProductService extends BaseService
         $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
         $is_using_stock = (empty($request->is_using_stock)) ? null : trim(strip_tags($request->is_using_stock));
 
-        if($public == false){
-            if(Auth::user()->hasRole([RoleEnum::AGEN])){
+        if ($public == false) {
+            if (Auth::user()->hasRole([RoleEnum::AGEN])) {
                 $user_id = Auth::user()->id;
             }
-    
-            if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
+
+            if (Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])) {
                 $user_id = Auth::user()->user_id;
             }
-    
-            if(!empty(Auth::user()->business_id)){
+
+            if (!empty(Auth::user()->business_id)) {
                 $business_id = Auth::user()->business_id;
             }
         }
@@ -68,31 +68,31 @@ class ProductService extends BaseService
                 $query2->orWhere('description', 'like', '%' . $search . '%');
             });
         }
-        if(!empty($user_id)){
-            $table = $table->where("user_id",$user_id);
+        if (!empty($user_id)) {
+            $table = $table->where("user_id", $user_id);
         }
-        if(isset($status)){
-            $table = $table->where("status",$status);
+        if (isset($status)) {
+            $table = $table->where("status", $status);
         }
-        if(isset($is_using_stock)){
-            $table = $table->where("is_using_stock",$is_using_stock);
+        if (isset($is_using_stock)) {
+            $table = $table->where("is_using_stock", $is_using_stock);
         }
-        if(!empty($business_id)){
-            $table = $table->where("business_id",$business_id);
-            if(request()->routeIs("landing-page.shops.index")){
+        if (!empty($business_id)) {
+            $table = $table->where("business_id", $business_id);
+            if (request()->routeIs("landing-page.shops.index")) {
                 $business = $this->business;
-                $business = $business->where("id",$business_id);
+                $business = $business->where("id", $business_id);
                 $business = $business->first();
 
-                if($business){
-                    if($business->category->name == BusinessCategoryEnum::MIKROTIK){
-                        $table = $table->where("mikrotik",ProductEnum::MIKROTIK_HOTSPOT);
+                if ($business) {
+                    if ($business->category->name == BusinessCategoryEnum::MIKROTIK) {
+                        $table = $table->where("mikrotik", ProductEnum::MIKROTIK_HOTSPOT);
                     }
                 }
             }
         }
         $table = $table->orderBy('created_at', 'DESC');
-        
+
 
         if ($paginate) {
             $table = $table->paginate(10);
@@ -100,31 +100,31 @@ class ProductService extends BaseService
         } else {
             $table = $table->get();
         }
-        
-        foreach($table as $index => $row){
-            $stock = $row->stocks()->where("type",ProductStockEnum::TYPE_MASUK)->sum("qty") - $row->stocks()->where("type",ProductStockEnum::TYPE_KELUAR)->sum("qty");
+
+        foreach ($table as $index => $row) {
+            $stock = $row->stocks()->where("type", ProductStockEnum::TYPE_MASUK)->sum("qty") - $row->stocks()->where("type", ProductStockEnum::TYPE_KELUAR)->sum("qty");
             $row->stock = $stock;
-            
+
             $estimationOwnerIncome = 0;
             $estimationAgenIncome = 0;
 
             $settingFee = SettingHelper::settingFee();
 
-            foreach($settingFee as $i => $value){
-                if($value->mark == SettingFeeEnum::MARK_KURANG_DARI){
-                    if($row->price <= $value->limit){
-                        $estimationOwnerIncome = ($value->owner_fee/100) * $row->price;
+            foreach ($settingFee as $i => $value) {
+                if ($value->mark == SettingFeeEnum::MARK_KURANG_DARI) {
+                    if ($row->price <= $value->limit) {
+                        $estimationOwnerIncome = ($value->owner_fee / 100) * $row->price;
                         $estimationOwnerIncome = round($estimationOwnerIncome) + 5000;
 
-                        $estimationAgenIncome = ($value->agen_fee/100) * $row->price;
+                        $estimationAgenIncome = ($value->agen_fee / 100) * $row->price;
                         $estimationAgenIncome = round($estimationAgenIncome) - 5000;
                     }
-                }else{
-                    if($row->price > $value->limit){
-                        $estimationOwnerIncome = ($value->owner_fee/100) * $row->price;
+                } else {
+                    if ($row->price > $value->limit) {
+                        $estimationOwnerIncome = ($value->owner_fee / 100) * $row->price;
                         $estimationOwnerIncome = round($estimationOwnerIncome) + 5000;
 
-                        $estimationAgenIncome = ($value->agen_fee/100) * $row->price;
+                        $estimationAgenIncome = ($value->agen_fee / 100) * $row->price;
                         $estimationAgenIncome = round($estimationAgenIncome) - 5000;
                     }
                 }
@@ -141,23 +141,23 @@ class ProductService extends BaseService
     {
         try {
             $result = $this->product;
-            if(Auth::user()->hasRole([RoleEnum::AGEN])){
-                $result = $result->where("user_id",Auth::user()->id);
+            if (Auth::user()->hasRole([RoleEnum::AGEN])) {
+                $result = $result->where("user_id", Auth::user()->id);
             }
-            if(Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])){
-                $result = $result->where("user_id",Auth::user()->user_id);
+            if (Auth::user()->hasRole([RoleEnum::ADMIN_AGEN])) {
+                $result = $result->where("user_id", Auth::user()->user_id);
             }
-            if(!empty(Auth::user()->business_id)){
-                $result = $result->where("business_id",Auth::user()->business_id);
+            if (!empty(Auth::user()->business_id)) {
+                $result = $result->where("business_id", Auth::user()->business_id);
             }
-            $result = $result->where('id',$id);
+            $result = $result->where('id', $id);
             $result = $result->first();
 
-            if(!$result){
+            if (!$result) {
                 return $this->response(false, "Data tidak ditemukan");
             }
 
-            $stock = $result->stocks()->where("type",ProductStockEnum::TYPE_MASUK)->sum("qty") - $result->stocks()->where("type",ProductStockEnum::TYPE_KELUAR)->sum("qty");
+            $stock = $result->stocks()->where("type", ProductStockEnum::TYPE_MASUK)->sum("qty") - $result->stocks()->where("type", ProductStockEnum::TYPE_KELUAR)->sum("qty");
             $result->stock = $stock;
 
             $estimationOwnerIncome = 0;
@@ -165,21 +165,21 @@ class ProductService extends BaseService
 
             $settingFee = SettingHelper::settingFee();
 
-            foreach($settingFee as $i => $value){
-                if($value->mark == SettingFeeEnum::MARK_KURANG_DARI){
-                    if($result->price <= $value->limit){
-                        $estimationOwnerIncome = ($value->owner_fee/100) * $result->price;
+            foreach ($settingFee as $i => $value) {
+                if ($value->mark == SettingFeeEnum::MARK_KURANG_DARI) {
+                    if ($result->price <= $value->limit) {
+                        $estimationOwnerIncome = ($value->owner_fee / 100) * $result->price;
                         $estimationOwnerIncome = round($estimationOwnerIncome) + 5000;
 
-                        $estimationAgenIncome = ($value->agen_fee/100) * $result->price;
+                        $estimationAgenIncome = ($value->agen_fee / 100) * $result->price;
                         $estimationAgenIncome = round($estimationAgenIncome) - 5000;
                     }
-                }else{
-                    if($result->price > $value->limit){
-                        $estimationOwnerIncome = ($value->owner_fee/100) * $result->price;
+                } else {
+                    if ($result->price > $value->limit) {
+                        $estimationOwnerIncome = ($value->owner_fee / 100) * $result->price;
                         $estimationOwnerIncome = round($estimationOwnerIncome) + 5000;
 
-                        $estimationAgenIncome = ($value->agen_fee/100) * $result->price;
+                        $estimationAgenIncome = ($value->agen_fee / 100) * $result->price;
                         $estimationAgenIncome = round($estimationAgenIncome) - 5000;
                     }
                 }
@@ -200,11 +200,11 @@ class ProductService extends BaseService
     {
         try {
             $result = $this->product;
-            $result = $result->where('slug',$slug);
-            $result = $result->where("status",ProductEnum::STATUS_TRUE);
+            $result = $result->where('slug', $slug);
+            $result = $result->where("status", ProductEnum::STATUS_TRUE);
             $result = $result->first();
 
-            if(!$result){
+            if (!$result) {
                 return $this->response(false, "Data tidak ditemukan");
             }
 
@@ -222,20 +222,20 @@ class ProductService extends BaseService
             $code = (empty($request->code)) ? null : trim(strip_tags($request->code));
             $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
 
-            if(!empty(Auth::user()->business_id)){
+            if (!empty(Auth::user()->business_id)) {
                 $business_id = Auth::user()->business_id;
             }
 
-            if(!$code){
+            if (!$code) {
                 return $this->response(false, "Kode Transaksi harus diisi");
             }
 
             $result = $this->product;
-            $result = $result->where('code',$code);
-            $result = $result->where('business_id',$business_id);
+            $result = $result->where('code', $code);
+            $result = $result->where('business_id', $business_id);
             $result = $result->first();
 
-            if(!$result){
+            if (!$result) {
                 return $this->response(false, "Data tidak ditemukan");
             }
 
@@ -270,13 +270,14 @@ class ProductService extends BaseService
             $comment = (empty($request->comment)) ? null : trim(strip_tags($request->comment));
             $address = (empty($request->address)) ? null : trim(strip_tags($request->address));
             $mac_address = (empty($request->mac_address)) ? null : trim(strip_tags($request->mac_address));
-            $expired_date = (empty($request->expired_date)) ? null : trim(strip_tags($request->expired_date));
+            $expired_month = (empty($request->expired_month)) ? null : trim(strip_tags($request->expired_month));
             $qty = (empty($request->qty)) ? null : trim(strip_tags($request->qty));
+            $mikrotik_config_id = (empty($request->mikrotik_config_id)) ? null : trim(strip_tags($request->mikrotik_config_id));
             $image = $request->file("image");
 
-            $slug = SlugHelper::generate(Product::class,$name,"slug");
+            $slug = SlugHelper::generate(Product::class, $name, "slug");
 
-            $code = str_replace(" ","-",$code);
+            $code = str_replace(" ", "-", $code);
 
             if ($image) {
                 $upload = UploadHelper::upload_file($image, 'products', ProductEnum::IMAGE_EXT);
@@ -288,35 +289,35 @@ class ProductService extends BaseService
                 $image = $upload["Path"];
             }
 
-            if(in_array($mikrotik,[ProductEnum::MIKROTIK_PPPOE,ProductEnum::MIKROTIK_HOTSPOT])){
-                $mikrotikConfig = SettingHelper::mikrotikConfig();
+            if (in_array($mikrotik, [ProductEnum::MIKROTIK_PPPOE, ProductEnum::MIKROTIK_HOTSPOT])) {
+                $mikrotikConfig = SettingHelper::mikrotikConfig($mikrotik_config_id);
                 $ipConfig = $mikrotikConfig->ip ?? null;
                 $usernameConfig = $mikrotikConfig->username ?? null;
                 $passwordConfig = $mikrotikConfig->password ?? null;
                 $portConfig = $mikrotikConfig->port ?? null;
-                
+
                 $connect = $this->routerosApi;
                 $connect->debug("false");
 
-                if(!$connect->connect($ipConfig,$usernameConfig,$passwordConfig,$portConfig)){
+                if (!$connect->connect($ipConfig, $usernameConfig, $passwordConfig, $portConfig)) {
                     return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
                 }
             }
 
-            if($mikrotik == ProductEnum::MIKROTIK_HOTSPOT){
+            if ($mikrotik == ProductEnum::MIKROTIK_HOTSPOT) {
                 $service = null;
                 $local_address = null;
                 $remote_address = null;
-                $expired_date = null;
+                $expired_month = null;
 
-                if(!empty($address)){
+                if (!empty($address)) {
                     $connect = $connect->comm('/ip/hotspot/user/print');
 
                     Log::info($connect);
 
-                    foreach($connect as $index => $row){
-                        if(isset($row["address"])){
-                            if($address == $row["address"]){
+                    foreach ($connect as $index => $row) {
+                        if (isset($row["address"])) {
+                            if ($address == $row["address"]) {
                                 return $this->response(false, "Duplikat address pada mikrotik");
                             }
                         }
@@ -324,11 +325,11 @@ class ProductService extends BaseService
                 }
             }
 
-            if($mikrotik == ProductEnum::MIKROTIK_PPPOE){
+            if ($mikrotik == ProductEnum::MIKROTIK_PPPOE) {
                 $server = null;
                 $address = null;
                 $mac_address = null;
-                $time_limit = null; 
+                $time_limit = null;
             }
 
             $create = $this->product->create([
@@ -353,11 +354,12 @@ class ProductService extends BaseService
                 'comment' => $comment,
                 'address' => $address,
                 'mac_address' => $mac_address,
-                'expired_date' => $expired_date,
+                'expired_month' => $expired_month,
+                'mikrotik_config_id' => $mikrotik_config_id,
                 'author_id' => Auth::user()->id,
             ]);
 
-            if($create->is_using_stock == ProductEnum::IS_USING_STOCK_TRUE){
+            if ($create->is_using_stock == ProductEnum::IS_USING_STOCK_TRUE) {
                 $create = $this->productStock->create([
                     'type' => ProductStockEnum::TYPE_MASUK,
                     'product_id' => $create->id,
@@ -370,7 +372,7 @@ class ProductService extends BaseService
 
             DB::commit();
 
-            return $this->response(true, 'Berhasil menambahkan data',$create);
+            return $this->response(true, 'Berhasil menambahkan data', $create);
         } catch (Throwable $th) {
             DB::rollBack();
             Log::emergency($th->getMessage());
@@ -401,19 +403,19 @@ class ProductService extends BaseService
             $comment = (empty($request->comment)) ? null : trim(strip_tags($request->comment));
             $address = (empty($request->address)) ? null : trim(strip_tags($request->address));
             $mac_address = (empty($request->mac_address)) ? null : trim(strip_tags($request->mac_address));
-            $expired_date = (empty($request->expired_date)) ? null : trim(strip_tags($request->expired_date));
+            $expired_month = (empty($request->expired_month)) ? null : trim(strip_tags($request->expired_month));
+            $mikrotik_config_id = (empty($request->mikrotik_config_id)) ? null : trim(strip_tags($request->mikrotik_config_id));
             $image = $request->file("image");
 
             $result = $this->product->findOrFail($id);
 
-            if($name !== $result->name){
-                $slug = SlugHelper::generate(Product::class,$name,"slug");
-            }
-            else{
+            if ($name !== $result->name) {
+                $slug = SlugHelper::generate(Product::class, $name, "slug");
+            } else {
                 $slug = $result->slug;
             }
 
-            $code = str_replace(" ","-",$code);
+            $code = str_replace(" ", "-", $code);
 
             if ($image) {
                 $upload = UploadHelper::upload_file($image, 'products', ProductEnum::IMAGE_EXT);
@@ -423,23 +425,37 @@ class ProductService extends BaseService
                 }
 
                 $image = $upload["Path"];
-            }
-            else{
+            } else {
                 $image = $result->image;
             }
 
-            if($mikrotik == ProductEnum::MIKROTIK_HOTSPOT){
+            if ($mikrotik == ProductEnum::MIKROTIK_HOTSPOT) {
                 $service = null;
                 $local_address = null;
                 $remote_address = null;
-                $expired_date = null;
+                $expired_month = null;
             }
 
-            if($mikrotik == ProductEnum::MIKROTIK_PPPOE){
+            if ($mikrotik == ProductEnum::MIKROTIK_PPPOE) {
                 $server = null;
                 $address = null;
                 $mac_address = null;
-                $time_limit = null; 
+                $time_limit = null;
+            }
+
+            if (in_array($mikrotik, [ProductEnum::MIKROTIK_PPPOE, ProductEnum::MIKROTIK_HOTSPOT])) {
+                $mikrotikConfig = SettingHelper::mikrotikConfig($mikrotik_config_id);
+                $ipConfig = $mikrotikConfig->ip ?? null;
+                $usernameConfig = $mikrotikConfig->username ?? null;
+                $passwordConfig = $mikrotikConfig->password ?? null;
+                $portConfig = $mikrotikConfig->port ?? null;
+
+                $connect = $this->routerosApi;
+                $connect->debug("false");
+
+                if (!$connect->connect($ipConfig, $usernameConfig, $passwordConfig, $portConfig)) {
+                    return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
+                }
             }
 
             $result->update([
@@ -464,10 +480,11 @@ class ProductService extends BaseService
                 'comment' => $comment,
                 'address' => $address,
                 'mac_address' => $mac_address,
-                'expired_date' => $expired_date,
+                'expired_month' => $expired_month,
+                'mikrotik_config_id' => $mikrotik_config_id,
             ]);
 
-            return $this->response(true, 'Berhasil mengubah data',$result);
+            return $this->response(true, 'Berhasil mengubah data', $result);
         } catch (Throwable $th) {
             Log::emergency($th->getMessage());
 
@@ -488,5 +505,4 @@ class ProductService extends BaseService
             return $this->response(false, "Terjadi kesalahan saat memproses data");
         }
     }
-    
 }

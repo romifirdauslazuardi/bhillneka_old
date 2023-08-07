@@ -65,6 +65,14 @@
                                         : {{$result->mikrotik() ?? null}}
                                     </div>
                                 </div>
+                                <div class="row mb-2">
+                                    <div class="col-md-3">
+                                        Router
+                                    </div>
+                                    <div class="col-md-8">
+                                        : {{$result->mikrotik_config->name ?? null}}
+                                    </div>
+                                </div>
                                 @endif
 
                                 <div class="row mb-2">
@@ -238,10 +246,10 @@
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col-md-3">
-                                        Berlaku Sampai Tanggal
+                                        Berlaku Hingga
                                     </div>
                                     <div class="col-md-8">
-                                        : @if(!empty($result->expired_date)) {{date("d-m-Y",strtotime($result->expired_date))}} @endif
+                                        : {{$result->expired_month}}
                                     </div>
                                 </div>
                                 @endif
@@ -280,7 +288,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div> 
+                        </div>
                     </div>
                 </div>
                 <div class="row">
@@ -336,7 +344,7 @@
                 $("#frmDelete").submit();
             }
         })
-        
+
     })
 </script>
 @endsection

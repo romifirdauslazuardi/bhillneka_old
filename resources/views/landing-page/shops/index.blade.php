@@ -15,7 +15,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="position-breadcrumb">
             <nav aria-label="breadcrumb" class="d-inline-block">
                 <ul class="breadcrumb rounded shadow mb-0 px-4 py-2">
@@ -88,7 +88,7 @@
                                     $index = 0;
                                 @endphp
                                 @foreach($carts as $i => $row)
-                                
+
                                 <input type="hidden" name="repeater[{{$index}}][product_id]" value="{{$row->id}}">
                                 <input type="hidden" name="repeater[{{$index}}][qty]" value="{{$row->quantity}}">
                                 <table class="mb-1" style="width:100%;">
@@ -352,7 +352,7 @@
 
         $(document).on("click",".btn-min-cart",function(e){
             e.preventDefault();
-            
+
             $(this).next().val(parseInt($(this).next().val())-1);
 
             let id = $(this).attr("data-id");
@@ -366,7 +366,7 @@
 
         $(document).on("click",".btn-plus-cart",function(e){
             e.preventDefault();
-            
+
             $(this).prev().val(parseInt($(this).prev().val())+1);
 
             let id = $(this).attr("data-id");

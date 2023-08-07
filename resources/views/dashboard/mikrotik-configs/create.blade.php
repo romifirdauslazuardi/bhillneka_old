@@ -27,6 +27,18 @@
                 <div class="row mb-3">
                     <div class="col-lg-12">
                         <div class="form-group row mb-3">
+                            <label class="col-md-3 col-form-label">Nama Router <span class="text-danger">*</span></label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="name" placeholder="Nama Router" value="{{old('name')}}" >
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
+                            <label class="col-md-3 col-form-label">Deskripsi</label>
+                            <div class="col-md-9">
+                                <textarea class="form-control" name="description" placeholder="Deskripsi">{{ old("description") }}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">IP <span class="text-danger">*</span></label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control" name="ip" placeholder="IP" value="{{old('ip')}}" >
@@ -89,7 +101,7 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);                   
+                            responseFailed(resp.message);
                         }
                         else{
                             responseSuccess(resp.message,"{{route('dashboard.mikrotik-configs.index')}}");
