@@ -25,7 +25,7 @@ class UpdateRequest extends FormRequest
         $this->merge($merge);
 
         if($this->roles == RoleEnum::CUSTOMER){
-            if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN,RoleEnum::OWNER])){
+            if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
                 $this->merge(["business_id" => Auth::user()->business_id]);
             }
         }
