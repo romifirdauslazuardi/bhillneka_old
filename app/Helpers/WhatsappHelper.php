@@ -28,7 +28,7 @@ class WhatsappHelper
 
             $message .= "\r\n";
             $message .= "\r\n";
-            $message .= "Penyedia Layanan / www.bhillneka.com";
+            $message .= "Penyedia Layanan / *www.bhillneka.com*";
             $message .= "\r\n";
             $message .= "TERIMAKASIH";
             $message .= "\r\n";

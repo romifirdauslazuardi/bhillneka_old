@@ -11,11 +11,14 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Enums\RoleEnum;
 use App\Enums\UserBankEnum;
+use App\Helpers\WhatsappHelper;
 use App\Notifications\UserBankNotification;
+use App\Mail\UserBankEmail;
 use Auth;
 use DB;
 use Log;
 use Throwable;
+use Mail;
 
 class UserBankService extends BaseService
 {
@@ -213,7 +216,25 @@ class UserBankService extends BaseService
             if($status == UserBankEnum::STATUS_APPROVED){
                 if($result->user->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
 
-                    Notification::send($result->user,new UserBankNotification(route('dashboard.user-banks.show',$result->id),"Rekening Berhasil Disetujui","Pengajuan rekening baru berhasil disetujui penyedia layanan "));
+                    $title = "Aktivasi Rekening Berhasil";
+                    $message = "Selamat, aktivasi rekening anda berhasil disetujui penyedia layanan";
+
+                    Notification::send($result->user,new UserBankNotification(route('dashboard.user-banks.show',$result->id),$title,$message));
+
+                    Mail::to($result->user->email)->send(new UserBankEmail($result->user,$title,$message,route("dashboard.user-banks.show",$result->id)));
+
+                    WhatsappHelper::send($result->user->phone,$result->user->name,["title" => $title ,"message" => $message],true);
+                }
+            }
+            else if($status == UserBankEnum::STATUS_REJECTED){
+                if($result->user->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
+
+                    $title = "Aktivasi Rekening Gagal";
+                    $message = "Maaf, aktivasi rekening anda gagal disetujui penyedia layanan. Silahkan cek kebenaran data terlebih dahulu dan ajukan lagi";
+
+                    Notification::send($result->user,new UserBankNotification(route('dashboard.user-banks.show',$result->id),$title,$message));
+
+                    Mail::to($result->user->email)->send(new UserBankEmail($result->user,$title,$message,route("dashboard.user-banks.show",$result->id)));
                 }
             }
 
