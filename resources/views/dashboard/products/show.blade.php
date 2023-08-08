@@ -169,22 +169,11 @@
 
                                 <div class="row mb-2">
                                     <div class="col-md-3">
-                                        QRcode Katalog
+                                        QRcode
                                     </div>
                                     <div class="col-md-8">
                                         : <a href="{{route('dashboard.products.qrcode',$result->id)}}">
                                             {{\QrCode::size(100)->generate(route('landing-page.buy-products.index',$result->slug))}}
-                                        </a>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-2">
-                                    <div class="col-md-3">
-                                        URL Katalog
-                                    </div>
-                                    <div class="col-md-8">
-                                        : <a href="{{route('landing-page.buy-products.index',$result->slug)}}">
-                                            {{route('landing-page.buy-products.index',$result->slug)}}
                                         </a>
                                     </div>
                                 </div>
