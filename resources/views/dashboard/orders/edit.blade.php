@@ -174,6 +174,7 @@
                                                                         <button type="button" class="btn btn-icon btn-close" data-bs-dismiss="modal" id="close-modal"><i class="uil uil-times fs-4 text-dark"></i></button>
                                                                     </div>
                                                                     <div class="modal-body">
+                                                                        <input type="hidden" value="{{$row->product->mikrotik_config_id ?? null}}" class="mikrotik_config_id">
                                                                         <input type="hidden" name="repeater[{{$index}}][mikrotik_id]" value="{{$row->order_mikrotik->mikrotik_id ?? null}}" class="mikrotik_id">
                                                                         <input type="hidden" name="repeater[{{$index}}][auto_userpassword]" value="{{$row->order_mikrotik->auto_userpassword ?? null}}" class="auto_userpassword">
                                                                         <div class="form-group mb-3">
@@ -196,7 +197,7 @@
                                                                             <div class="col-lg-6">
                                                                                 <div class="form-group mb-3">
                                                                                     <label>Profile<span class="text-danger">*</span></label>
-                                                                                    <select class="form-control profile-{{$row->product_id}}" style="width:100%" name="repeater[{{$index}}][profile]">
+                                                                                    <select class="form-control profile-{{$row->product_id}} profile select-profile-pppoe" style="width:100%" name="repeater[{{$index}}][profile]">
                                                                                         <option value="">==Pilih Profile</option>
                                                                                     </select>
                                                                                 </div>
@@ -254,6 +255,7 @@
                                                                         <button type="button" class="btn btn-icon btn-close" data-bs-dismiss="modal" id="close-modal"><i class="uil uil-times fs-4 text-dark"></i></button>
                                                                     </div>
                                                                     <div class="modal-body">
+                                                                        <input type="hidden" value="{{$row->product->mikrotik_config_id ?? null}}" class="mikrotik_config_id">
                                                                         <input type="hidden" name="repeater[{{$index}}][mikrotik_id]" value="{{$row->order_mikrotik->mikrotik_id ?? null}}" class="mikrotik_id">
                                                                         <input type="hidden" name="repeater[{{$index}}][auto_userpassword]" value="{{$row->order_mikrotik->auto_userpassword ?? null}}" class="auto_userpassword">
                                                                         <div class="form-group mb-3">
@@ -446,13 +448,12 @@
         @endif
 
         @foreach($result->items as $index => $row)
-            @if($row->product->mikrotik == \App\Enums\ProductEnum::MIKROTIK_PPPOE){
+            @if($row->product->mikrotik == \App\Enums\ProductEnum::MIKROTIK_PPPOE)
                 getProfilePppoe('.profile-'+'{{$row->product_id}}','{{$row->product->mikrotik_config_id ?? null}}','{{$row->order_mikrotik->profile ?? null}}');
-            }
-            @elseif($row->product->mikrotik == \App\Enums\ProductEnum::MIKROTIK_HOTSPOT){
+            @elseif($row->product->mikrotik == \App\Enums\ProductEnum::MIKROTIK_HOTSPOT)
                 getProfileHotspot('.profile-'+'{{$row->product_id}}','{{$row->product->mikrotik_config_id ?? null}}','{{$row->order_mikrotik->profile ?? null}}');
                 getServerHotspot('.server-'+'{{$row->product_id}}','{{$row->product->mikrotik_config_id ?? null}}','{{$row->order_mikrotik->server ?? null}}');
-            }
+            @endif
         @endforeach
 
         $(document).on("click",".btn-show-product",function(e){
@@ -596,6 +597,49 @@
             }
         })
 
+        $(document).on("change",".select-profile-pppoe",function(e){
+            e.preventDefault();
+
+            let $this = $(this);
+            let val = $this.val();
+            let mikrotik_id = $this.parent().parent().parent().parent().find(".mikrotik_config_id").val();
+
+
+            if(val != "" && val != null && val != undefined){
+                $.ajax({
+                    url : '{{route("base.mikrotik-configs.detailProfilePppoe",["mikrotik_id" => "_mikrotik_id_","name" => "_name_"])}}'.replace("_mikrotik_id_", mikrotik_id).replace("_name_", val),
+                    method : "GET",
+                    dataType : "JSON",
+                    beforeSend : function(){
+                        return openLoader();
+                    },
+                    success : function(resp){
+                        if(resp.success == false){
+                            return responseFailed(resp.message);
+                        }
+                        else{
+                            $this.parent().parent().parent().parent().find(".local-address").val(resp.data.local_address);
+                            $this.parent().parent().parent().parent().find(".remote-address").val(resp.data.remote_address);
+                        }
+                    },
+                    error: function (request, status, error) {
+                        if(request.status == 422){
+                            return responseFailed(request.responseJSON.message);
+                        }
+                        else if(request.status == 419){
+                            return sessionTimeOut();
+                        }
+                        else{
+                            return responseInternalServerError();
+                        }
+                    },
+                    complete :function(){
+                        return closeLoader();
+                    }
+                })
+            }
+        });
+
         $(document).on('submit','#frmUpdate',function(e){
             e.preventDefault();
             if(confirm("Apakah anda yakin ingin menyimpan data ini ?")){
@@ -612,18 +656,21 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);
+                            return responseFailed(resp.message);
                         }
                         else{
-                            responseSuccess(resp.message,"{{route('dashboard.orders.index')}}");
+                            return responseSuccess(resp.message,"{{route('dashboard.orders.index')}}");
                         }
                     },
                     error: function (request, status, error) {
                         if(request.status == 422){
-                            responseFailed(request.responseJSON.message);
+                            return responseFailed(request.responseJSON.message);
+                        }
+                        else if(request.status == 419){
+                            return sessionTimeOut();
                         }
                         else{
-                            responseInternalServerError();
+                            return responseInternalServerError();
                         }
                     },
                     complete :function(){
@@ -672,10 +719,13 @@
             },
             error: function (request, status, error) {
                 if(request.status == 422){
-                    responseFailed(request.responseJSON.message);
+                    return responseFailed(request.responseJSON.message);
+                }
+                else if(request.status == 419){
+                    return sessionTimeOut();
                 }
                 else{
-                    responseInternalServerError();
+                    return responseInternalServerError();
                 }
             },
             complete :function(){
@@ -738,6 +788,7 @@
                                                 <button type="button" class="btn btn-icon btn-close" data-bs-dismiss="modal" id="close-modal"><i class="uil uil-times fs-4 text-dark"></i></button>
                                             </div>
                                             <div class="modal-body">
+                                                <input type="hidden" value="`+echo(resp.data.mikrotik_config_id)+`" class="mikrotik_config_id"/>
                                                 <input type="hidden" name="repeater[${index}][auto_userpassword]" value="`+'{{\App\Enums\OrderMikrotikEnum::AUTO_USERPASSWORD_FALSE}}'+`" class="auto_userpassword"/>
                                                 <div class="form-group mb-3">
                                                     <label>Username<span class="text-danger">*</span></label>
@@ -821,6 +872,7 @@
                                                 <button type="button" class="btn btn-icon btn-close" data-bs-dismiss="modal" id="close-modal"><i class="uil uil-times fs-4 text-dark"></i></button>
                                             </div>
                                             <div class="modal-body">
+                                                <input type="hidden" value="`+echo(resp.data.mikrotik_config_id)+`" class="mikrotik_config_id"/>
                                                 <div class="form-group mb-3">
                                                     <label>Jenis Pengisian Username dan Password<span class="text-danger">*</span></label>
                                                     <select class="form-control autouserpassword" name="repeater[${index}][auto_userpassword]">
@@ -921,10 +973,13 @@
             },
             error: function (request, status, error) {
                 if(request.status == 422){
-                    responseFailed(request.responseJSON.message);
+                    return responseFailed(request.responseJSON.message);
+                }
+                else if(request.status == 419){
+                    return sessionTimeOut();
                 }
                 else{
-                    responseInternalServerError();
+                    return responseInternalServerError();
                 }
             },
             complete :function(){

@@ -98,18 +98,21 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);                   
+                            return responseFailed(resp.message);
                         }
                         else{
-                            responseSuccess(resp.message,"{{route('dashboard.landing-page.testimonials.index')}}");
+                            return responseSuccess(resp.message,"{{route('dashboard.landing-page.testimonials.index')}}");
                         }
                     },
                     error: function (request, status, error) {
                         if(request.status == 422){
-                            responseFailed(request.responseJSON.message);
+                            return responseFailed(request.responseJSON.message);
+                        }
+                        else if(request.status == 419){
+                            return sessionTimeOut();
                         }
                         else{
-                            responseInternalServerError();
+                            return responseInternalServerError();
                         }
                     },
                     complete :function(){

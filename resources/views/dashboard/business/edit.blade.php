@@ -122,7 +122,7 @@
     $(function(){
 
         $('button[type="submit"]').attr("disabled",false);
-        
+
         @if(!empty($result->village_code))
             getProvince('.select-province','{{$result->village->district->city->province->code ?? null}}');
             getCity('.select-city','{{$result->village->district->city->province->code ?? null}}','{{$result->village->district->city->code ?? null}}');
@@ -184,18 +184,21 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);                   
+                            return responseFailed(resp.message);
                         }
                         else{
-                            responseSuccess(resp.message,"{{route('dashboard.business.index')}}");
+                            return responseSuccess(resp.message,"{{route('dashboard.business.index')}}");
                         }
                     },
                     error: function (request, status, error) {
                         if(request.status == 422){
-                            responseFailed(request.responseJSON.message);
+                            return responseFailed(request.responseJSON.message);
+                        }
+                        else if(request.status == 419){
+                            return sessionTimeOut();
                         }
                         else{
-                            responseInternalServerError();
+                            return responseInternalServerError();
                         }
                     },
                     complete :function(){

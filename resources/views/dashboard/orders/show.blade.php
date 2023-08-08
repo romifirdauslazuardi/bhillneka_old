@@ -219,13 +219,13 @@
                                                                             </div>
                                                                         </div>
                                                                         @endif
-                                                                        
+
                                                                         <div class="form-group mb-3">
                                                                             <label>Comment</label>
                                                                             <input type="text" class="form-control comment" placeholder="Comment" value="{{$row->order_mikrotik->comment ?? null}}" readonly disabled>
                                                                         </div>
                                                                     </div>
-                                                                    
+
                                                                     <div class="modal-footer">
                                                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                                                                     </div>
@@ -424,7 +424,7 @@
         $(document).on("click", ".btn-proof-order", function(e) {
             e.preventDefault();
             let id = $(this).data("id");
-            
+
             $("#frmUploadProofOrder").attr("action", "{{ route('dashboard.orders.proofOrder', '_id_') }}".replace("_id_", id));
             $("#modalUploadProofOrder").modal("show");
         })
@@ -445,18 +445,21 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);                   
+                            return responseFailed(resp.message);
                         }
                         else{
-                            responseSuccess(resp.message,"{{route('dashboard.orders.show',$result->id)}}");
+                            return responseSuccess(resp.message,"{{route('dashboard.orders.show',$result->id)}}");
                         }
                     },
                     error: function (request, status, error) {
                         if(request.status == 422){
-                            responseFailed(request.responseJSON.message);
+                            return responseFailed(request.responseJSON.message);
+                        }
+                        else if(request.status == 419){
+                            return sessionTimeOut();
                         }
                         else{
-                            responseInternalServerError();
+                            return responseInternalServerError();
                         }
                     },
                     complete :function(){

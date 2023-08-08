@@ -154,6 +154,60 @@
             getServerHotspot('.select-server','{{ $result->order_item->product->mikrotik_config_id ?? null }}','{{$result->server}}');
         @endif
 
+        $(document).on("change",".select-profile",function(e){
+            e.preventDefault();
+
+            let $this = $(this);
+            let val = $this.val();
+            let mikrotik_id = '{{ $result->order_item->product->mikrotik_config_id ?? null }}';
+
+            if(mikrotik_id){
+                if('{{ $result->order_item->product->mikrotik }}' == '{{App\Enums\ProductEnum::MIKROTIK_PPPOE}}'){
+                    if(val != "" && val != null && val != undefined){
+                        $.ajax({
+                            url : '{{route("base.mikrotik-configs.detailProfilePppoe",["mikrotik_id" => "_mikrotik_id_","name" => "_name_"])}}'.replace("_mikrotik_id_", mikrotik_id).replace("_name_", val),
+                            method : "GET",
+                            dataType : "JSON",
+                            beforeSend : function(){
+                                return openLoader();
+                            },
+                            success : function(resp){
+                                if(resp.success == false){
+                                    return responseFailed(resp.message);
+                                }
+                                else{
+                                    $('input[name="local_address"]').val(resp.data.local_address);
+                                    $('input[name="remote_address"]').val(resp.data.remote_address);
+                                }
+                            },
+                            error: function (request, status, error) {
+                                if(request.status == 422){
+                                    return responseFailed(request.responseJSON.message);
+                                }
+                                else if(request.status == 419){
+                                    return sessionTimeOut();
+                                }
+                                else{
+                                    return responseInternalServerError();
+                                }
+                            },
+                            complete :function(){
+                                return closeLoader();
+                            }
+                        })
+                    }
+                }
+            }
+            else{
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    html: "Harap pilih router terlebih dahulu",
+                    timer : 5000,
+                })
+            }
+        });
+
         $(document).on('submit','#frmUpdate',function(e){
             e.preventDefault();
             if(confirm("Apakah anda yakin ingin menyimpan data ini ?")){
@@ -170,18 +224,21 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);
+                            return responseFailed(resp.message);
                         }
                         else{
-                            responseSuccess(resp.message,"{{route('dashboard.reports.order-mikrotiks.index')}}");
+                            return responseSuccess(resp.message,"{{route('dashboard.reports.order-mikrotiks.index')}}");
                         }
                     },
                     error: function (request, status, error) {
                         if(request.status == 422){
-                            responseFailed(request.responseJSON.message);
+                            return responseFailed(request.responseJSON.message);
+                        }
+                        else if(request.status == 419){
+                            return sessionTimeOut();
                         }
                         else{
-                            responseInternalServerError();
+                            return responseInternalServerError();
                         }
                     },
                     complete :function(){

@@ -45,7 +45,7 @@
                             <div class="col-md-9">
                                 <input type="email" class="form-control" name="email" placeholder="Email" value="{{old('email',$result->email)}}">
                             </div>
-                        </div>                            
+                        </div>
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Foto</label>
                             <div class="col-md-9">
@@ -92,7 +92,7 @@
     $(function(){
         $.datetimepicker.setDateFormatter('moment');
         $.datetimepicker.setLocale('id');
-        
+
         $('.datetimepicker').datetimepicker({
               format:'YYYY-MM-DD HH:mm:ss',
               formatTime:'HH:mm:ss',
@@ -117,18 +117,21 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);                   
+                            return responseFailed(resp.message);
                         }
                         else{
-                            responseSuccess(resp.message,"{{route('dashboard.profile.index')}}");
+                            return responseSuccess(resp.message,"{{route('dashboard.profile.index')}}");
                         }
                     },
                     error: function (request, status, error) {
                         if(request.status == 422){
-                            responseFailed(request.responseJSON.message);
+                            return responseFailed(request.responseJSON.message);
+                        }
+                        else if(request.status == 419){
+                            return sessionTimeOut();
                         }
                         else{
-                            responseInternalServerError();
+                            return responseInternalServerError();
                         }
                     },
                     complete :function(){

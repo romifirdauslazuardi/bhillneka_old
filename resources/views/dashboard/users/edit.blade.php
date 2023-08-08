@@ -45,7 +45,7 @@
                             <div class="col-md-9">
                                 <input type="email" class="form-control" name="email" placeholder="Email" value="{{old('email',$result->email)}}">
                             </div>
-                        </div>                            
+                        </div>
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Foto</label>
                             <div class="col-md-9">
@@ -133,7 +133,7 @@
     $(function(){
         $.datetimepicker.setDateFormatter('moment');
         $.datetimepicker.setLocale('id');
-        
+
         $('.datetimepicker').datetimepicker({
               format:'YYYY-MM-DD HH:mm:ss',
               formatTime:'HH:mm:ss',
@@ -150,7 +150,7 @@
             e.preventDefault();
             let val = $(this).val();
             let agen = false;
-            
+
             if(val == '{{\App\Enums\RoleEnum::CUSTOMER}}' || val == '{{\App\Enums\RoleEnum::ADMIN_AGEN}}'){
                 agen = true;
             }
@@ -190,7 +190,7 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            return responseFailed(resp.message);                   
+                            return responseFailed(resp.message);
                         }
                         else{
                             return responseSuccess(resp.message,"{{route('dashboard.users.index')}}");
@@ -199,6 +199,9 @@
                     error: function (request, status, error) {
                         if(request.status == 422){
                             return responseFailed(request.responseJSON.message);
+                        }
+                        else if(request.status == 419){
+                            return sessionTimeOut();
                         }
                         else{
                             return responseInternalServerError();

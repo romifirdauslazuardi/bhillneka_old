@@ -47,33 +47,36 @@ class OrderController extends Controller
         $this->mikrotikConfigService = new MikrotikConfigService();
 
         $this->middleware(function ($request, $next) {
-            if(empty(Auth::user()->business_id)){
-                if($request->wantsJson()){
+            if (empty(Auth::user()->business_id)) {
+                if ($request->wantsJson()) {
                     return ResponseHelper::apiResponse(false, "Bisnis page belum diaktifkan");
                 }
                 alert()->error('Gagal', "Bisnis page belum diaktifkan");
                 return redirect()->route("dashboard.index");
             }
             return $next($request);
-        },['only' => 'create','edit','store','update','destroy']);
+        }, ['only' => 'create', 'edit', 'store', 'update', 'destroy']);
 
         $this->middleware(function ($request, $next) {
-            if(Auth::user()->hasRole([
-                RoleEnum::AGEN,
-                RoleEnum::ADMIN_AGEN]) 
-            && empty(Auth::user()->business_id)){
-                if($request->wantsJson()){
+            if (
+                Auth::user()->hasRole([
+                    RoleEnum::AGEN,
+                    RoleEnum::ADMIN_AGEN
+                ])
+                && empty(Auth::user()->business_id)
+            ) {
+                if ($request->wantsJson()) {
                     return ResponseHelper::apiResponse(false, "Bisnis page belum diaktifkan");
                 }
                 alert()->error('Gagal', "Bisnis page belum diaktifkan");
                 return redirect()->route("dashboard.index");
             }
             return $next($request);
-        },['only' => ['index','show']]);
+        }, ['only' => ['index', 'show']]);
 
         $this->middleware(function ($request, $next) {
-            if(SettingHelper::hasBankActive()==false){
-                if($request->wantsJson()){
+            if (SettingHelper::hasBankActive() == false) {
+                if ($request->wantsJson()) {
                     return ResponseHelper::apiResponse(false, "Tidak ada rekening bank anda yang sudah diverifikasi oleh owner");
                 }
                 alert()->error('Gagal', "Tidak ada rekening bank anda yang sudah diverifikasi oleh owner");
@@ -87,26 +90,25 @@ class OrderController extends Controller
     {
         $response = $this->orderService->index($request);
 
-        $users = $this->userService->index(new Request(['role' => RoleEnum::AGEN]),false);
+        $users = $this->userService->index(new Request(['role' => RoleEnum::AGEN]), false);
         $users = $users->data;
 
-        $providers = $this->providerService->index(new Request([]),false);
+        $providers = $this->providerService->index(new Request([]), false);
         $providers = $providers->data;
 
-        foreach($providers as $index => $row){
-            if($row->type == ProviderEnum::TYPE_PAY_LATER){
-                if(empty(Auth::user()->business_id) && Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
+        foreach ($providers as $index => $row) {
+            if ($row->type == ProviderEnum::TYPE_PAY_LATER) {
+                if (empty(Auth::user()->business_id) && Auth::user()->hasRole([RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])) {
                     unset($providers[$index]);
-                }
-                else{
-                    if(empty(Auth::user()->business->user_pay_later->status)){
+                } else {
+                    if (empty(Auth::user()->business->user_pay_later->status)) {
                         unset($providers[$index]);
                     }
                 }
             }
         }
 
-        $business = $this->businessService->index(new Request([]),false);
+        $business = $this->businessService->index(new Request([]), false);
         $business = $business->data;
 
         $status = OrderEnum::status();
@@ -126,11 +128,11 @@ class OrderController extends Controller
 
     public function create()
     {
-        $providers = $this->providerService->index(new Request(['status' => ProviderEnum::STATUS_TRUE]),false);
+        $providers = $this->providerService->index(new Request(['status' => ProviderEnum::STATUS_TRUE]), false);
         $providers = $providers->data;
 
-        foreach($providers as $index => $row){
-            if($row->type == ProviderEnum::TYPE_PAY_LATER){
+        foreach ($providers as $index => $row) {
+            if ($row->type == ProviderEnum::TYPE_PAY_LATER) {
                 unset($providers[$index]);
             }
         }
@@ -145,7 +147,7 @@ class OrderController extends Controller
             'fnb_type' => $fnb_type,
         ];
 
-        return view($this->view."create",$data);
+        return view($this->view . "create", $data);
     }
 
     public function show($id)
@@ -173,7 +175,7 @@ class OrderController extends Controller
         }
         $result = $result->data;
 
-        $providers = $this->providerService->index(new Request(['status' => ProviderEnum::STATUS_TRUE]),false);
+        $providers = $this->providerService->index(new Request(['status' => ProviderEnum::STATUS_TRUE]), false);
         $providers = $providers->data;
 
         $status = OrderEnum::status();
@@ -184,15 +186,6 @@ class OrderController extends Controller
 
         $fnb_type = OrderEnum::fnb_type();
 
-        $serverHotspot = $this->mikrotikConfigService->serverHotspot();
-        $serverHotspot = $serverHotspot->data;
-
-        $profileHotspot = $this->mikrotikConfigService->profileHotspot();
-        $profileHotspot = $profileHotspot->data;
-
-        $profilePppoe = $this->mikrotikConfigService->profilePppoe();
-        $profilePppoe = $profilePppoe->data;
-
         $data = [
             'result' => $result,
             'status' => $status,
@@ -200,9 +193,6 @@ class OrderController extends Controller
             'type' => $type,
             'providers' => $providers,
             'fnb_type' => $fnb_type,
-            'serverHotspot' => $serverHotspot,
-            'profileHotspot' => $profileHotspot,
-            'profilePppoe' => $profilePppoe,
         ];
 
         return view($this->view . "edit", $data);
@@ -213,14 +203,14 @@ class OrderController extends Controller
         try {
             $response = $this->orderService->store($request);
             if (!$response->success) {
-                return ResponseHelper::apiResponse(false, $response->message , null, null, $response->code);
+                return ResponseHelper::apiResponse(false, $response->message, null, null, $response->code);
             }
 
-            return ResponseHelper::apiResponse(true, $response->message , $response->data , null, $response->code);
+            return ResponseHelper::apiResponse(true, $response->message, $response->data, null, $response->code);
         } catch (\Throwable $th) {
             Log::emergency($th->getMessage());
 
-            return ResponseHelper::apiResponse(false, $th->getMessage() , null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
+            return ResponseHelper::apiResponse(false, $th->getMessage(), null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -229,14 +219,14 @@ class OrderController extends Controller
         try {
             $response = $this->orderService->update($request, $id);
             if (!$response->success) {
-                return ResponseHelper::apiResponse(false, $response->message , null, null, $response->code);
+                return ResponseHelper::apiResponse(false, $response->message, null, null, $response->code);
             }
-            
-            return ResponseHelper::apiResponse(true, $response->message , $response->data , null, $response->code);
+
+            return ResponseHelper::apiResponse(true, $response->message, $response->data, null, $response->code);
         } catch (\Throwable $th) {
             Log::emergency($th->getMessage());
 
-            return ResponseHelper::apiResponse(false, $th->getMessage() , null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
+            return ResponseHelper::apiResponse(false, $th->getMessage(), null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -264,14 +254,14 @@ class OrderController extends Controller
         try {
             $response = $this->orderService->proofOrder($request, $id);
             if (!$response->success) {
-                return ResponseHelper::apiResponse(false, $response->message , null, null, $response->code);
+                return ResponseHelper::apiResponse(false, $response->message, null, null, $response->code);
             }
-            
-            return ResponseHelper::apiResponse(true, $response->message , $response->data , null, $response->code);
+
+            return ResponseHelper::apiResponse(true, $response->message, $response->data, null, $response->code);
         } catch (\Throwable $th) {
             Log::emergency($th->getMessage());
 
-            return ResponseHelper::apiResponse(false, $th->getMessage() , null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
+            return ResponseHelper::apiResponse(false, $th->getMessage(), null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -280,14 +270,14 @@ class OrderController extends Controller
         try {
             $response = $this->orderService->updateProgress($request, $id);
             if (!$response->success) {
-                return ResponseHelper::apiResponse(false, $response->message , null, null, $response->code);
+                return ResponseHelper::apiResponse(false, $response->message, null, null, $response->code);
             }
-            
-            return ResponseHelper::apiResponse(true, $response->message , $response->data , null, $response->code);
+
+            return ResponseHelper::apiResponse(true, $response->message, $response->data, null, $response->code);
         } catch (\Throwable $th) {
             Log::emergency($th->getMessage());
 
-            return ResponseHelper::apiResponse(false, $th->getMessage() , null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
+            return ResponseHelper::apiResponse(false, $th->getMessage(), null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -296,27 +286,28 @@ class OrderController extends Controller
         try {
             $response = $this->orderService->updateStatus($request, $id);
             if (!$response->success) {
-                return ResponseHelper::apiResponse(false, $response->message , null, null, $response->code);
+                return ResponseHelper::apiResponse(false, $response->message, null, null, $response->code);
             }
-            
-            return ResponseHelper::apiResponse(true, $response->message , $response->data , null, $response->code);
+
+            return ResponseHelper::apiResponse(true, $response->message, $response->data, null, $response->code);
         } catch (\Throwable $th) {
             Log::emergency($th->getMessage());
 
-            return ResponseHelper::apiResponse(false, $th->getMessage() , null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
+            return ResponseHelper::apiResponse(false, $th->getMessage(), null, null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function exportExcel(Request $request){
+    public function exportExcel(Request $request)
+    {
         try {
-            $orders = $this->orderService->index($request,false);
+            $orders = $this->orderService->index($request, false);
             $orders = $orders->data;
 
             $total = 0;
             $collection = new Collection();
-            foreach($orders as $index => $row){
+            foreach ($orders as $index => $row) {
                 $collection->push([
-                    $index+1,
+                    $index + 1,
                     $row->code,
                     $row->user->name ?? null,
                     $row->cutomer->name ?? null,
@@ -324,7 +315,7 @@ class OrderController extends Controller
                     $row->provider->name ?? null,
                     $row->status()->msg ?? null,
                     $row->progress()->msg ?? null,
-                    date('d-m-Y H:i:s',strtotime($row->created_at))
+                    date('d-m-Y H:i:s', strtotime($row->created_at))
                 ]);
 
                 $total += $row->totalNeto();
@@ -352,7 +343,7 @@ class OrderController extends Controller
                 null,
             ]);
 
-            return Excel::download(new OrderExport($collection), 'orders-'.time().'.xlsx');
+            return Excel::download(new OrderExport($collection), 'orders-' . time() . '.xlsx');
         } catch (\Throwable $th) {
             Log::emergency($th->getMessage());
             alert()->error('Gagal', $th->getMessage());

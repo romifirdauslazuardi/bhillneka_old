@@ -121,7 +121,7 @@
     $(function(){
 
         $('button[type="submit"]').attr("disabled",false);
-        
+
         getProvince('.select-province',null);
 
         $(document).on("change", ".select-province", function(e) {
@@ -176,18 +176,21 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);                   
+                            return responseFailed(resp.message);
                         }
                         else{
-                            responseSuccess(resp.message,"{{route('dashboard.business.index')}}");
+                            return responseSuccess(resp.message,"{{route('dashboard.business.index')}}");
                         }
                     },
                     error: function (request, status, error) {
                         if(request.status == 422){
-                            responseFailed(request.responseJSON.message);
+                            return responseFailed(request.responseJSON.message);
+                        }
+                        else if(request.status == 419){
+                            return sessionTimeOut();
                         }
                         else{
-                            responseInternalServerError();
+                            return responseInternalServerError();
                         }
                     },
                     complete :function(){

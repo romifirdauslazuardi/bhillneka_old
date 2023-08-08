@@ -433,8 +433,6 @@
             let val = $this.val();
             let mikrotik_id = $this.parent().parent().parent().parent().find(".mikrotik_config_id").val();
 
-            console.log($this.parent().parent().parent().parent().find(".mikrotik_config_id"));
-
             if(val != "" && val != null && val != undefined){
                 $.ajax({
                     url : '{{route("base.mikrotik-configs.detailProfilePppoe",["mikrotik_id" => "_mikrotik_id_","name" => "_name_"])}}'.replace("_mikrotik_id_", mikrotik_id).replace("_name_", val),
@@ -445,7 +443,7 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);
+                            return responseFailed(resp.message);
                         }
                         else{
                             $this.parent().parent().parent().parent().find(".local-address").val(resp.data.local_address);
@@ -454,10 +452,13 @@
                     },
                     error: function (request, status, error) {
                         if(request.status == 422){
-                            responseFailed(request.responseJSON.message);
+                            return responseFailed(request.responseJSON.message);
+                        }
+                        else if(request.status == 419){
+                            return sessionTimeOut();
                         }
                         else{
-                            responseInternalServerError();
+                            return responseInternalServerError();
                         }
                     },
                     complete :function(){
@@ -483,18 +484,21 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);
+                            return responseFailed(resp.message);
                         }
                         else{
-                            responseSuccess(resp.message,"{{route('dashboard.orders.create')}}");
+                            return responseSuccess(resp.message,"{{route('dashboard.orders.create')}}");
                         }
                     },
                     error: function (request, status, error) {
                         if(request.status == 422){
-                            responseFailed(request.responseJSON.message);
+                            return responseFailed(request.responseJSON.message);
+                        }
+                        else if(request.status == 419){
+                            return sessionTimeOut();
                         }
                         else{
-                            responseInternalServerError();
+                            return responseInternalServerError();
                         }
                     },
                     complete :function(){
@@ -543,10 +547,13 @@
             },
             error: function (request, status, error) {
                 if(request.status == 422){
-                    responseFailed(request.responseJSON.message);
+                    return responseFailed(request.responseJSON.message);
+                }
+                else if(request.status == 419){
+                    return sessionTimeOut();
                 }
                 else{
-                    responseInternalServerError();
+                    return responseInternalServerError();
                 }
             },
             complete :function(){
@@ -794,10 +801,13 @@
             },
             error: function (request, status, error) {
                 if(request.status == 422){
-                    responseFailed(request.responseJSON.message);
+                    return responseFailed(request.responseJSON.message);
+                }
+                else if(request.status == 419){
+                    return sessionTimeOut();
                 }
                 else{
-                    responseInternalServerError();
+                    return responseInternalServerError();
                 }
             },
             complete :function(){
@@ -844,10 +854,13 @@
             },
             error: function (request, status, error) {
                 if(request.status == 422){
-                    responseFailed(request.responseJSON.message);
+                    return responseFailed(request.responseJSON.message);
+                }
+                else if(request.status == 419){
+                    return sessionTimeOut();
                 }
                 else{
-                    responseInternalServerError();
+                    return responseInternalServerError();
                 }
             },
             complete :function(){

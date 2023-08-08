@@ -146,18 +146,21 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);
+                            return responseFailed(resp.message);
                         }
                         else{
-                            responseSuccess(resp.message,"{{url()->current()}}");
+                            return responseSuccess(resp.message,"{{url()->current()}}");
                         }
                     },
                     error: function (request, status, error) {
                         if(request.status == 422){
-                            responseFailed(request.responseJSON.message);
+                            return responseFailed(request.responseJSON.message);
+                        }
+                        else if(request.status == 419){
+                            return sessionTimeOut();
                         }
                         else{
-                            responseInternalServerError();
+                            return responseInternalServerError();
                         }
                     },
                     complete :function(){
@@ -183,7 +186,7 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);
+                            return responseFailed(resp.message);
                         }
                         else{
                             responseSuccess(resp.message,null);
@@ -193,10 +196,13 @@
                     },
                     error: function (request, status, error) {
                         if(request.status == 422){
-                            responseFailed(request.responseJSON.message);
+                            return responseFailed(request.responseJSON.message);
+                        }
+                        else if(request.status == 419){
+                            return sessionTimeOut();
                         }
                         else{
-                            responseInternalServerError();
+                            return responseInternalServerError();
                         }
                     },
                     complete :function(){
@@ -254,6 +260,17 @@
 	    })
 	}
 
+    function sessionTimeOut() {
+	    Swal.fire({
+	        icon: 'error',
+	        title: 'Oops...',
+	        html: 'Session login anda sudah habis , silahkan login kembali',
+            timer : 5000,
+	    }).then((ok) => {
+	        return location.href = '{{ route("dashboard.auth.login.index") }}';
+	    })
+	}
+
     function getProvince(selector,selectedId=null){
         $.ajax({
             url : '{{route("base.indonesia.province")}}',
@@ -282,10 +299,13 @@
             },
             error: function (request, status, error) {
                 if(request.status == 422){
-                    responseFailed(request.responseJSON.message);
+                    return responseFailed(request.responseJSON.message);
+                }
+                else if(request.status == 419){
+                    return sessionTimeOut();
                 }
                 else{
-                    responseInternalServerError();
+                    return responseInternalServerError();
                 }
             },
             complete :function(){
@@ -325,10 +345,13 @@
             },
             error: function (request, status, error) {
                 if(request.status == 422){
-                    responseFailed(request.responseJSON.message);
+                    return responseFailed(request.responseJSON.message);
+                }
+                else if(request.status == 419){
+                    return sessionTimeOut();
                 }
                 else{
-                    responseInternalServerError();
+                    return responseInternalServerError();
                 }
             },
             complete :function(){
@@ -368,10 +391,13 @@
             },
             error: function (request, status, error) {
                 if(request.status == 422){
-                    responseFailed(request.responseJSON.message);
+                    return responseFailed(request.responseJSON.message);
+                }
+                else if(request.status == 419){
+                    return sessionTimeOut();
                 }
                 else{
-                    responseInternalServerError();
+                    return responseInternalServerError();
                 }
             },
             complete :function(){
@@ -411,10 +437,13 @@
             },
             error: function (request, status, error) {
                 if(request.status == 422){
-                    responseFailed(request.responseJSON.message);
+                    return responseFailed(request.responseJSON.message);
+                }
+                else if(request.status == 419){
+                    return sessionTimeOut();
                 }
                 else{
-                    responseInternalServerError();
+                    return responseInternalServerError();
                 }
             },
             complete :function(){
@@ -454,10 +483,13 @@
             },
             error: function (request, status, error) {
                 if(request.status == 422){
-                    responseFailed(request.responseJSON.message);
+                    return responseFailed(request.responseJSON.message);
+                }
+                else if(request.status == 419){
+                    return sessionTimeOut();
                 }
                 else{
-                    responseInternalServerError();
+                    return responseInternalServerError();
                 }
             },
             complete :function(){
@@ -497,10 +529,13 @@
             },
             error: function (request, status, error) {
                 if(request.status == 422){
-                    responseFailed(request.responseJSON.message);
+                    return responseFailed(request.responseJSON.message);
+                }
+                else if(request.status == 419){
+                    return sessionTimeOut();
                 }
                 else{
-                    responseInternalServerError();
+                    return responseInternalServerError();
                 }
             },
             complete :function(){
@@ -540,10 +575,13 @@
             },
             error: function (request, status, error) {
                 if(request.status == 422){
-                    responseFailed(request.responseJSON.message);
+                    return responseFailed(request.responseJSON.message);
+                }
+                else if(request.status == 419){
+                    return sessionTimeOut();
                 }
                 else{
-                    responseInternalServerError();
+                    return responseInternalServerError();
                 }
             },
             complete :function(){
@@ -580,10 +618,13 @@
             },
             error: function (request, status, error) {
                 if(request.status == 422){
-                    responseFailed(request.responseJSON.message);
+                    return responseFailed(request.responseJSON.message);
+                }
+                else if(request.status == 419){
+                    return sessionTimeOut();
                 }
                 else{
-                    responseInternalServerError();
+                    return responseInternalServerError();
                 }
             },
             complete :function(){
@@ -620,10 +661,13 @@
             },
             error: function (request, status, error) {
                 if(request.status == 422){
-                    responseFailed(request.responseJSON.message);
+                    return responseFailed(request.responseJSON.message);
+                }
+                else if(request.status == 419){
+                    return sessionTimeOut();
                 }
                 else{
-                    responseInternalServerError();
+                    return responseInternalServerError();
                 }
             },
             complete :function(){
@@ -660,10 +704,13 @@
             },
             error: function (request, status, error) {
                 if(request.status == 422){
-                    responseFailed(request.responseJSON.message);
+                    return responseFailed(request.responseJSON.message);
+                }
+                else if(request.status == 419){
+                    return sessionTimeOut();
                 }
                 else{
-                    responseInternalServerError();
+                    return responseInternalServerError();
                 }
             },
             complete :function(){

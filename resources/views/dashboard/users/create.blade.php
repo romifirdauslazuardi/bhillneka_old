@@ -130,7 +130,7 @@
     $(function(){
         $.datetimepicker.setDateFormatter('moment');
         $.datetimepicker.setLocale('id');
-        
+
         $('.datetimepicker').datetimepicker({
               format:'YYYY-MM-DD HH:mm:ss',
               formatTime:'HH:mm:ss',
@@ -143,7 +143,7 @@
             e.preventDefault();
             let val = $(this).val();
             let agen = false;
-            
+
             if(val == '{{\App\Enums\RoleEnum::CUSTOMER}}' || val == '{{\App\Enums\RoleEnum::ADMIN_AGEN}}'){
                 agen = true;
             }
@@ -189,18 +189,21 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);                   
+                            return responseFailed(resp.message);
                         }
                         else{
-                            responseSuccess(resp.message,"{{route('dashboard.users.index')}}");
+                            return responseSuccess(resp.message,"{{route('dashboard.users.index')}}");
                         }
                     },
                     error: function (request, status, error) {
                         if(request.status == 422){
-                            responseFailed(request.responseJSON.message);
+                            return responseFailed(request.responseJSON.message);
+                        }
+                        else if(request.status == 419){
+                            return sessionTimeOut();
                         }
                         else{
-                            responseInternalServerError();
+                            return responseInternalServerError();
                         }
                     },
                     complete :function(){
