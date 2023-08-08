@@ -83,7 +83,7 @@ class OrderOnTimePayMikrotikExpiredCommand extends Command
 
     private function disabledMikrotik($orderItem)
     {
-        $mikrotikConfig = SettingHelper::mikrotikConfig($orderItem->product->mikrotik_id ?? null);
+        $mikrotikConfig = SettingHelper::mikrotikConfig($orderItem->product->mikrotik_config_id ?? null);
         $ip = $mikrotikConfig->ip ?? null;
         $username = $mikrotikConfig->username ?? null;
         $password = $mikrotikConfig->password ?? null;

@@ -189,7 +189,7 @@
                                                                                 <div class="form-group mb-3">
                                                                                     <label>Service<span class="text-danger">*</span></label>
                                                                                     <select class="form-control service" name="repeater[{{$index}}][service]" style="width:100%">
-                                                                                        <option value="pppoe">PPPOE</option>
+                                                                                        <option value="any">any</option>
                                                                                     </select>
                                                                                 </div>
                                                                             </div>
@@ -198,7 +198,6 @@
                                                                                     <label>Profile<span class="text-danger">*</span></label>
                                                                                     <select class="form-control profile-{{$row->product_id}}" style="width:100%" name="repeater[{{$index}}][profile]">
                                                                                         <option value="">==Pilih Profile</option>
-                                                                                        <option value="{{ $row->order_mikrotik->profile ?? null}}">{{ $row->order_mikrotik->profile ?? null}}</option>
                                                                                     </select>
                                                                                 </div>
                                                                             </div>
@@ -269,7 +268,6 @@
                                                                             <label>Server<span class="text-danger">*</span></label>
                                                                             <select class="form-control select2 server server-{{$row->product_id}}" style="width:100%" name="repeater[{{$index}}][server]">
                                                                                 <option value="">==Pilih Server</option>
-                                                                                <option value="{{ $row->order_mikrotik->server ?? null}}">{{ $row->order_mikrotik->server ?? null}}</option>
                                                                             </select>
                                                                             <p class="text-info" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;"><small><i>Nama server akan ditampikan sebagai SSID</i></small></p>
                                                                         </div>
@@ -277,7 +275,6 @@
                                                                             <label>Profile<span class="text-danger">*</span></label>
                                                                             <select class="form-control select2 profile profile-{{$row->product_id}}" style="width:100%" name="repeater[{{$index}}][profile]">
                                                                                 <option value="">==Pilih Profile</option>
-                                                                                <option value="{{ $row->order_mikrotik->profile ?? null}}">{{ $row->order_mikrotik->profile ?? null}}</option>
                                                                             </select>
                                                                         </div>
                                                                         <div class="form-group mb-3">
@@ -447,6 +444,16 @@
             getCustomer('.select-customer','{{$result->business_id}}','{{$result->customer_id}}');
             getTable('.select-table','{{$result->business_id}}','{{$result->table_id}}');
         @endif
+
+        @foreach($result->items as $index => $row)
+            @if($row->product->mikrotik == \App\Enums\ProductEnum::MIKROTIK_PPPOE){
+                getProfilePppoe('.profile-'+'{{$row->product_id}}','{{$row->product->mikrotik_config_id ?? null}}','{{$row->order_mikrotik->profile ?? null}}');
+            }
+            @elseif($row->product->mikrotik == \App\Enums\ProductEnum::MIKROTIK_HOTSPOT){
+                getProfileHotspot('.profile-'+'{{$row->product_id}}','{{$row->product->mikrotik_config_id ?? null}}','{{$row->order_mikrotik->profile ?? null}}');
+                getServerHotspot('.server-'+'{{$row->product_id}}','{{$row->product->mikrotik_config_id ?? null}}','{{$row->order_mikrotik->server ?? null}}');
+            }
+        @endforeach
 
         $(document).on("click",".btn-show-product",function(e){
             e.preventDefault();
@@ -745,7 +752,7 @@
                                                         <div class="form-group mb-3">
                                                             <label>Service<span class="text-danger">*</span></label>
                                                             <select class="form-control service" name="repeater[${index}][service]" style="width:100%">
-                                                                <option value="pppoe">PPPOE</option>
+                                                                <option value="any">any</option>
                                                             </select>
                                                         </div>
                                                     </div>

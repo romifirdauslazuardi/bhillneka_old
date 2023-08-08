@@ -73,13 +73,12 @@ class RepeatOrderCommand extends Command
                 }
                 
                 if(!empty($order->repeat_order_at) && $checkOtherOrder == 0){
-                    if(((int)date("d")) == $order->repeat_order_at){
+                    $dateRepeatAt = date("Y-m",strtotime($order->created_at));
+                    $dateRepeatAt = $dateRepeatAt."-".($order->repeat_order_at);
+                    $date7minDay = date("Y-m-d",strtotime($dateRepeatAt." -7 day"));
 
-                        $date7minDay = date("Y-m-d",strtotime(date("Y-m-d")." -7 day"));
-
-                        if($date7minDay == date("Y-m-d")){
-                            $generateOrder = self::generateOrder($order);
-                        }
+                    if(date("Y-m-d") == $date7minDay){
+                        $generateOrder = self::generateOrder($order);
                     }
                 }
 
@@ -152,7 +151,7 @@ class RepeatOrderCommand extends Command
                         }
                     }
 
-                    $settingFee = SettingHelper::checkSettingFee($generateOrder);
+                    $settingFee = SettingHelper::checkSettingFee($generateOrder->id);
 
                     if($settingFee["IsError"] == TRUE){
                         Log::emergency("RepeatOrderCommand : ".$settingFee["Message"]);

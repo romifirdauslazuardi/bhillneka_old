@@ -624,7 +624,7 @@
                                                         <div class="form-group mb-3">
                                                             <label>Service<span class="text-danger">*</span></label>
                                                             <select class="form-control service" name="repeater[${index}][service]" style="width:100%">
-                                                                <option value="pppoe">PPPOE</option>
+                                                                <option value="any">any</option>
                                                             </select>
                                                         </div>
                                                     </div>

@@ -50,7 +50,7 @@ class SyncMikrotikToDatabaseCommand extends Command
 
                 foreach ($order->items as $i => $orderItem) {
                     if (!empty($orderItem->order_mikrotik->mikrotik_id)) {
-                        $mikrotikConfig = SettingHelper::mikrotikConfig($orderItem->product->mikrotik_id ?? null);
+                        $mikrotikConfig = SettingHelper::mikrotikConfig($orderItem->product->mikrotik_config_id ?? null);
                         $ipConfig = $mikrotikConfig->ip ?? null;
                         $usernameConfig = $mikrotikConfig->username ?? null;
                         $passwordConfig = $mikrotikConfig->password ?? null;
