@@ -141,7 +141,7 @@
                                             <th>Aksi</th>
                                         </thead>
                                         <tbody class="tbody-product">
-                                            
+
                                         </tbody>
                                     </table>
                                 </div>
@@ -269,7 +269,7 @@
     $(function(){
         $.datetimepicker.setDateFormatter('moment');
         $.datetimepicker.setLocale('id');
-        
+
         $('.datetimepicker').datetimepicker({
               format:'YYYY-MM-DD HH:mm:ss',
               formatTime:'HH:mm:ss',
@@ -303,7 +303,7 @@
             else{
                 $('.display-general-customer').removeClass("d-none");
             }
-            
+
         });
 
         $(document).on("change",".select-type",function(e){
@@ -319,7 +319,7 @@
                 $('.display-due-date').removeClass("d-none");
                 $('.display-expired-month').removeClass("d-none").addClass("d-none");
             }
-            
+
         });
 
         $(document).on("click",".btn-select-product",function(e){
@@ -360,10 +360,10 @@
 
         $(document).on("keyup",".tbody-product-qty",function(e){
             e.preventDefault();
-            
+
             generateSubTotalRow($(this).parent().parent());
             generateTotal();
-            
+
         });
 
         $(document).on("keyup",".tbody-product-discount",function(e){
@@ -372,21 +372,21 @@
             let val = $(this).val();
 
             $(this).val(formatRupiah(val,undefined));
-            
+
             generateSubTotalRow($(this).parent().parent());
             generateTotal();
-            
+
         });
 
         $(document).on("keyup",".input-discount",function(e){
             e.preventDefault();
-            
+
             let val = $(this).val();
 
             $(this).val(formatRupiah(val,undefined));
 
             generateTotal();
-            
+
         });
 
         $(document).on("click",".btn-delete-product",function(e){
@@ -431,10 +431,13 @@
 
             let $this = $(this);
             let val = $this.val();
-            
+            let mikrotik_id = $this.parent().parent().parent().parent().find(".mikrotik_config_id").val();
+
+            console.log($this.parent().parent().parent().parent().find(".mikrotik_config_id"));
+
             if(val != "" && val != null && val != undefined){
                 $.ajax({
-                    url : '{{route("base.mikrotik-configs.detailProfilePppoe","_name_")}}'.replace("_name_", val),
+                    url : '{{route("base.mikrotik-configs.detailProfilePppoe",["mikrotik_id" => "_mikrotik_id_","name" => "_name_"])}}'.replace("_mikrotik_id_", mikrotik_id).replace("_name_", val),
                     method : "GET",
                     dataType : "JSON",
                     beforeSend : function(){
@@ -442,7 +445,7 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);         
+                            responseFailed(resp.message);
                         }
                         else{
                             $this.parent().parent().parent().parent().find(".local-address").val(resp.data.local_address);
@@ -480,7 +483,7 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);                   
+                            responseFailed(resp.message);
                         }
                         else{
                             responseSuccess(resp.message,"{{route('dashboard.orders.create')}}");
@@ -515,8 +518,8 @@
             },
             success : function(resp){
                 if(resp.success == false){
-                    responseFailed(resp.message);       
-                    $('.tbody-modal-product').html('<tr><td class="text-center" colspan="7">Produk Tidak Ditemukan</td></tr>');         
+                    responseFailed(resp.message);
+                    $('.tbody-modal-product').html('<tr><td class="text-center" colspan="7">Produk Tidak Ditemukan</td></tr>');
                 }
                 else{
                     let html = "";
@@ -568,11 +571,11 @@
             },
             success : function(resp){
                 if(resp.success == false){
-                    responseFailed(resp.message);         
+                    responseFailed(resp.message);
                 }
                 else{
                     let index = 0;
-                    
+
                     $('.repeater-product').each(function(index,element){
                         index += 1;
                     });
@@ -606,7 +609,8 @@
                                                 <button type="button" class="btn btn-icon btn-close" data-bs-dismiss="modal" id="close-modal"><i class="uil uil-times fs-4 text-dark"></i></button>
                                             </div>
                                             <div class="modal-body">
-                                                <input type="hidden" name="repeater[${index}][auto_userpassword]" value="`+'{{\App\Enums\OrderMikrotikEnum::AUTO_USERPASSWORD_FALSE}}'+`" class="auto_userpassword"/>
+                                                <input type="hidden" value="`+echo(resp.data.mikrotik_config_id)+`" class="mikrotik_config_id"/>
+                                                <input type="hidden" value="`+'{{\App\Enums\OrderMikrotikEnum::AUTO_USERPASSWORD_FALSE}}'+`" class="auto_userpassword"/>
                                                 <div class="form-group mb-3">
                                                     <label>Username<span class="text-danger">*</span></label>
                                                     <input type="text" class="form-control username" placeholder="Username" name="repeater[${index}][username]">
@@ -620,14 +624,14 @@
                                                         <div class="form-group mb-3">
                                                             <label>Service<span class="text-danger">*</span></label>
                                                             <select class="form-control service" name="repeater[${index}][service]" style="width:100%">
-                                                                <option value="pppoe">PPPOE</option>
+                                                                <option value="any">any</option>
                                                             </select>
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group mb-3">
                                                             <label>Profile<span class="text-danger">*</span></label>
-                                                            <select class="form-control profile-${index} select-profile-pppoe" style="width:100%" name="repeater[${index}][profile]">
+                                                            <select class="form-control profile-${resp.data.id} select-profile-pppoe profile" style="width:100%" name="repeater[${index}][profile]">
                                                                 <option value="">==Pilih Profile</option>
                                                             </select>
                                                         </div>
@@ -689,6 +693,7 @@
                                                 <button type="button" class="btn btn-icon btn-close" data-bs-dismiss="modal" id="close-modal"><i class="uil uil-times fs-4 text-dark"></i></button>
                                             </div>
                                             <div class="modal-body">
+                                                <input type="hidden" value="`+echo(resp.data.mikrotik_config_id)+`" class="mikrotik_config_id"/>
                                                 <div class="form-group mb-3">
                                                     <label>Jenis Pengisian Username dan Password<span class="text-danger">*</span></label>
                                                     <select class="form-control autouserpassword" name="repeater[${index}][auto_userpassword]">
@@ -707,14 +712,14 @@
                                                 </div>
                                                 <div class="form-group mb-3">
                                                     <label>Server<span class="text-danger">*</span></label>
-                                                    <select class="form-control select2 server server-${index}" style="width:100%" name="repeater[${index}][server]">
+                                                    <select class="form-control select2 server server-${resp.data.id}" style="width:100%" name="repeater[${index}][server]">
                                                         <option value="">==Pilih Server</option>
                                                     </select>
                                                     <p class="text-info" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;"><small><i>Nama server akan ditampikan sebagai SSID</i></small></p>
                                                 </div>
                                                 <div class="form-group mb-3">
                                                     <label>Profile<span class="text-danger">*</span></label>
-                                                    <select class="form-control select2 profile profile-${index}" style="width:100%" name="repeater[${index}][profile]">
+                                                    <select class="form-control select2 profile profile-${resp.data.id}" style="width:100%" name="repeater[${index}][profile]">
                                                         <option value="">==Pilih Profile</option>
                                                     </select>
                                                 </div>
@@ -740,7 +745,7 @@
                                                     <label>Comment</label>
                                                     <input type="text" class="form-control comment" placeholder="Comment" name="repeater[${index}][comment]" value="`+echo(resp.data.comment)+`">
                                                 </div>
-                                                
+
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
@@ -774,11 +779,11 @@
                         $('.tbody-product').append(html);
 
                         if(resp.data.mikrotik == '{{App\Enums\ProductEnum::MIKROTIK_PPPOE}}'){
-                            getProfilePppoe('.profile-'+index,resp.data.profile);
+                            getProfilePppoe('.profile-'+resp.data.id,resp.data.mikrotik_config_id,resp.data.profile);
                         }
                         else if(resp.data.mikrotik == '{{App\Enums\ProductEnum::MIKROTIK_HOTSPOT}}'){
-                            getProfileHotspot('.profile-'+index,resp.data.profile);
-                            getServerHotspot('.server-'+index,resp.data.server);
+                            getProfileHotspot('.profile-'+resp.data.id,resp.data.mikrotik_config_id,resp.data.profile);
+                            getServerHotspot('.server-'+resp.data.id,resp.data.mikrotik_config_id,resp.data.server);
                         }
                     }
 
@@ -814,7 +819,7 @@
             },
             success : function(resp){
                 if(resp.success == false){
-                    responseFailed(resp.message);         
+                    responseFailed(resp.message);
                 }
                 else{
                     let html = "";
@@ -832,7 +837,7 @@
                             </tr>
                         `;
                     });
-                    
+
                     $('.tbody-latest-order').html(html);
                     $('.latest-order-datatable').DataTable();
                 }
@@ -885,11 +890,11 @@
         let total = 0;
         let discount = $('.input-discount').val();
         let total_discount = 0;
-        
+
         discount = discount.split(".").join("");
 
         discount = parseInt(discount);
-        
+
         if(isNaN(discount)){
             discount = 0;
         }
@@ -929,11 +934,11 @@
             subtotal = 0;
             total = subtotal;
         }
-        
+
         $('.input-subtotal').val(formatRupiah(subtotal,undefined));
         $('.input-total').val(formatRupiah(total,undefined));
         $('.text-total').html(formatRupiah(total,undefined));
-        
+
     }
 
     function sortTableProduct(){

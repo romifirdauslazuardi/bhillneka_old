@@ -54,7 +54,7 @@
                 </ul>
                 <!-- Tab panes -->
                 <div class="tab-content">
-                    <div class="tab-pane container active" id="product">
+                    <div class="tab-pane active" id="product">
                         <div class="row mt-3">
                             <div class="row mb-3">
                                 <div class="col-lg-12">
@@ -104,9 +104,20 @@
                                     </div>
                                     @if(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                                     <div class="form-group row mb-3">
+                                        <label class="col-md-3 col-form-label">Router<span class="text-danger">*</span></label>
+                                        <div class="col-md-9">
+                                            <select class="form-control select2 select-mikrotik-config" name="mikrotik_config_id" >
+                                                <option value="">==Pilih Router==</option>
+                                                @foreach ($mikrotik_configs as $index => $row)
+                                                <option value="{{$row->id}}" @if($row->id == $result->mikrotik_config_id) selected @endif>{{ $row->name }} - {{$row->ip}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mb-3">
                                         <label class="col-md-3 col-form-label">Tipe Mikrotik<span class="text-danger">*</span></label>
                                         <div class="col-md-9">
-                                            <select class="form-control select2" name="mikrotik" >
+                                            <select class="form-control select2 select-mikrotik" name="mikrotik" @if(empty($result->mikrotik_config_id)) disabled @endif>
                                                 <option value="">==Pilih Tipe Mikrotik==</option>
                                                 @foreach ($mikrotik as $index => $row)
                                                 <option value="{{$index}}" @if($index == $result->mikrotik) selected @endif>{{$row}}</option>
@@ -161,14 +172,14 @@
                         </div>
                     </div>
                     @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::MIKROTIK]))
-                    <div class="tab-pane container fade" id="configuration">
+                    <div class="tab-pane fade" id="configuration">
                         <div class="row mt-3">
                             <div class="col-12">
                                 <div class="form-group row mb-3 @if(!in_array($result->mikrotik,[\App\Enums\ProductEnum::MIKROTIK_PPPOE])) d-none @endif display-service">
                                     <label class="col-md-3 col-form-label">Service</label>
                                     <div class="col-md-9">
                                         <select class="form-control service select-service" style="width:100%" name="service">
-                                            <option value="pppoe">PPPOE</option>
+                                            <option value="any">any</option>
                                         </select>
                                     </div>
                                 </div>
@@ -218,10 +229,15 @@
                                         <input type="text" class="form-control remote-address" name="remote_address" placeholder="Remote Address" value="{{$result->remote_address}}">
                                     </div>
                                 </div>
-                                <div class="form-group row mb-3 @if(!in_array($result->mikrotik,[\App\Enums\ProductEnum::MIKROTIK_PPPOE])) d-none @endif display-expired-date">
-                                    <label class="col-md-3 col-form-label">Berlaku Sampai Tanggal</label>
+                                <div class="form-group row mb-3 @if(!in_array($result->mikrotik,[\App\Enums\ProductEnum::MIKROTIK_PPPOE])) d-none @endif display-month">
+                                    <label class="col-md-3 col-form-label">Berlaku Hingga</label>
                                     <div class="col-md-9">
-                                        <input type="date" class="form-control expired-date" name="expired_date" placeholder="Berlaku Sampai Tanggal" value="{{$result->expired_date}}">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" placeholder="Berlaku Hingga" name="expired_month" value="{{ $result->expired_month }}">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">BULAN</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="form-group row mb-3 @if(!in_array($result->mikrotik,[\App\Enums\ProductEnum::MIKROTIK_PPPOE,\App\Enums\ProductEnum::MIKROTIK_HOTSPOT])) d-none @endif display-comment">
@@ -256,72 +272,97 @@
         $('button[type="submit"]').attr("disabled",false);
 
         @if(in_array($result->mikrotik,[\App\Enums\ProductEnum::MIKROTIK_PPPOE]))
-            getProfilePppoe(".select-profile",'{{$result->profile}}');
+            getProfilePppoe(".select-profile",'{{$result->mikrotik_config_id}}','{{$result->profile}}');
         @endif
 
         @if(in_array($result->mikrotik,[\App\Enums\ProductEnum::MIKROTIK_HOTSPOT]))
-            getServerHotspot(".select-server",'{{$result->server}}');
-            getProfileHotspot(".select-profile",'{{$result->profile}}');
+            getServerHotspot(".select-server",'{{$result->mikrotik_config_id}}','{{$result->server}}');
+            getProfileHotspot(".select-profile",'{{$result->mikrotik_config_id}}','{{$result->profile}}');
         @endif
+
+        $(document).on("change",".select-mikrotik-config",function(e){
+            let val = $(this).val();
+
+            if(val != "" && val != undefined && val != null){
+                $('.select-mikrotik').val(null).trigger("change");
+                $('.select-mikrotik').prop("disabled",false);
+            }
+            else{
+                $('.select-mikrotik').val(null).trigger("change");
+                $('.select-mikrotik').prop("disabled",true);
+            }
+        });
 
         $(document).on("change",".select-mikrotik",function(e){
             e.preventDefault();
 
             let val = $(this).val();
+            let mikrotik_id = $('.select-mikrotik-config').val();
 
-            if(val != "" && val != undefined && val != null){
-                if(val == '{{App\Enums\ProductEnum::MIKROTIK_PPPOE}}'){
+            if(mikrotik_id){
+                if(val != "" && val != undefined && val != null){
+                    if(val == '{{App\Enums\ProductEnum::MIKROTIK_PPPOE}}'){
+                        $('.display-server').removeClass("d-none").addClass("d-none");
+                        $('.display-address').removeClass("d-none").addClass("d-none");
+                        $('.display-mac-address').removeClass("d-none").addClass("d-none");
+                        $('.display-time-limit').removeClass("d-none").addClass("d-none");
+                        $('.display-profile').removeClass("d-none").addClass("d-none");
+                        $('.display-comment').removeClass("d-none").addClass("d-none");
+
+                        $('.display-service').removeClass("d-none");
+                        $('.display-profile').removeClass("d-none");
+                        $('.display-local-address').removeClass("d-none");
+                        $('.display-remote-address').removeClass("d-none");
+                        $('.display-month').removeClass("d-none");
+                        $('.display-comment').removeClass("d-none");
+
+                        $('.select-server').html('<option value="">==Pilih Server==</option>');
+                        $('.select-profile').html('<option value="">==Pilih Profile==</option>');
+
+                        getProfilePppoe('.select-profile',mikrotik_id);
+                    }else{
+                        $('.display-service').removeClass("d-none").addClass("d-none");
+                        $('.display-profile').removeClass("d-none").addClass("d-none");
+                        $('.display-local-address').removeClass("d-none").addClass("d-none");
+                        $('.display-remote-address').removeClass("d-none").addClass("d-none");
+                        $('.display-month').removeClass("d-none").addClass("d-none");
+                        $('.display-comment').removeClass("d-none").addClass("d-none");
+
+                        $('.display-server').removeClass("d-none");
+                        $('.display-profile').removeClass("d-none");
+                        $('.display-address').removeClass("d-none");
+                        $('.display-mac-address').removeClass("d-none");
+                        $('.display-time-limit').removeClass("d-none");
+                        $('.display-comment').removeClass("d-none");
+
+                        $('.select-server').html('<option value="">==Pilih Server==</option>');
+                        $('.select-profile').html('<option value="">==Pilih Profile==</option>');
+
+                        getServerHotspot('.select-server',mikrotik_id);
+                        getProfileHotspot('.select-profile',mikrotik_id);
+                    }
+                }
+                else{
                     $('.display-server').removeClass("d-none").addClass("d-none");
                     $('.display-address').removeClass("d-none").addClass("d-none");
                     $('.display-mac-address').removeClass("d-none").addClass("d-none");
                     $('.display-time-limit').removeClass("d-none").addClass("d-none");
                     $('.display-profile').removeClass("d-none").addClass("d-none");
                     $('.display-comment').removeClass("d-none").addClass("d-none");
-
-                    $('.display-service').removeClass("d-none");
-                    $('.display-profile').removeClass("d-none");
-                    $('.display-local-address').removeClass("d-none");
-                    $('.display-remote-address').removeClass("d-none");
-                    $('.display-expired-date').removeClass("d-none");
-                    $('.display-comment').removeClass("d-none");
-
-                    $('.select-server').html('<option value="">==Pilih Server==</option>');
-                    $('.select-profile').html('<option value="">==Pilih Profile==</option>');
-
-                    getProfilePppoe('.select-profile');
-                }else{
                     $('.display-service').removeClass("d-none").addClass("d-none");
-                    $('.display-profile').removeClass("d-none").addClass("d-none");
                     $('.display-local-address').removeClass("d-none").addClass("d-none");
                     $('.display-remote-address').removeClass("d-none").addClass("d-none");
-                    $('.display-expired-date').removeClass("d-none").addClass("d-none");
-                    $('.display-comment').removeClass("d-none").addClass("d-none");
-
-                    $('.display-server').removeClass("d-none");
-                    $('.display-profile').removeClass("d-none");
-                    $('.display-address').removeClass("d-none");
-                    $('.display-mac-address').removeClass("d-none");
-                    $('.display-time-limit').removeClass("d-none");
-                    $('.display-comment').removeClass("d-none");
-
-                    $('.select-server').html('<option value="">==Pilih Server==</option>');
-                    $('.select-profile').html('<option value="">==Pilih Profile==</option>');
-
-                    getServerHotspot('.select-server');
-                    getProfileHotspot('.select-profile');
+                    $('.display-month').removeClass("d-none").addClass("d-none");
                 }
+
             }
             else{
-                $('.display-server').removeClass("d-none").addClass("d-none");
-                $('.display-address').removeClass("d-none").addClass("d-none");
-                $('.display-mac-address').removeClass("d-none").addClass("d-none");
-                $('.display-time-limit').removeClass("d-none").addClass("d-none");
-                $('.display-profile').removeClass("d-none").addClass("d-none");
-                $('.display-comment').removeClass("d-none").addClass("d-none");
-                $('.display-service').removeClass("d-none").addClass("d-none");
-                $('.display-local-address').removeClass("d-none").addClass("d-none");
-                $('.display-remote-address').removeClass("d-none").addClass("d-none");
-                $('.display-expired-date').removeClass("d-none").addClass("d-none");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    html: "Harap pilih router terlebih dahulu",
+                    timer : 5000,
+                })
             }
         });
 
@@ -330,39 +371,49 @@
 
             let $this = $(this);
             let val = $this.val();
+            let mikrotik_id = $('.select-mikrotik-config').val();
 
-            if($('.select-mikrotik').val() == '{{App\Enums\ProductEnum::MIKROTIK_PPPOE}}')
-            {
-                if(val != "" && val != null && val != undefined){
-                    $.ajax({
-                        url : '{{route("base.mikrotik-configs.detailProfilePppoe","_name_")}}'.replace("_name_", val),
-                        method : "GET",
-                        dataType : "JSON",
-                        beforeSend : function(){
-                            return openLoader();
-                        },
-                        success : function(resp){
-                            if(resp.success == false){
-                                responseFailed(resp.message);         
+            if(mikrotik_id){
+                if($('.select-mikrotik').val() == '{{App\Enums\ProductEnum::MIKROTIK_PPPOE}}'){
+                    if(val != "" && val != null && val != undefined){
+                        $.ajax({
+                            url : '{{route("base.mikrotik-configs.detailProfilePppoe",["mikrotik_id" => "_mikrotik_id_","name" => "_name_"])}}'.replace("_mikrotik_id_", mikrotik_id).replace("_name_", val),
+                            method : "GET",
+                            dataType : "JSON",
+                            beforeSend : function(){
+                                return openLoader();
+                            },
+                            success : function(resp){
+                                if(resp.success == false){
+                                    responseFailed(resp.message);
+                                }
+                                else{
+                                    $this.parent().parent().parent().find(".local-address").val(resp.data.local_address);
+                                    $this.parent().parent().parent().find(".remote-address").val(resp.data.remote_address);
+                                }
+                            },
+                            error: function (request, status, error) {
+                                if(request.status == 422){
+                                    responseFailed(request.responseJSON.message);
+                                }
+                                else{
+                                    responseInternalServerError();
+                                }
+                            },
+                            complete :function(){
+                                return closeLoader();
                             }
-                            else{
-                                $this.parent().parent().parent().find(".local-address").val(resp.data.local_address);
-                                $this.parent().parent().parent().find(".remote-address").val(resp.data.remote_address);
-                            }
-                        },
-                        error: function (request, status, error) {
-                            if(request.status == 422){
-                                responseFailed(request.responseJSON.message);
-                            }
-                            else{
-                                responseInternalServerError();
-                            }
-                        },
-                        complete :function(){
-                            return closeLoader();
-                        }
-                    })
+                        })
+                    }
                 }
+            }
+            else{
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    html: "Harap pilih router terlebih dahulu",
+                    timer : 5000,
+                })
             }
         });
 
@@ -382,7 +433,7 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);                   
+                            responseFailed(resp.message);
                         }
                         else{
                             responseSuccess(resp.message,"{{route('dashboard.products.index')}}");

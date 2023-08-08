@@ -10,7 +10,7 @@ use App\Enums\ProductEnum;
 
 class Product extends Model
 {
-    use HasFactory, Loggable,SoftDeletes;
+    use HasFactory, Loggable, SoftDeletes;
     protected $table = "products";
     protected $fillable = [
         'code',
@@ -35,8 +35,9 @@ class Product extends Model
         'remote_address',
         'address',
         'mac_address',
-        'expired_date',
+        'expired_month',
         'author_id',
+        'mikrotik_config_id',
     ];
 
     public function user()
@@ -46,7 +47,7 @@ class Product extends Model
 
     public function stocks()
     {
-        return $this->hasMany(ProductStock::class, 'product_id')->orderBy("created_at","DESC");
+        return $this->hasMany(ProductStock::class, 'product_id')->orderBy("created_at", "DESC");
     }
 
     public function author()
@@ -59,6 +60,11 @@ class Product extends Model
         return $this->belongsTo(Business::class, 'business_id', 'id');
     }
 
+    public function mikrotik_config()
+    {
+        return $this->belongsTo(MikrotikConfig::class, 'mikrotik_config_id', 'id');
+    }
+
     public function getPriceAttribute($value)
     {
         return (int)$value;
@@ -68,13 +74,12 @@ class Product extends Model
     {
         $return = null;
 
-        if($this->status == ProductEnum::STATUS_FALSE){
+        if ($this->status == ProductEnum::STATUS_FALSE) {
             $return = (object) [
                 'class' => 'warning',
                 'msg' => 'Tidak Aktif',
             ];
-        }
-        else{
+        } else {
             $return = (object) [
                 'class' => 'success',
                 'msg' => 'Aktif',
@@ -88,13 +93,12 @@ class Product extends Model
     {
         $return = null;
 
-        if($this->is_using_stock == ProductEnum::IS_USING_STOCK_TRUE){
+        if ($this->is_using_stock == ProductEnum::IS_USING_STOCK_TRUE) {
             $return = (object) [
                 'class' => 'success',
                 'msg' => 'Ya',
             ];
-        }
-        else{
+        } else {
             $return = (object) [
                 'class' => 'warning',
                 'msg' => 'Tidak',
@@ -108,17 +112,17 @@ class Product extends Model
     {
         $return = null;
 
-        if($this->mikrotik == ProductEnum::MIKROTIK_PPPOE){
+        if ($this->mikrotik == ProductEnum::MIKROTIK_PPPOE) {
             $return = "PPPOE";
-        }
-        else if($this->mikrotik == ProductEnum::MIKROTIK_HOTSPOT){
+        } else if ($this->mikrotik == ProductEnum::MIKROTIK_HOTSPOT) {
             $return = "Hotspot";
         }
 
         return $return;
     }
 
-    public function weight(){
-        return $this->weight." gram";
+    public function weight()
+    {
+        return $this->weight . " gram";
     }
 }

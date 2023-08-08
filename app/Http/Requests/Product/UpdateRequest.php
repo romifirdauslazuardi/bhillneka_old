@@ -19,10 +19,10 @@ class UpdateRequest extends FormRequest
         $merge["user_id"] = Auth::user()->business->user_id ?? null;
         $merge["business_id"] = Auth::user()->business_id;
 
-        if(in_array(Auth::user()->business->category->name,[BusinessCategoryEnum::JASA,BusinessCategoryEnum::BARANG,BusinessCategoryEnum::FNB])){
+        if (in_array(Auth::user()->business->category->name, [BusinessCategoryEnum::JASA, BusinessCategoryEnum::BARANG, BusinessCategoryEnum::FNB])) {
             $merge["mikrotik"] = ProductEnum::MIKROTIK_NONE;
         }
-        if(in_array(Auth::user()->business->category->name,[BusinessCategoryEnum::JASA])){
+        if (in_array(Auth::user()->business->category->name, [BusinessCategoryEnum::JASA])) {
             $merge["is_using_stock"] = ProductEnum::IS_USING_STOCK_FALSE;
         }
 
@@ -50,11 +50,11 @@ class UpdateRequest extends FormRequest
             ],
             'is_using_stock' => [
                 'required',
-                'in:'.implode(",",[ProductEnum::IS_USING_STOCK_TRUE,ProductEnum::IS_USING_STOCK_FALSE])
+                'in:' . implode(",", [ProductEnum::IS_USING_STOCK_TRUE, ProductEnum::IS_USING_STOCK_FALSE])
             ],
             'status' => [
                 'required',
-                'in:'.implode(",",[ProductEnum::STATUS_TRUE,ProductEnum::STATUS_FALSE])
+                'in:' . implode(",", [ProductEnum::STATUS_TRUE, ProductEnum::STATUS_FALSE])
             ],
             'business_id' => [
                 'required',
@@ -66,13 +66,17 @@ class UpdateRequest extends FormRequest
             ],
             'mikrotik' => [
                 'required',
-                'in:'.implode(",",[ProductEnum::MIKROTIK_NONE,ProductEnum::MIKROTIK_HOTSPOT,ProductEnum::MIKROTIK_PPPOE])
+                'in:' . implode(",", [ProductEnum::MIKROTIK_NONE, ProductEnum::MIKROTIK_HOTSPOT, ProductEnum::MIKROTIK_PPPOE])
             ],
             'image' => [
                 'nullable',
                 'image',
                 'max:2048',
                 'mimes:jpeg,png,jpg,svg',
+            ],
+            'mikrotik_config_id' => [
+                (in_array($this->mikrotik, [ProductEnum::MIKROTIK_HOTSPOT, ProductEnum::MIKROTIK_PPPOE])) ? "required" : "nullable",
+                Rule::exists('mikrotik_configs', 'id'),
             ],
         ];
     }
@@ -100,6 +104,8 @@ class UpdateRequest extends FormRequest
             'image.image' => 'Gambar harus berupa gambar',
             'image.mimes' => 'Gambar harus berupa jpeg,png,jpg,svg',
             'image.max' => 'Gambar tidak boleh lebih dari 2MB',
+            'mikrotik_config_id.required' => 'Router harus dipilih',
+            'mikrotik_config_id.exists' => 'Router tidak ditemukan',
         ];
     }
 

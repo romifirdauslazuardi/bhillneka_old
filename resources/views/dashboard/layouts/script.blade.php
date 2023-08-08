@@ -146,7 +146,7 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);                   
+                            responseFailed(resp.message);
                         }
                         else{
                             responseSuccess(resp.message,"{{url()->current()}}");
@@ -183,7 +183,7 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);                   
+                            responseFailed(resp.message);
                         }
                         else{
                             responseSuccess(resp.message,null);
@@ -264,8 +264,8 @@
             },
             success : function(resp){
                 if(resp.success == false){
-                    responseFailed(resp.message);       
-                    $(selector+'').html("");            
+                    responseFailed(resp.message);
+                    $(selector+'').html("");
                 }
                 else{
                     let html = "";
@@ -307,8 +307,8 @@
             },
             success : function(resp){
                 if(resp.success == false){
-                    responseFailed(resp.message);       
-                    $(selector+'').html("");            
+                    responseFailed(resp.message);
+                    $(selector+'').html("");
                 }
                 else{
                     let html = "";
@@ -350,8 +350,8 @@
             },
             success : function(resp){
                 if(resp.success == false){
-                    responseFailed(resp.message);       
-                    $(selector+'').html("");            
+                    responseFailed(resp.message);
+                    $(selector+'').html("");
                 }
                 else{
                     let html = "";
@@ -393,8 +393,8 @@
             },
             success : function(resp){
                 if(resp.success == false){
-                    responseFailed(resp.message);       
-                    $(selector+'').html("");            
+                    responseFailed(resp.message);
+                    $(selector+'').html("");
                 }
                 else{
                     let html = "";
@@ -429,15 +429,15 @@
             method : "GET",
             dataType : "JSON",
             data : {
-                user_id : user_id    
+                user_id : user_id
             },
             beforeSend : function(){
                 return openLoader();
             },
             success : function(resp){
                 if(resp.success == false){
-                    responseFailed(resp.message);       
-                    $(selector+'').html("");            
+                    responseFailed(resp.message);
+                    $(selector+'').html("");
                 }
                 else{
                     let html = "";
@@ -472,15 +472,15 @@
             method : "GET",
             dataType : "JSON",
             data : {
-                business_id : business_id    
+                business_id : business_id
             },
             beforeSend : function(){
                 return openLoader();
             },
             success : function(resp){
                 if(resp.success == false){
-                    responseFailed(resp.message);       
-                    $(selector+'').html("");            
+                    responseFailed(resp.message);
+                    $(selector+'').html("");
                 }
                 else{
                     let html = "";
@@ -515,15 +515,15 @@
             method : "GET",
             dataType : "JSON",
             data : {
-                business_id : business_id    
+                business_id : business_id
             },
             beforeSend : function(){
                 return openLoader();
             },
             success : function(resp){
                 if(resp.success == false){
-                    responseFailed(resp.message);       
-                    $(selector+'').html("");            
+                    responseFailed(resp.message);
+                    $(selector+'').html("");
                 }
                 else{
                     let html = "";
@@ -552,9 +552,9 @@
         })
     }
 
-    function getProfilePppoe(selector,selectedName=null){
+    function getProfilePppoe(selector,mikrotik_id,selectedName=null){
         $.ajax({
-            url : '{{route("base.mikrotik-configs.profilePppoe")}}',
+            url : '{{route("base.mikrotik-configs.profilePppoe","_mikrotik_id_")}}'.replace("_mikrotik_id_", mikrotik_id),
             method : "GET",
             dataType : "JSON",
             beforeSend : function(){
@@ -562,8 +562,8 @@
             },
             success : function(resp){
                 if(resp.success == false){
-                    responseFailed(resp.message);       
-                    $(selector+'').html("");            
+                    responseFailed(resp.message);
+                    $(selector+'').html("");
                 }
                 else{
                     let html = "";
@@ -592,9 +592,9 @@
         })
     }
 
-    function getProfileHotspot(selector,selectedName=null){
+    function getProfileHotspot(selector,mikrotik_id,selectedName=null){
         $.ajax({
-            url : '{{route("base.mikrotik-configs.profileHotspot")}}',
+            url : '{{route("base.mikrotik-configs.profileHotspot","_mikrotik_id_")}}'.replace("_mikrotik_id_", mikrotik_id),
             method : "GET",
             dataType : "JSON",
             beforeSend : function(){
@@ -602,8 +602,8 @@
             },
             success : function(resp){
                 if(resp.success == false){
-                    responseFailed(resp.message);       
-                    $(selector+'').html("");            
+                    responseFailed(resp.message);
+                    $(selector+'').html("");
                 }
                 else{
                     let html = "";
@@ -632,9 +632,9 @@
         })
     }
 
-    function getServerHotspot(selector,selectedName=null){
+    function getServerHotspot(selector,mikrotik_id,selectedName=null){
         $.ajax({
-            url : '{{route("base.mikrotik-configs.serverHotspot")}}',
+            url : '{{route("base.mikrotik-configs.serverHotspot","_mikrotik_id_")}}'.replace("_mikrotik_id_", mikrotik_id),
             method : "GET",
             dataType : "JSON",
             beforeSend : function(){
@@ -642,8 +642,8 @@
             },
             success : function(resp){
                 if(resp.success == false){
-                    responseFailed(resp.message);       
-                    $(selector+'').html("");            
+                    responseFailed(resp.message);
+                    $(selector+'').html("");
                 }
                 else{
                     let html = "";
@@ -683,13 +683,13 @@
         sisa     		= split[0].length % 3,
         rupiah     		= split[0].substr(0, sisa),
         ribuan     		= split[0].substr(sisa).match(/\d{3}/gi);
-    
+
         // tambahkan titik jika yang di input sudah menjadi angka ribuan
         if(ribuan){
             separator = sisa ? '.' : '';
             rupiah += separator + ribuan.join('.');
         }
-    
+
         rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
         return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
     }

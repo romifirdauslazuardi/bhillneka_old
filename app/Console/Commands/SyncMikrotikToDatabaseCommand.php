@@ -37,85 +37,76 @@ class SyncMikrotikToDatabaseCommand extends Command
         DB::beginTransaction();
         try {
             $orders = new Order();
-            $orders = $orders->where("status",OrderEnum::STATUS_SUCCESS);
-            $orders = $orders->whereHas("business",function($query2){
-                $query2->whereHas("category",function($query3){
-                    $query3->where("name",BusinessCategoryEnum::MIKROTIK);
+            $orders = $orders->where("status", OrderEnum::STATUS_SUCCESS);
+            $orders = $orders->whereHas("business", function ($query2) {
+                $query2->whereHas("category", function ($query3) {
+                    $query3->where("name", BusinessCategoryEnum::MIKROTIK);
                 });
             });
-            $orders = $orders->orderBy("created_at","DESC");
+            $orders = $orders->orderBy("created_at", "DESC");
             $orders = $orders->get();
 
-            foreach($orders as $index => $order){
-                
-                foreach($order->items as $i => $orderItem){
-                    if(!empty($orderItem->order_mikrotik->mikrotik_id)){
-                        $mikrotikConfig = SettingHelper::mikrotikConfig($order->business_id,$order->business->user_id);
+            foreach ($orders as $index => $order) {
+
+                foreach ($order->items as $i => $orderItem) {
+                    if (!empty($orderItem->order_mikrotik->mikrotik_id)) {
+                        $mikrotikConfig = SettingHelper::mikrotikConfig($orderItem->product->mikrotik_config_id ?? null);
                         $ipConfig = $mikrotikConfig->ip ?? null;
                         $usernameConfig = $mikrotikConfig->username ?? null;
                         $passwordConfig = $mikrotikConfig->password ?? null;
                         $portConfig = $mikrotikConfig->port ?? null;
-                        
+
                         $connect = new RouterosAPI();
                         $connect->debug("false");
-        
-                        if($connect->connect($ipConfig,$usernameConfig,$passwordConfig,$portConfig)){
-                            if($orderItem->order_mikrotik->type == OrderMikrotikEnum::TYPE_PPPOE){
-                                $connect = $connect->comm('/ppp/secret/print',[
+
+                        if ($connect->connect($ipConfig, $usernameConfig, $passwordConfig, $portConfig)) {
+                            if ($orderItem->order_mikrotik->type == OrderMikrotikEnum::TYPE_PPPOE) {
+                                $connect = $connect->comm('/ppp/secret/print', [
+                                    '?.id' => $orderItem->order_mikrotik->mikrotik_id
+                                ]);
+                            } else {
+                                $connect = $connect->comm('/ip/hotspot/user/print', [
                                     '?.id' => $orderItem->order_mikrotik->mikrotik_id
                                 ]);
                             }
-                            else{
-                                $connect = $connect->comm('/ip/hotspot/user/print',[
-                                    '?.id' => $orderItem->order_mikrotik->mikrotik_id
-                                ]);
-                            }
-            
-                            if(isset($connect[0]["disabled"])){
-                                if($connect[0]["disabled"] == "false"){
-                                    if($orderItem->order_mikrotik->disabled != OrderMikrotikEnum::DISABED_NO){
+
+                            if (isset($connect[0]["disabled"])) {
+                                if ($connect[0]["disabled"] == "false") {
+                                    if ($orderItem->order_mikrotik->disabled != OrderMikrotikEnum::DISABED_NO) {
                                         $orderItem->order_mikrotik()->update([
                                             'disabled' => OrderMikrotikEnum::DISABED_NO
                                         ]);
                                     }
-                                    
-                                }
-                                else if($connect[0]["disabled"] == "true"){
-                                    if($orderItem->order_mikrotik->disabled != OrderMikrotikEnum::DISABLED_TRUE){
+                                } else if ($connect[0]["disabled"] == "true") {
+                                    if ($orderItem->order_mikrotik->disabled != OrderMikrotikEnum::DISABLED_TRUE) {
                                         $orderItem->order_mikrotik()->update([
                                             'disabled' => OrderMikrotikEnum::DISABLED_TRUE
                                         ]);
                                     }
                                 }
-                            }
-                            else{
+                            } else {
                                 $orderItem->order_mikrotik()->update([
                                     'disabled' => OrderMikrotikEnum::DISABLED_TRUE
                                 ]);
                             }
                         }
-                    }
-                    else{
-                        if($orderItem->order_mikrotik->disabled != OrderMikrotikEnum::DISABLED_TRUE){
+                    } else {
+                        if ($orderItem->order_mikrotik->disabled != OrderMikrotikEnum::DISABLED_TRUE) {
                             $orderItem->order_mikrotik()->update([
                                 'disabled' => OrderMikrotikEnum::DISABLED_TRUE
                             ]);
                         }
                     }
                 }
-                
             }
 
             DB::commit();
 
             return CommandAlias::SUCCESS;
-
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::emergency($th->getMessage());
             return CommandAlias::FAILURE;
         }
-
-        
     }
 }

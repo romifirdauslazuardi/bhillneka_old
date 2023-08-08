@@ -96,6 +96,7 @@ class PaymentHelper
             $agenBank = $agenBank->where("status",UserBankEnum::STATUS_APPROVED);
             $agenBank = $agenBank->where("default",UserBankEnum::DEFAULT_TRUE);
             $agenBank = $agenBank->where("user_id",$order->user_id);
+            $agenBank = $agenBank->where("business_id",$order->business_id);
             $agenBank = $agenBank->orderBy("created_at","DESC");
             $agenBank = $agenBank->first();
 

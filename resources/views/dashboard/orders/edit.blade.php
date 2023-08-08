@@ -189,18 +189,15 @@
                                                                                 <div class="form-group mb-3">
                                                                                     <label>Service<span class="text-danger">*</span></label>
                                                                                     <select class="form-control service" name="repeater[{{$index}}][service]" style="width:100%">
-                                                                                        <option value="pppoe">PPPOE</option>
+                                                                                        <option value="any">any</option>
                                                                                     </select>
                                                                                 </div>
                                                                             </div>
                                                                             <div class="col-lg-6">
                                                                                 <div class="form-group mb-3">
                                                                                     <label>Profile<span class="text-danger">*</span></label>
-                                                                                    <select class="form-control profile-{{$index}}" style="width:100%" name="repeater[{{$index}}][profile]">
+                                                                                    <select class="form-control profile-{{$row->product_id}}" style="width:100%" name="repeater[{{$index}}][profile]">
                                                                                         <option value="">==Pilih Profile</option>
-                                                                                        @foreach($profilePppoe as $i => $v)
-                                                                                        <option value="{{$v['name']}}" @if($v['name'] == $row->order_mikrotik->profile) selected @endif>{{$v['name']}}</option>
-                                                                                        @endforeach
                                                                                     </select>
                                                                                 </div>
                                                                             </div>
@@ -234,7 +231,7 @@
                                                                             </div>
                                                                         </div>
                                                                         @endif
-                                                                        
+
                                                                         <div class="form-group mb-3">
                                                                             <label>Comment</label>
                                                                             <input type="text" class="form-control comment" placeholder="Comment" name="repeater[{{$index}}][comment]" value="{{$row->order_mikrotik->comment ?? null}}">
@@ -269,21 +266,15 @@
                                                                         </div>
                                                                         <div class="form-group mb-3">
                                                                             <label>Server<span class="text-danger">*</span></label>
-                                                                            <select class="form-control select2 server server-{{$index}}" style="width:100%" name="repeater[{{$index}}][server]">
+                                                                            <select class="form-control select2 server server-{{$row->product_id}}" style="width:100%" name="repeater[{{$index}}][server]">
                                                                                 <option value="">==Pilih Server</option>
-                                                                                @foreach($serverHotspot as $i => $v)
-                                                                                <option value="{{$v['name']}}" @if($v['name'] == $row->order_mikrotik->server) selected @endif>{{$v['name']}}</option>
-                                                                                @endforeach
                                                                             </select>
                                                                             <p class="text-info" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;"><small><i>Nama server akan ditampikan sebagai SSID</i></small></p>
                                                                         </div>
                                                                         <div class="form-group mb-3">
                                                                             <label>Profile<span class="text-danger">*</span></label>
-                                                                            <select class="form-control select2 profile profile-{{$index}}" style="width:100%" name="repeater[{{$index}}][profile]">
+                                                                            <select class="form-control select2 profile profile-{{$row->product_id}}" style="width:100%" name="repeater[{{$index}}][profile]">
                                                                                 <option value="">==Pilih Profile</option>
-                                                                                @foreach($profileHotspot as $i => $v)
-                                                                                <option value="{{$v['name']}}" @if($v['name'] == $row->order_mikrotik->profile) selected @endif>{{$v['name']}}</option>
-                                                                                @endforeach
                                                                             </select>
                                                                         </div>
                                                                         <div class="form-group mb-3">
@@ -437,7 +428,7 @@
     $(function(){
         $.datetimepicker.setDateFormatter('moment');
         $.datetimepicker.setLocale('id');
-        
+
         $('.datetimepicker').datetimepicker({
               format:'YYYY-MM-DD HH:mm:ss',
               formatTime:'HH:mm:ss',
@@ -453,6 +444,16 @@
             getCustomer('.select-customer','{{$result->business_id}}','{{$result->customer_id}}');
             getTable('.select-table','{{$result->business_id}}','{{$result->table_id}}');
         @endif
+
+        @foreach($result->items as $index => $row)
+            @if($row->product->mikrotik == \App\Enums\ProductEnum::MIKROTIK_PPPOE){
+                getProfilePppoe('.profile-'+'{{$row->product_id}}','{{$row->product->mikrotik_config_id ?? null}}','{{$row->order_mikrotik->profile ?? null}}');
+            }
+            @elseif($row->product->mikrotik == \App\Enums\ProductEnum::MIKROTIK_HOTSPOT){
+                getProfileHotspot('.profile-'+'{{$row->product_id}}','{{$row->product->mikrotik_config_id ?? null}}','{{$row->order_mikrotik->profile ?? null}}');
+                getServerHotspot('.server-'+'{{$row->product_id}}','{{$row->product->mikrotik_config_id ?? null}}','{{$row->order_mikrotik->server ?? null}}');
+            }
+        @endforeach
 
         $(document).on("click",".btn-show-product",function(e){
             e.preventDefault();
@@ -470,7 +471,7 @@
             else{
                 $('.display-general-customer').removeClass("d-none");
             }
-            
+
         });
 
         $(document).on("change",".select-type",function(e){
@@ -488,7 +489,7 @@
                 $('.display-due-date-status').removeClass("d-none");
                 $('.display-expired-month').removeClass("d-none").addClass("d-none");
             }
-            
+
         });
 
         $(document).on("click",".btn-select-product",function(e){
@@ -529,10 +530,10 @@
 
         $(document).on("keyup",".tbody-product-qty",function(e){
             e.preventDefault();
-            
+
             generateSubTotalRow($(this).parent().parent());
             generateTotal();
-            
+
         });
 
         $(document).on("keyup",".tbody-product-discount",function(e){
@@ -541,21 +542,21 @@
             let val = $(this).val();
 
             $(this).val(formatRupiah(val,undefined));
-            
+
             generateSubTotalRow($(this).parent().parent());
             generateTotal();
-            
+
         });
 
         $(document).on("keyup",".input-discount",function(e){
             e.preventDefault();
-            
+
             let val = $(this).val();
 
             $(this).val(formatRupiah(val,undefined));
 
             generateTotal();
-            
+
         });
 
         $(document).on("click",".btn-delete-product",function(e){
@@ -611,7 +612,7 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);                   
+                            responseFailed(resp.message);
                         }
                         else{
                             responseSuccess(resp.message,"{{route('dashboard.orders.index')}}");
@@ -646,8 +647,8 @@
             },
             success : function(resp){
                 if(resp.success == false){
-                    responseFailed(resp.message);       
-                    $('.tbody-modal-product').html('<tr><td class="text-center" colspan="7">Produk Tidak Ditemukan</td></tr>');         
+                    responseFailed(resp.message);
+                    $('.tbody-modal-product').html('<tr><td class="text-center" colspan="7">Produk Tidak Ditemukan</td></tr>');
                 }
                 else{
                     let html = "";
@@ -699,11 +700,11 @@
             },
             success : function(resp){
                 if(resp.success == false){
-                    responseFailed(resp.message);         
+                    responseFailed(resp.message);
                 }
                 else{
                     let index = 0;
-                    
+
                     $('.repeater-product').each(function(index,element){
                         index += 1;
                     });
@@ -751,14 +752,14 @@
                                                         <div class="form-group mb-3">
                                                             <label>Service<span class="text-danger">*</span></label>
                                                             <select class="form-control service" name="repeater[${index}][service]" style="width:100%">
-                                                                <option value="pppoe">PPPOE</option>
+                                                                <option value="any">any</option>
                                                             </select>
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6">
                                                         <div class="form-group mb-3">
                                                             <label>Profile<span class="text-danger">*</span></label>
-                                                            <select class="form-control profile-${index} select-profile-pppoe" style="width:100%" name="repeater[${index}][profile]">
+                                                            <select class="form-control profile-${resp.data.id} profile select-profile-pppoe" style="width:100%" name="repeater[${index}][profile]">
                                                                 <option value="">==Pilih Profile</option>
                                                             </select>
                                                         </div>
@@ -845,7 +846,7 @@
                                                 </div>
                                                 <div class="form-group mb-3">
                                                     <label>Profile<span class="text-danger">*</span></label>
-                                                    <select class="form-control select2 profile profile-${index}" style="width:100%" name="repeater[${index}][profile]">
+                                                    <select class="form-control select2 profile profile-${resp.data.id}" style="width:100%" name="repeater[${index}][profile]">
                                                         <option value="">==Pilih Profile</option>
                                                     </select>
                                                 </div>
@@ -871,7 +872,7 @@
                                                     <label>Comment</label>
                                                     <input type="text" class="form-control comment" placeholder="Comment" name="repeater[${index}][comment]" value="`+echo(resp.data.comment)+`">
                                                 </div>
-                                                
+
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
@@ -905,11 +906,11 @@
                         $('.tbody-product').append(html);
 
                         if(resp.data.mikrotik == '{{App\Enums\ProductEnum::MIKROTIK_PPPOE}}'){
-                            getProfilePppoe('.profile-'+index,resp.data.profile);
+                            getProfilePppoe('.profile-'+resp.data.id,resp.data.mikrotik_config_id,resp.data.profile);
                         }
                         else if(resp.data.mikrotik == '{{App\Enums\ProductEnum::MIKROTIK_HOTSPOT}}'){
-                            getProfileHotspot('.profile-'+index,resp.data.profile);
-                            getServerHotspot('.server-'+index,resp.data.server);
+                            getProfileHotspot('.profile-'+resp.data.id,resp.data.mikrotik_config_id,resp.data.profile);
+                            getServerHotspot('.server-'+resp.data.id,resp.data.mikrotik_config_id,resp.data.server);
                         }
                     }
 
@@ -966,11 +967,11 @@
         let total = 0;
         let discount = $('.input-discount').val();
         let total_discount = 0;
-        
+
         discount = discount.split(".").join("");
 
         discount = parseInt(discount);
-        
+
         if(isNaN(discount)){
             discount = 0;
         }
@@ -1010,11 +1011,11 @@
             subtotal = 0;
             total = subtotal;
         }
-        
+
         $('.input-subtotal').val(formatRupiah(subtotal,undefined));
         $('.input-total').val(formatRupiah(total,undefined));
         $('.text-total').html(formatRupiah(total,undefined));
-        
+
     }
 
     function sortTableProduct(){

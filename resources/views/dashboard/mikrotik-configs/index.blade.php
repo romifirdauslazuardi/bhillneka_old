@@ -39,6 +39,7 @@
                                 <thead>
                                     <th>Aksi</th>
                                     <th>No</th>
+                                    <th>Nama Router</th>
                                     <th>IP</th>
                                     <th>Username</th>
                                     <th>Password</th>
@@ -65,6 +66,7 @@
                                             </div>
                                         </td>
                                         <td>{{$table->firstItem() + $index}}</td>
+                                        <td>{{$row->name}}</td>
                                         <td>{{$row->ip}}</td>
                                         <td>{{$row->username}}</td>
                                         <td>{{$row->password}}</td>

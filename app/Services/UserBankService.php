@@ -176,8 +176,6 @@ class UserBankService extends BaseService
 
             $result = $this->userBank->findOrFail($id);
 
-            $oldStatus = $result->status;
-
             if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
                 $status = UserBankEnum::STATUS_WAITING_APPROVE;
 

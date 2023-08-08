@@ -67,7 +67,8 @@ class OrderDueDateMikrotikExpiredCommand extends Command
                 $ifOrderAgainSuccess = false;
                 
                 if($checkOtherOrder){
-                    $dateCustomPlusDay = date("Y-m-d",strtotime($checkOtherOrder->created_at." + ".($order->repeat_order_at)." day"));
+                    $dateCustomPlusDay = date("Y-m",strtotime($checkOtherOrder->created_at." + 1 month"));
+                    $dateCustomPlusDay = $dateCustomPlusDay."-".$checkOtherOrder->repeat_order_at;
 
                     if(date("Y-m-d") <= $dateCustomPlusDay){
                         $ifOrderAgainSuccess = true;
@@ -75,9 +76,10 @@ class OrderDueDateMikrotikExpiredCommand extends Command
                 }
 
                 if(!empty($order->repeat_order_at) && $ifOrderAgainSuccess == false){
-                    $dateExpired = date("Y-m-d",strtotime($order->created_at." + ".($order->repeat_order_at+1)." day"));
-
-                    if($dateExpired == date("Y-m-d")){
+                    $dateRepeatAtPlus1 = date("Y-m",strtotime($order->created_at));
+                    $dateRepeatAtPlus1 = $dateRepeatAtPlus1."-".($order->repeat_order_at+1);
+                    
+                    if($dateRepeatAtPlus1 == date("Y-m-d")){
                         foreach($order->items as $i => $value){
                             self::disabledMikrotik($value);
                         }
@@ -110,7 +112,7 @@ class OrderDueDateMikrotikExpiredCommand extends Command
     }
 
     private function disabledMikrotik($orderItem){
-        $mikrotikConfig = SettingHelper::mikrotikConfig($orderItem->order->business_id ?? null,$orderItem->order->business->user_id ?? null);
+        $mikrotikConfig = SettingHelper::mikrotikConfig($orderItem->product->mikrotik_config_id ?? null);
         $ip = $mikrotikConfig->ip ?? null;
         $username = $mikrotikConfig->username ?? null;
         $password = $mikrotikConfig->password ?? null;

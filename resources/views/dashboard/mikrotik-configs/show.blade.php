@@ -26,7 +26,25 @@
                 <h5 class="card-title mb-3">Informasi Data Pengaturan Mikrotik</h5>
                 <div class="row">
                     <div class="col-12">
-    
+
+                        <div class="row mb-2">
+                            <div class="col-md-3">
+                                Nama Router
+                            </div>
+                            <div class="col-md-8">
+                                : {{$result->name}}
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-3">
+                                Deskripsi
+                            </div>
+                            <div class="col-md-8">
+                                : {{$result->description}}
+                            </div>
+                        </div>
+
                         <div class="row mb-2">
                             <div class="col-md-3">
                                 IP

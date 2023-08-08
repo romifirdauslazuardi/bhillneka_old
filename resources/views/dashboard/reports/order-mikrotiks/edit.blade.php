@@ -44,7 +44,7 @@
                             <label class="col-md-3 col-form-label">Service<span class="text-danger">*</span></label>
                             <div class="col-md-9">
                                 <select class="form-control" name="service" >
-                                    <option value="pppoe">PPPOE</option>
+                                    <option value="any">any</option>
                                 </select>
                             </div>
                         </div>
@@ -148,10 +148,10 @@
         $('button[type="submit"]').attr("disabled",false);
 
         @if($result->type == \App\Enums\OrderMikrotikEnum::TYPE_PPPOE)
-            getProfilePppoe('.select-profile','{{$result->profile}}');
+            getProfilePppoe('.select-profile','{{ $result->order_item->product->mikrotik_config_id ?? null }}','{{$result->profile}}');
         @else
-            getProfileHotspot('.select-profile','{{$result->profile}}');
-            getServerHotspot('.select-server','{{$result->server}}');
+            getProfileHotspot('.select-profile','{{ $result->order_item->product->mikrotik_config_id ?? null }}','{{$result->profile}}');
+            getServerHotspot('.select-server','{{ $result->order_item->product->mikrotik_config_id ?? null }}','{{$result->server}}');
         @endif
 
         $(document).on('submit','#frmUpdate',function(e){
@@ -170,7 +170,7 @@
                     },
                     success : function(resp){
                         if(resp.success == false){
-                            responseFailed(resp.message);                   
+                            responseFailed(resp.message);
                         }
                         else{
                             responseSuccess(resp.message,"{{route('dashboard.reports.order-mikrotiks.index')}}");
