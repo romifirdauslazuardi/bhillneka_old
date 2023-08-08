@@ -11,10 +11,13 @@ use App\Services\OrderService;
 use App\Services\ProviderService;
 use App\Services\CartService;
 use Illuminate\Http\Request;
+use App\Traits\HasSeo;
 use Log;
 
 class BuyProductController extends Controller
 {
+    use HasSeo;
+
     protected $route;
     protected $view;
     protected $productService;
@@ -47,6 +50,14 @@ class BuyProductController extends Controller
 
         $providers = $this->providerService->index(new Request(['status' => ProviderEnum::STATUS_TRUE]),false);
         $providers = $providers->data;
+
+        $this->seo(
+            title: $result->name,
+            description: $result->description,
+            keywords: $result->name,
+            url: null,
+            image: (!empty($result->image)) ? asset($result->image) : null,
+        );
 
         $data = [
             'result' => $result,

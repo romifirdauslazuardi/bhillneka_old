@@ -14,10 +14,13 @@ use App\Http\Requests\Cart\StoreRequest;
 use App\Http\Requests\Cart\UpdateRequest;
 use App\Services\CartService;
 use Illuminate\Http\Request;
+use App\Traits\HasSeo;
 use Cart;
 
 class ShopController extends Controller
 {
+    use HasSeo;
+
     protected $route;
     protected $view;
     protected $productService;
@@ -83,6 +86,10 @@ class ShopController extends Controller
         $carts = $carts->data;
 
         $fnb_type = OrderEnum::fnb_type();
+
+        $this->seo(
+            title: "Katalog",
+        );
 
         $data = [
             'products' => $products,

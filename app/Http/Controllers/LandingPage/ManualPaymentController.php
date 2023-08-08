@@ -7,10 +7,13 @@ use App\Enums\ProviderEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\ProofOrderRequest;
 use App\Services\OrderService;
+use App\Traits\HasSeo;
 use Log;
 
 class ManualPaymentController extends Controller
 {
+    use HasSeo;
+
     protected $route;
     protected $view;
     protected $orderService;
@@ -39,6 +42,10 @@ class ManualPaymentController extends Controller
             alert()->error('Gagal', "Status order tidak valid");
             return redirect()->route('landing-page.home.index')->withInput();
         }
+
+        $this->seo(
+            title: "Pembayaran Manual",
+        );
 
         $data = [
             'result' => $result

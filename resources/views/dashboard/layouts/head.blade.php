@@ -9,10 +9,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="{{\SettingHelper::settings('dashboard', 'description')}}" />
 <meta name="keywords" content="{{\SettingHelper::settings('dashboard', 'keyword')}}" />
-<meta name="author" content="Shreethemes" />
-<meta name="email" content="support@shreethemes.in" />
-<meta name="website" content="https://shreethemes.in" />
-<meta name="Version" content="v4.7.0" />
 
 <!-- favicon -->
 <link rel="shortcut icon" href="{{!empty(\SettingHelper::settings('dashboard', 'favicon')) ? asset(\SettingHelper::settings('dashboard', 'favicon')) : URL::to('/').'/templates/dashboard/assets/images/favicon.ico'}}" />

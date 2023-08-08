@@ -9,9 +9,12 @@ use App\Http\Requests\Order\UpdateProviderRequest;
 use Illuminate\Http\Request;
 use App\Services\OrderService;
 use App\Services\ProviderService;
+use App\Traits\HasSeo;
 
 class OrderController extends Controller
 {
+    use HasSeo;
+
     protected $route;
     protected $view;
     protected $orderService;
@@ -48,6 +51,10 @@ class OrderController extends Controller
                     }
                 }
             }
+
+            $this->seo(
+                title: "Pembelian",
+            );
 
             $data = [
                 'result' => $result,

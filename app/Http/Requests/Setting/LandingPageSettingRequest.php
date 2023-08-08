@@ -30,15 +30,6 @@ class LandingPageSettingRequest extends FormRequest
             'phone' => [
                 'required'
             ],
-            'instagram' => [
-                'nullable'
-            ],
-            'facebook' => [
-                'nullable'
-            ],
-            'twitter' => [
-                'nullable'
-            ],
             'logo' => [
                 'nullable',
                 'image',

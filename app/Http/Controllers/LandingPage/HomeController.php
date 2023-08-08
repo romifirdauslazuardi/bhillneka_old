@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\LandingPage;
 
+use App\Helpers\SettingHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\WhyUsService;
@@ -10,9 +11,12 @@ use App\Services\FaqService;
 use App\Services\OurServiceService;
 use App\Services\DashboardService;
 use App\Services\PartnerService;
+use App\Traits\HasSeo;
 
 class HomeController extends Controller
 {
+    use HasSeo;
+
     protected $route;
     protected $view;
     protected $whyUsService;
@@ -53,6 +57,14 @@ class HomeController extends Controller
         $totalVisitor = $this->dashboardService->totalVisitor();
         
         $totalOrderSuccess = $this->dashboardService->totalOrderSuccess();
+
+        $this->seo(
+            title: SettingHelper::settings("landing_page", "title"),
+            description: SettingHelper::settings("landing_page", "description"),
+            keywords: SettingHelper::settings("landing_page", "keyword"),
+            url: null,
+            image: SettingHelper::settings("landing_page", "logo")
+        );
 
         $data = [
             'whyUs' => $whyUs,

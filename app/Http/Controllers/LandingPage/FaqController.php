@@ -5,9 +5,12 @@ namespace App\Http\Controllers\LandingPage;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\FaqService;
+use App\Traits\HasSeo;
 
 class FaqController extends Controller
 {
+    use HasSeo;
+
     protected $route;
     protected $view;
     protected $faqService;
@@ -20,13 +23,17 @@ class FaqController extends Controller
     }
 
     public function index(Request $request){
-
+        
         $table = $this->faqService->index($request,false);
         if (!$table->success) {
             alert()->error('Gagal', $table->message);
             return redirect()->route('landing-page.home.index')->withInput();
         }
         $table = $table->data;
+
+        $this->seo(
+            title: "Faq",
+        );
 
         $data = [
             'table' => $table

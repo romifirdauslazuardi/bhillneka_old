@@ -8,11 +8,14 @@ use App\Helpers\ResponseHelper;
 use App\Http\Requests\LandingPage\Contact\TicketRequest;
 use App\Mail\TicketMail;
 use App\Settings\LandingPageSetting;
+use App\Traits\HasSeo;
 use Mail;
 use Log;
 
 class ContactUsController extends Controller
 {
+    use HasSeo;
+
     protected $route;
     protected $view;
 
@@ -23,6 +26,11 @@ class ContactUsController extends Controller
     }
 
     public function index(){
+        
+        $this->seo(
+            title: "Hubungi Kami",
+        );
+
         return view($this->view."index");
     }
 

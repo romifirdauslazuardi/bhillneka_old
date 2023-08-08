@@ -7,8 +7,8 @@
 @endif
 </title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="{{\SettingHelper::settings('landing_page', 'description')}}">
-<meta name="keywords" content="{{\SettingHelper::settings('landing_page', 'keyword')}}">
+
+{!! SEO::generate() !!}
 
 <!-- favicon -->
 <link rel="shortcut icon" href="{{!empty(\SettingHelper::settings('landing_page', 'favicon')) ? asset(\SettingHelper::settings('landing_page', 'favicon')) : URL::to('/').'/templates/landing-page/assets/images/favicon.ico'}}">

@@ -115,10 +115,7 @@ class MikrotikConfigService extends BaseService
                 return $this->response(false, "Koneksi dengan mikrotik gagal. Silahkan cek konfigurasi anda");
             }
 
-            $create = $this->mikrotikConfig->updateOrCreate([
-                'user_id' => $user_id,
-                'business_id' => $business_id,
-            ], [
+            $create = $this->mikrotikConfig->create([
                 'name' => $name,
                 'description' => $description,
                 'ip' => $ip,
