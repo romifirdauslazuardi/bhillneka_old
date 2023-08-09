@@ -92,6 +92,15 @@
 
                         <div class="row mb-2">
                             <div class="col-md-3">
+                                Nama Usaha
+                            </div>
+                            <div class="col-md-8">
+                                : {{$result->business->name ?? null}}
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-3">
                                 Status
                             </div>
                             <div class="col-md-8">
