@@ -55,6 +55,11 @@ class UserBankService extends BaseService
         if(isset($status)){
             $table = $table->where("status",$status);
         }
+        if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
+            $table = $table->whereHas("user",function($query2){
+                $query2->role([RoleEnum::AGEN]);
+            });
+        }
         $table = $table->orderBy('created_at', 'DESC');
 
         if ($paginate) {
@@ -174,17 +179,28 @@ class UserBankService extends BaseService
             $bank_settlement_id = (empty($request->bank_settlement_id)) ? null : trim(strip_tags($request->bank_settlement_id));
             $branch = (empty($request->branch)) ? null : trim(strip_tags($request->branch));
             $business_id = (empty($request->business_id)) ? null : trim(strip_tags($request->business_id));
-
+            
             $result = $this->userBank->findOrFail($id);
 
+            $oldName = $result->name;
+            $oldNumber = $result->number;
+            $oldBankId = $result->bank_id;
+            $oldBranch = $result->branch;
+            $oldStatus = $result->status;
+
             if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
-                $status = UserBankEnum::STATUS_WAITING_APPROVE;
+                if($oldName != $name || $oldNumber != $number || $oldBankId != $bank_id || $oldBranch != $branch){
+                    $status = UserBankEnum::STATUS_WAITING_APPROVE;
 
-                $owners = $this->user;
-                $owners = $owners->role([RoleEnum::OWNER]);
-                $owners = $owners->get();
+                    $owners = $this->user;
+                    $owners = $owners->role([RoleEnum::OWNER]);
+                    $owners = $owners->get();
 
-                Notification::send($owners,new UserBankNotification(route('dashboard.user-banks.show',$result->id),"Perubahan Data Rekening","Terdapat perubahan rekening baru dari ".Auth::user()->name.". Silahkan approve / reject perubahan ini"));
+                    Notification::send($owners,new UserBankNotification(route('dashboard.user-banks.show',$result->id),"Perubahan Data Rekening","Terdapat perubahan rekening baru dari ".Auth::user()->name.". Silahkan approve / reject perubahan ini"));
+                }
+                else{
+                    $status  = $result->status;
+                }
             }            
 
             $result->update([
@@ -213,7 +229,7 @@ class UserBankService extends BaseService
                 }
             }
 
-            if($status == UserBankEnum::STATUS_APPROVED){
+            if($status == UserBankEnum::STATUS_APPROVED && $oldStatus != $status){
                 if($result->user->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
 
                     $title = "Aktivasi Rekening Berhasil";
@@ -226,7 +242,7 @@ class UserBankService extends BaseService
                     WhatsappHelper::send($result->user->phone,$result->user->name,["title" => $title ,"message" => $message],true);
                 }
             }
-            else if($status == UserBankEnum::STATUS_REJECTED){
+            else if($status == UserBankEnum::STATUS_REJECTED && $oldStatus != $status){
                 if($result->user->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
 
                     $title = "Aktivasi Rekening Gagal";

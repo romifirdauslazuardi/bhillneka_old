@@ -18,7 +18,6 @@ class UpdateRequest extends FormRequest
         if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
             $merge["business_id"] = Auth::user()->business_id;
             $merge["user_id"] = Auth::user()->business->user_id ?? null;
-            $merge["status"] = UserBankEnum::STATUS_WAITING_APPROVE;
         }
         $this->merge($merge);
     }
