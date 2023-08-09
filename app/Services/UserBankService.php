@@ -140,6 +140,7 @@ class UserBankService extends BaseService
                 $disabledOtherBank = $this->userBank;
                 $disabledOtherBank = $disabledOtherBank->where("id","!=",$create->id);
                 $disabledOtherBank = $disabledOtherBank->where("user_id",$create->user_id);
+                $disabledOtherBank = $disabledOtherBank->where("business_id",$create->business_id);
                 $disabledOtherBank = $disabledOtherBank->get();
 
                 foreach($disabledOtherBank as $index => $row){
@@ -202,6 +203,7 @@ class UserBankService extends BaseService
                 $disabledOtherBank = $this->userBank;
                 $disabledOtherBank = $disabledOtherBank->where("id","!=",$result->id);
                 $disabledOtherBank = $disabledOtherBank->where("user_id",$result->user_id);
+                $disabledOtherBank = $disabledOtherBank->where("business_id",$result->business_id);
                 $disabledOtherBank = $disabledOtherBank->get();
 
                 foreach($disabledOtherBank as $index => $row){
