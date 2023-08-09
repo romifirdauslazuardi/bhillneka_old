@@ -20,7 +20,7 @@
 
             @if((Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER,\App\Enums\RoleEnum::AGEN,\App\Enums\RoleEnum::ADMIN_AGEN]) && !empty(Auth::user()->business_id)))
             <li>
-                <li><a href="{{route('dashboard.orders.create')}}"><i class="fa fa-plus"></i>Buat Order</a></li>
+                <li><a href="{{(\SettingHelper::hasBankActive()==false) ? '#' : route('dashboard.orders.create')}}" class="{{(\SettingHelper::hasBankActive()==false) ? 'hasBankNonActive' : ''}}"><i class="fa fa-{{(\SettingHelper::hasBankActive()==false) ? 'lock' : 'plus'}"></i>Buat Order</a></li>
             </li>
             @endif
 
