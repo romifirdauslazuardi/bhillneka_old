@@ -25,25 +25,6 @@ class PartnerController extends Controller
         $this->route = "dashboard.landing-page.partners.";
         $this->view = "dashboard.landing-page.partners.";
         $this->partnerService = new PartnerService();
-
-        $this->middleware(function ($request, $next) {
-            if(empty(Auth::user()->business_id)){
-                alert()->error('Gagal', "Bisnis page belum diaktifkan");
-                return redirect()->route("dashboard.index");
-            }
-            return $next($request);
-        },['only' => ['create','edit','store','destroy']]);
-
-        $this->middleware(function ($request, $next) {
-            if(Auth::user()->hasRole([
-                RoleEnum::AGEN,
-                RoleEnum::ADMIN_AGEN]) 
-            && empty(Auth::user()->business_id)){
-                alert()->error('Gagal', "Bisnis page belum diaktifkan");
-                return redirect()->route("dashboard.index");
-            }
-            return $next($request);
-        },['only' => ['index','show','create','store']]);
     }
 
     public function index(Request $request)
