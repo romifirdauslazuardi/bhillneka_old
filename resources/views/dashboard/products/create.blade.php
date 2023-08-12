@@ -154,7 +154,6 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        @if(in_array(Auth::user()->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                                         <div class="form-group row mb-3">
                                             <label class="col-md-3 col-form-label">Apakah Produk Stok ? <span class="text-danger">*</span></label>
                                             <div class="col-md-9">
@@ -174,7 +173,6 @@
                                                 <input type="number" class="form-control" name="qty" placeholder="Stok Awal" value="{{old('qty')}}" >
                                             </div>
                                         </div>
-                                        @endif
                                     </div>
                                 </div>
                             </div>

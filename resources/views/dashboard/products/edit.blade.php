@@ -154,7 +154,6 @@
                                             </select>
                                         </div>
                                     </div>
-                                    @if(in_array($result->business->category->name ?? null,[\App\Enums\BusinessCategoryEnum::BARANG,\App\Enums\BusinessCategoryEnum::FNB,\App\Enums\BusinessCategoryEnum::MIKROTIK]))
                                     <div class="form-group row mb-3">
                                         <label class="col-md-3 col-form-label">Apakah Produk Stok ? <span class="text-danger">*</span></label>
                                         <div class="col-md-9">
@@ -166,7 +165,6 @@
                                             </select>
                                         </div>
                                     </div>
-                                    @endif
                                 </div>
                             </div>
                         </div>

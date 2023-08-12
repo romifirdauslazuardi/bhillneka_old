@@ -39,7 +39,7 @@ trait HasSeo
         if (!empty($image)) {
             SEOTools::addImages($image);
         } else {
-            SEOTools::addImages(asset('templates/dashboard/assets/images/logo-icon.png'));
+            SEOTools::addImages(asset('templates/landing-page/assets/images/logo-dark.png'));
         }
         if (!empty($twitterUsername)) {
             SEOTools::twitter()->setSite($twitterUsername);
