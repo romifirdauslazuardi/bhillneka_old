@@ -57,7 +57,7 @@ class RegisterService extends BaseService
 
             DB::commit();
 
-            return $this->response(true, "Register berhasil");
+            return $this->response(true, "Register berhasil. Silahkan cek email anda untuk verifikasi akun");
         } catch (\Throwable $th) {
             DB::rollback();
             Log::emergency($th->getMessage());
