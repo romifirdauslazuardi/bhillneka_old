@@ -126,7 +126,7 @@
                         <div class="card border-0 rounded shadow p-4">
                             <h5 class="card-title"><b>Grand Total</b></h5>
                             <h1><b class="text-total">{{number_format($result->totalNeto(),0,',','.')}}</b></h1>
-                            <p><small><i><i class="fa fa-info-circle"></i> Grand total belum dipotongan biaya layanan & aplikasi</i></small></p>
+                            <p><small><i><i class="fa fa-info-circle"></i> Grand total belum dipotong biaya layanan & aplikasi</i></small></p>
                         </div>
                     </div>
                 </div>
@@ -580,7 +580,7 @@
             $(this).next().modal("show");
         });
 
-        $(document).on("change",".autouserpassword",function(e){
+        $(document).on("change",".auto_userpassword",function(e){
             e.preventDefault();
 
             let val = $(this).val();
@@ -823,7 +823,7 @@
                                             <div class="modal-body">
                                                 <div class="form-group mb-3">
                                                     <label>Jenis Pengisian Username dan Password<span class="text-danger">*</span></label>
-                                                    <select class="form-control autouserpassword" name="repeater[${index}][auto_userpassword]">
+                                                    <select class="form-control auto_userpassword" name="repeater[${index}][auto_userpassword]">
                                                         <option value="">==Pilih Jenis Pengisian Username dan Password==</option>
                                                         <option value="`+'{{\App\Enums\OrderMikrotikEnum::AUTO_USERPASSWORD_TRUE}}'+`">Otomatis</option>
                                                         <option value="`+'{{\App\Enums\OrderMikrotikEnum::AUTO_USERPASSWORD_FALSE}}'+`">Input Manual</option>

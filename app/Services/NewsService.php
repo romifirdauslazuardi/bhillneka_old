@@ -94,12 +94,11 @@ class NewsService extends BaseService
             if(Auth::user()->hasRole([RoleEnum::AGEN,RoleEnum::ADMIN_AGEN])){
                 
                 $check5xSend = $this->news;
-                $check5xSend = $check5xSend->whereDate("created_at",">=",date("Y-m")."-1");
-                $check5xSend = $check5xSend->whereDate("created_at","<=",date("Y-m-t"));
+                $check5xSend = $check5xSend->whereMonth("created_at",date("m"));
                 $check5xSend = $check5xSend->where("business_id",$business_id);
                 $check5xSend = $check5xSend->count();
 
-                if($check5xSend >= 5){
+                if($check5xSend >= 6){
                     DB::rollBack();
                     return $this->response(false,'Anda mencapai limit pengiriman pesan. Maksimal pengiriman pesan 5x dalam satu bulan');
                 }

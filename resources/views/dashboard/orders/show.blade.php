@@ -125,7 +125,7 @@
                         <div class="card border-0 rounded shadow p-4">
                             <h5 class="card-title"><b>Grand Total</b></h5>
                             <h1 style="margin-top: 0;"><b class="text-total">{{number_format($result->totalNeto(),0,',','.')}}</b></h1>
-                            <p><small><i><i class="fa fa-info-circle"></i> Grand total belum dipotongan biaya layanan & aplikasi</i></small></p>
+                            <p><small><i><i class="fa fa-info-circle"></i> Grand total belum dipotong biaya layanan & aplikasi</i></small></p>
                         </div>
                     </div>
                 </div>
