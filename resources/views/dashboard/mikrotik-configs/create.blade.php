@@ -53,7 +53,7 @@
                         <div class="form-group row mb-3">
                             <label class="col-md-3 col-form-label">Password <span class="text-danger">*</span></label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" name="password" placeholder="Password" value="{{old('password')}}" >
+                                <input type="password" class="form-control" name="password" placeholder="Password" value="{{old('password')}}" >
                             </div>
                         </div>
                         <div class="form-group row mb-3">
