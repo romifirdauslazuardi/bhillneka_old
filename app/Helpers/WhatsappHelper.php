@@ -46,7 +46,7 @@ class WhatsappHelper
         }
     }
 
-    public static function sendWhatsappOrderTemplate($orderId, string $type = "pesanan")
+    public static function sendWhatsappOrderTemplate($orderId, string $type = "pesanan",$jatuhTempo=false)
     {
         $order = new Order();
         $order = $order->where("id", $orderId);
@@ -56,12 +56,14 @@ class WhatsappHelper
         if ($type == "pesanan") {
             if ($order->status == OrderEnum::STATUS_WAITING_PAYMENT) {
                 $differenceDay = DateHelper::differentDay($order->created_at, date("d F Y", strtotime($order->expired_date)));
-                if ($differenceDay == 7) {
-                    $message .= "Jatuh tempo kurang dari 7 hari. ";
-                } else if ($differenceDay == 5) {
-                    $message .= "Jatuh tempo kurang dari 5 hari. ";
-                } else if ($differenceDay == 2) {
-                    $message .= "Jatuh tempo kurang dari 2 hari. ";
+                if($jatuhTempo==true){
+                    if ($differenceDay == 7) {
+                        $message .= "Jatuh tempo kurang dari 7 hari. ";
+                    } else if ($differenceDay == 5) {
+                        $message .= "Jatuh tempo kurang dari 5 hari. ";
+                    } else if ($differenceDay == 2) {
+                        $message .= "Jatuh tempo kurang dari 2 hari. ";
+                    }
                 }
                 $message .= "Selesaikan Pembayaran Anda sebelum " . date("d F Y H:i:s", strtotime($order->expired_date)) . " WIB";
                 $message .= "\r\n";

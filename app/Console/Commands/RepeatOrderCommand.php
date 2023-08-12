@@ -182,7 +182,7 @@ class RepeatOrderCommand extends Command
 
                     OrderExpiredJob::dispatch($generateOrder->id)->delay(now()->addMinutes(10080+1));
 
-                    WhatsappHelper::sendWhatsappOrderTemplate($generateOrder->id,"pesanan");
+                    WhatsappHelper::sendWhatsappOrderTemplate($generateOrder->id,"pesanan",true);
                 }
             }
 

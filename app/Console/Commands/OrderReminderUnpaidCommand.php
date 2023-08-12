@@ -48,8 +48,7 @@ class OrderReminderUnpaidCommand extends Command
                     $dateMin2day = date("Y-m-d",strtotime($expiredDate." - 2 day"));
 
                     if($dateMin5day == date("Y-m-d") || $dateMin2day == date("Y-m-d") || $expiredDate == date("Y-m-d")){
-                        // WhatsappHelper::sendWhatsappOrderTemplate($order->id,"pesanan");
-                        Log::info("kene");
+                        WhatsappHelper::sendWhatsappOrderTemplate($order->id,"pesanan",true);
                     }
                 }
             }
