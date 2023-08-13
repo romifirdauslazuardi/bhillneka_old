@@ -73,7 +73,7 @@ class RepeatOrderCommand extends Command
                 }
                 
                 if(!empty($order->repeat_order_at) && $checkOtherOrder == 0){
-                    $dateRepeatAt = date("Y-m",strtotime($order->created_at));
+                    $dateRepeatAt = date("Y-m",strtotime($order->created_at." + 1 month"));
                     $dateRepeatAt = $dateRepeatAt."-".($order->repeat_order_at);
                     $date7minDay = date("Y-m-d",strtotime($dateRepeatAt." -7 day"));
 
