@@ -73,14 +73,14 @@
                                     !empty(Auth::user()->business_id)))
                             <li><a class="{{ getClass('dashboard.reports.incomes.index') }}"
                                     href="{{ \SettingHelper::hasBankActive() == false ? '#' : route('dashboard.reports.incomes.index') }}"><i
-                                        data-feather="{{ \SettingHelper::hasBankActive() == false ? 'lock' : 'bar-chart-2' }}"></i><span>Report</span></a>
+                                        data-feather="{{ \SettingHelper::hasBankActive() == false ? 'lock' : 'bar-chart-2' }}"></i><span>Sales</span></a>
                             </li>
                         @endif
                         @if (Auth::user()->hasRole([\App\Enums\RoleEnum::OWNER, \App\Enums\RoleEnum::AGEN, \App\Enums\RoleEnum::ADMIN_AGEN]) &&
                                 !empty(Auth::user()->business_id))
                             <li>
                                 <a class="{{ getclass('dashboard.orders.create') }}"
-                                    href="{{ \SettingHelper::hasBankActive() == false ? '#' : route('dashboard.orders.create') }}">
+                                    href="{{ \SettingHelper::hasBankActive() == false ? '#' : route('dashboard.orders.create2') }}">
                                     <i
                                         data-feather="{{ \SettingHelper::hasBankActive() == false ? 'lock' : 'hard-drive' }}"></i><span>POS</span>
                                 </a>

@@ -184,6 +184,7 @@ Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.a
     Route::group(["as" => "orders.", "prefix" => "orders", "middleware" => ["hasBankActive"]], function () {
         Route::get('/', 'OrderController@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::CUSTOMER])]);
         Route::get('/create', 'OrderController@create')->name("create")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+        Route::get('/create2', 'OrderController@create2')->name("create2")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
         Route::get('/{id}', 'OrderController@show')->name("show")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN, RoleEnum::CUSTOMER])]);
         Route::get('/{id}/edit', 'OrderController@edit')->name("edit")->middleware(['role:' . implode('|', [RoleEnum::OWNER])]);
         Route::post('/', 'OrderController@store')->name("store")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);

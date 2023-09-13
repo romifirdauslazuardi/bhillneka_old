@@ -85,9 +85,9 @@
 
 <body oncontextmenu="return false;">
     <input type="text" name="base_url" id="base_url" value="{{ url('/') }}" hidden>
-    <div id="global-loader">
+    {{-- <div id="global-loader">
         <div class="whirly-loader"> </div>
-    </div>
+    </div> --}}
     <!-- Main Wrapper -->
     <div class="main-wrapper">
         @include('dashboard.layouts.topbar')

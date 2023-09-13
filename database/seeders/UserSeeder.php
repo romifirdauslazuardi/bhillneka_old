@@ -32,7 +32,7 @@ class UserSeeder extends Seeder
         ]);
         $admin->assignRole(RoleEnum::ADMIN_AGEN);
         $agen = User::create([
-            "name" => "Owner",
+            "name" => "Agen",
             "email" => "agen@mail.com",
             "phone" => "082",
             "email_verified_at" => Carbon::now(),

@@ -1,0 +1,10 @@
+Rule
+1. uncomment code totalVisitor() di file app/Services/DashboardService.php
+
+
+Yang Ditambahkan
+
+1.duplikat pos
+-routes dashboard.php | Route::get('/create2', 'OrderController@create2')->name("create2")->middleware(['role:' . implode('|', [RoleEnum::OWNER, RoleEnum::AGEN, RoleEnum::ADMIN_AGEN])]);
+-controller | app\Http\Controllers\Dashboard\OrderController.php | method create2()
+-view | resources\views\dashboard\orders\create2.blade.php

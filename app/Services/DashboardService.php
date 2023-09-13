@@ -148,14 +148,15 @@ class DashboardService extends BaseService
     }
 
     public function totalVisitor(){
-        $table = Analytics::fetchMostVisitedPages(Period::months(6));
+        // $table = Analytics::fetchMostVisitedPages(Period::months(6));
 
-        $total = 0;
-        foreach($table as $index => $row){
-            $total += $row["screenPageViews"];
-        }
+        // $total = 0;
+        // foreach($table as $index => $row){
+        //     $total += $row["screenPageViews"];
+        // }
 
-        return $total;
+        // return $total;
+        return 0;
     }
 
     public function totalOrderSuccess(){

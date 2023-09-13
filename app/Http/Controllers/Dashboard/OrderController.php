@@ -2,29 +2,30 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use Log;
+use Auth;
+use Excel;
+use App\Enums\RoleEnum;
 use App\Enums\OrderEnum;
 use App\Enums\ProviderEnum;
-use App\Enums\RoleEnum;
 use App\Exports\OrderExport;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Services\UserService;
 use Illuminate\Http\Response;
+use App\Helpers\SettingHelper;
+use App\Services\OrderService;
+use App\Helpers\ResponseHelper;
+use App\Models\ProductCategory;
+use App\Services\BusinessService;
+use App\Services\ProviderService;
+use Illuminate\Support\Collection;
+use App\Http\Controllers\Controller;
+use App\Services\MikrotikConfigService;
 use App\Http\Requests\Order\StoreRequest;
 use App\Http\Requests\Order\UpdateRequest;
-use App\Services\UserService;
-use App\Services\ProviderService;
-use App\Services\OrderService;
-use App\Services\BusinessService;
-use App\Services\MikrotikConfigService;
-use App\Helpers\ResponseHelper;
-use App\Helpers\SettingHelper;
 use App\Http\Requests\Order\ProofOrderRequest;
-use App\Http\Requests\Order\UpdateProgressRequest;
 use App\Http\Requests\Order\UpdateStatusRequest;
-use Illuminate\Support\Collection;
-use Log;
-use Excel;
-use Auth;
+use App\Http\Requests\Order\UpdateProgressRequest;
 
 class OrderController extends Controller
 {
@@ -146,6 +147,30 @@ class OrderController extends Controller
         ];
 
         return view($this->view."create",$data);
+    }
+    public function create2()
+    {
+        $providers = $this->providerService->index(new Request(['status' => ProviderEnum::STATUS_TRUE]),false);
+        $providers = $providers->data;
+
+        foreach($providers as $index => $row){
+            if($row->type == ProviderEnum::TYPE_PAY_LATER){
+                unset($providers[$index]);
+            }
+        }
+
+        $type = OrderEnum::type();
+
+        $fnb_type = OrderEnum::fnb_type();
+
+        $data = [
+            'providers' => $providers,
+            'type' => $type,
+            'fnb_type' => $fnb_type,
+            'product_category'=>ProductCategory::all()
+        ];
+
+        return view($this->view."create2",$data);
     }
 
     public function show($id)
