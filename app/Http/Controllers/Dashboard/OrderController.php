@@ -167,7 +167,7 @@ class OrderController extends Controller
             'providers' => $providers,
             'type' => $type,
             'fnb_type' => $fnb_type,
-            'product_category'=>ProductCategory::all()
+            'product_category'=>ProductCategory::where('business_id',Auth::user()->business_id)->get()
         ];
 
         return view($this->view."create2",$data);
