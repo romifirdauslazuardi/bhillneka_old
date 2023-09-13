@@ -161,91 +161,69 @@
                         <h4>Order List</h4>
                         <h5>Transaction id : #65565</h5>
                     </div>
-                    <div class="actionproducts">
-                        <ul>
-                            <li>
-                                <a href="javascript:void(0);" class="deletebg confirm-text"><img
-                                        src="assets/img/icons/delete-2.svg" alt="img"></a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="false"
-                                    class="dropset">
-                                    <img src="assets/img/icons/ellipise1.svg" alt="img">
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton"
-                                    data-popper-placement="bottom-end">
-                                    <li>
-                                        <a href="#" class="dropdown-item">Action</a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="dropdown-item">Another Action</a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="dropdown-item">Something Elses</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
                 </div>
                 <div class="card card-order">
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col-12">
-                                <a href="javascript:void(0);" class="btn btn-adds" data-bs-toggle="modal"
-                                    data-bs-target="#create"><i class="fa fa-plus me-2"></i>Add Customer</a>
+                        <div class="form-group row mb-3">
+                            <label class="col-md-5 col-form-label">Tanggal </label>
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" placeholder="Tanggal"
+                                    value="{{ date('d-m-Y') }}" readonly disabled>
                             </div>
-                            <div class="col-lg-12">
-                                <div class="select-split ">
-                                    <div class="select-group w-100">
-                                        <select class="select select2-hidden-accessible" data-select2-id="1"
-                                            tabindex="-1" aria-hidden="true">
-                                            <option data-select2-id="3">Walk-in Customer</option>
-                                            <option>Chris Moris</option>
-                                        </select><span class="select2 select2-container select2-container--default"
-                                            dir="ltr" data-select2-id="2" style="width: 100%;"><span
-                                                class="selection"><span
-                                                    class="select2-selection select2-selection--single" role="combobox"
-                                                    aria-haspopup="true" aria-expanded="false" tabindex="0"
-                                                    aria-disabled="false" aria-labelledby="select2-qjex-container"><span
-                                                        class="select2-selection__rendered" id="select2-qjex-container"
-                                                        role="textbox" aria-readonly="true"
-                                                        title="Walk-in Customer">Walk-in
-                                                        Customer</span><span class="select2-selection__arrow"
-                                                        role="presentation"><b
-                                                            role="presentation"></b></span></span></span><span
-                                                class="dropdown-wrapper" aria-hidden="true"></span></span>
-                                    </div>
+                        </div>
+                        <div class="form-group row mb-3">
+                            <label class="col-md-5 col-form-label">Customer</label>
+                            <div class="col-md-7">
+                                <select class="form-control select2 select-customer" name="customer_id"
+                                    style="width: 100%;">
+                                    <option value="">==Umum==</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="display-general-customer">
+                            <div class="form-group row mb-3">
+                                <label class="col-md-5 col-form-label">Nama Customer</label>
+                                <div class="col-md-7">
+                                    <input type="text" class="form-control" name="customer_name"
+                                        placeholder="Nama Customer">
                                 </div>
                             </div>
-                            <div class="col-lg-12">
-                                <div class="select-split">
-                                    <div class="select-group w-100">
-                                        <select class="select select2-hidden-accessible" data-select2-id="4"
-                                            tabindex="-1" aria-hidden="true">
-                                            <option data-select2-id="6">Product </option>
-                                            <option>Barcode</option>
-                                        </select><span class="select2 select2-container select2-container--default"
-                                            dir="ltr" data-select2-id="5" style="width: 100%;"><span
-                                                class="selection"><span
-                                                    class="select2-selection select2-selection--single" role="combobox"
-                                                    aria-haspopup="true" aria-expanded="false" tabindex="0"
-                                                    aria-disabled="false" aria-labelledby="select2-w0zu-container"><span
-                                                        class="select2-selection__rendered" id="select2-w0zu-container"
-                                                        role="textbox" aria-readonly="true" title="Product ">Product
-                                                    </span><span class="select2-selection__arrow" role="presentation"><b
-                                                            role="presentation"></b></span></span></span><span
-                                                class="dropdown-wrapper" aria-hidden="true"></span></span>
-                                    </div>
+                            <div class="form-group row mb-3">
+                                <label class="col-md-5 col-form-label">Telp. Customer</label>
+                                <div class="col-md-7">
+                                    <input type="text" class="form-control" name="customer_phone"
+                                        placeholder="Telp. Customer">
                                 </div>
                             </div>
-                            <div class="col-12">
-                                <div class="text-end">
-                                    <a class="btn btn-scanner-set"><img src="assets/img/icons/scanner1.svg"
-                                            alt="img" class="me-2">Scan bardcode</a>
+                            <div class="form-group row mb-3">
+                                <label class="col-md-5 col-form-label">Email Customer</label>
+                                <div class="col-md-7">
+                                    <input type="email" class="form-control" name="customer_email"
+                                        placeholder="Email Customer">
                                 </div>
                             </div>
                         </div>
+                        @if (in_array(Auth::user()->business->category->name ?? null, [\App\Enums\BusinessCategoryEnum::FNB]))
+                            <div class="form-group row mb-3">
+                                <label class="col-md-5 col-form-label">Dine In/Take Away</label>
+                                <div class="col-md-7">
+                                    <select class="form-control select2" name="fnb_type" style="width: 100%;">
+                                        @foreach ($fnb_type as $index => $row)
+                                            <option value="{{ $index }}">{{ $row }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-3">
+                                <label class="col-md-5 col-form-label">Meja</label>
+                                <div class="col-md-7">
+                                    <select class="form-control select2 select-table" name="table_id"
+                                        style="width: 100%;">
+                                        <option value="">==Pilih Meja==</option>
+                                    </select>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                     <div class="split-card">
                     </div>
@@ -421,31 +399,6 @@
                         <div class="btn-totallabel">
                             <h5>Checkout</h5>
                             <h6>60.00$</h6>
-                        </div>
-                        <div class="btn-pos">
-                            <ul>
-                                <li>
-                                    <a class="btn"><img src="assets/img/icons/pause1.svg" alt="img"
-                                            class="me-1">Hold</a>
-                                </li>
-                                <li>
-                                    <a class="btn"><img src="assets/img/icons/edit-6.svg" alt="img"
-                                            class="me-1">Quotation</a>
-                                </li>
-                                <li>
-                                    <a class="btn"><img src="assets/img/icons/trash12.svg" alt="img"
-                                            class="me-1">Void</a>
-                                </li>
-                                <li>
-                                    <a class="btn"><img src="assets/img/icons/wallet1.svg" alt="img"
-                                            class="me-1">Payment</a>
-                                </li>
-                                <li>
-                                    <a class="btn" data-bs-toggle="modal" data-bs-target="#recents"><img
-                                            src="assets/img/icons/transcation.svg" alt="img" class="me-1">
-                                        Transaction</a>
-                                </li>
-                            </ul>
                         </div>
                     </div>
                 </div>
