@@ -43,7 +43,16 @@
             aspect-ratio: 1/1;
         }
 
-        .product_card {
+        .product_card .anjay,
+        .product_card img {
+            transition: 0.5s
+        }
+
+        .product_card:hover img {
+            transform: scale(140%);
+        }
+
+        .product_card .anjay {
             border: 1px solid transparent;
             transition: 0.5s
         }
@@ -52,12 +61,8 @@
             display: none
         }
 
-        .product_card img {
-            transition: 0.5s
-        }
-
-        .product_card:hover,
-        .product_card.active {
+        .product_card:hover .anjay,
+        .product_card.active .anjay {
             border: 1px solid blue;
         }
 
@@ -65,8 +70,16 @@
             display: block
         }
 
-        .product_card:hover img {
-            transform: scale(140%);
+        @media(max-width:768px) {
+            .product_card .anjay {
+                padding-left: 100px;
+                padding-right: 100px;
+            }
+
+            .product_card:hover .anjay {
+                padding-left: 98px;
+                padding-right: 98px;
+            }
         }
     </style>
 @endsection
@@ -113,9 +126,8 @@
             @foreach ($product_category as $index => $category)
                 <div class="prd_section row mt-4 {{ $index != 0 ? 'd-none' : '' }}" id="prdctg{{ $category->id }}">
                     @foreach ($category->products as $product)
-                        <div class="col col-sm-6 col-md-4 mb-4">
-                            <div class="product_card bg-white rounded overflow-hidden shadow-sm position-relative"
-                                id="product{{ $product->id }}">
+                        <div class="product_card col-12 col-md-4 mb-4 position-relative">
+                            <div class="anjay bg-white rounded overflow-hidden shadow-sm" id="product{{ $product->id }}">
                                 <div class="overflow-hidden square">
                                     <img src="{{ asset($product->image) }}"
                                         style="object-fit: cover; width: 100%; height: 100%;">
@@ -125,13 +137,13 @@
                                     <h6>{{ $product->name }}</h6>
                                     <p class="text-danger mt-2">Rp {{ number_format($product->price) }}</p>
                                 </div>
-                                <div class="position-absolute top-0 bg-primary text-white p-1 check_select">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="20"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" class="feather feather-check">
-                                        <path d="M20 6L9 17l-5-5"></path>
-                                    </svg>
-                                </div>
+                            </div>
+                            <div class="position-absolute top-0 bg-primary text-white p-1 check_select">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="feather feather-check">
+                                    <path d="M20 6L9 17l-5-5"></path>
+                                </svg>
                             </div>
                         </div>
                     @endforeach
