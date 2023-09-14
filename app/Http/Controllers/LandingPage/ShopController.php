@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers\LandingPage;
 
+use Cart;
+use App\Traits\HasSeo;
 use App\Enums\OrderEnum;
-use App\Http\Controllers\Controller;
+use App\Enums\ProductEnum;
+use App\Enums\ProviderEnum;
+use Illuminate\Http\Request;
+use App\Services\CartService;
+use App\Services\TableService;
+use App\Models\ProductCategory;
 use App\Services\ProductService;
 use App\Services\BusinessService;
-use App\Services\TableService;
 use App\Services\ProviderService;
-use App\Enums\ProviderEnum;
-use App\Enums\ProductEnum;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Cart\StoreRequest;
 use App\Http\Requests\Cart\UpdateRequest;
-use App\Services\CartService;
-use Illuminate\Http\Request;
-use App\Traits\HasSeo;
-use Cart;
 
 class ShopController extends Controller
 {
@@ -98,6 +100,7 @@ class ShopController extends Controller
             'providers' => $providers,
             'carts' => $carts,
             'fnb_type' => $fnb_type,
+            'product_category'=>ProductCategory::where('business_id',$business->id)->get()
         ];
 
         return view($this->view."index",$data);

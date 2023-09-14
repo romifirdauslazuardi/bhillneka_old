@@ -287,15 +287,7 @@
                                 </ul>
                             </div>
                             <div class="setvaluecash">
-
-                                <div class="form-group row mb-3">
-                                    <label>Jenis Transaksi</label>
-                                    <select class="form-control select2 select-type" name="type">
-                                        @foreach ($type as $index => $row)
-                                            <option value="{{ $index }}">{{ $row }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                <input type="hidden" name="type" value="1">
                                 <div class="display-due-date d-none">
                                     <div class="form-group row mb-3">
                                         <label>Jatuh Tempo Setiap Tanggal</label>
