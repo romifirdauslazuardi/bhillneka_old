@@ -127,7 +127,8 @@
                         @if ($category->products->count() > 0)
                             @foreach ($category->products as $product)
                                 <div class="product_card col-12 col-md-4 mb-4 position-relative"
-                                    data-id="{{ $product->id }}" data-code="{{ $product->code }}">
+                                    data-id="{{ $product->id }}" data-code="{{ $product->code }}"
+                                    id="product_card{{ $product->code }}">
                                     <div class="anjay bg-white rounded overflow-hidden shadow-sm"
                                         id="product{{ $product->id }}">
                                         <div class="overflow-hidden square">
@@ -172,8 +173,6 @@
                             Tambah</button>
                         <input type="text" class="form-control input-subtotal" placeholder="Sub Total" value="0"
                             readonly disabled>
-                        <input type="text" class="form-control input-discount" placeholder="Diskon" value="0"
-                            name="discount">
                         <input type="text" class="form-control input-total" placeholder="Grand Total" value="0"
                             readonly disabled>
                     </div>
@@ -272,15 +271,18 @@
                                 <ul>
                                     <li>
                                         <h5>Subtotal </h5>
-                                        <h6>55.00$</h6>
+                                        <h6 class="text-subtotal">0</h6>
                                     </li>
-                                    <li>
-                                        <h5>Tax </h5>
-                                        <h6>5.00$</h6>
+                                    <li class="form-group row">
+                                        <label class="col-md-5 col-form-label">Diskon</label>
+                                        <div class="col-md-7">
+                                            <input type="text" class="form-control input-discount"
+                                                placeholder="Diskon" value="0" name="discount">
+                                        </div>
                                     </li>
                                     <li class="total-value">
                                         <h5>Total </h5>
-                                        <h6>60.00$</h6>
+                                        <h6 class="text-total">0</h6>
                                     </li>
                                 </ul>
                             </div>
@@ -472,7 +474,7 @@
 
             });
 
-            $(document).on("keyup", ".tbody-product-qty", function(e) {
+            $(document).on("keyup input paste", ".tbody-product-qty", function(e) {
                 e.preventDefault();
 
                 generateSubTotalRow($(this).parent().parent());
@@ -480,7 +482,7 @@
 
             });
 
-            $(document).on("keyup", ".tbody-product-discount", function(e) {
+            $(document).on("keyup input paste", ".tbody-product-discount", function(e) {
                 e.preventDefault();
 
                 let val = $(this).val();
@@ -492,7 +494,7 @@
 
             });
 
-            $(document).on("keyup", ".input-discount", function(e) {
+            $(document).on("keyup input paste", ".input-discount", function(e) {
                 e.preventDefault();
 
                 let val = $(this).val();
@@ -916,7 +918,7 @@
                                     <td class="tbody-product-total">${formatRupiah(total,undefined)}</td>
                                     <td>
                                         ${config}
-                                        <a href="#" class="btn btn-danger btn-sm mr-2 mb-2 btn-delete-product" id="btn-delete-product${resp.data.code}">Hapus</a>
+                                        <a href="#" class="btn btn-danger btn-sm mr-2 mb-2 btn-delete-product" id="btn-delete-product${resp.data.code}" onclick="$('#product_card${resp.data.code}').removeClass('active')">Hapus</a>
                                     </td>
                                 </tr>
                         `;
@@ -1085,6 +1087,8 @@
 
             $('.input-subtotal').val(formatRupiah(subtotal, undefined));
             $('.input-total').val(formatRupiah(total, undefined));
+
+            $('.text-subtotal').html(formatRupiah(subtotal, undefined));
             $('.text-total').html(formatRupiah(total, undefined));
 
         }
