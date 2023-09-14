@@ -126,7 +126,8 @@
                     <div class="prd_section row mt-4 {{ $index != 0 ? 'd-none' : '' }}" id="prdctg{{ $category->id }}">
                         @if ($category->products->count() > 0)
                             @foreach ($category->products as $product)
-                                <div class="product_card col-12 col-md-4 mb-4 position-relative">
+                                <div class="product_card col-12 col-md-4 mb-4 position-relative"
+                                    data-id="{{ $product->id }}" data-code="{{ $product->code }}">
                                     <div class="anjay bg-white rounded overflow-hidden shadow-sm"
                                         id="product{{ $product->id }}">
                                         <div class="overflow-hidden square">
@@ -162,246 +163,183 @@
                         <h5>Transaction id : #65565</h5>
                     </div>
                 </div>
-                <div class="card card-order">
-                    <div class="card-body">
-                        <div class="form-group row mb-3">
-                            <label class="col-md-5 col-form-label">Tanggal </label>
-                            <div class="col-md-7">
-                                <input type="text" class="form-control" placeholder="Tanggal"
-                                    value="{{ date('d-m-Y') }}" readonly disabled>
-                            </div>
-                        </div>
-                        <div class="form-group row mb-3">
-                            <label class="col-md-5 col-form-label">Customer</label>
-                            <div class="col-md-7">
-                                <select class="form-control select2 select-customer" name="customer_id"
-                                    style="width: 100%;">
-                                    <option value="">==Umum==</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="display-general-customer">
+                <form action="{{ route('dashboard.orders.store') }}" id="frmStore" autocomplete="off">
+                    @csrf
+                    <div class="d-none">
+                        <input type="text" class="form-control code" placeholder="Pilih Produk">
+                        <input type="number" class="form-control input-qty" placeholder="Quantity" value="1">
+                        <button type="button" class="btn btn-primary btn-sm btn-submit-product"><i class="fa fa-plus"></i>
+                            Tambah</button>
+                        <input type="text" class="form-control input-subtotal" placeholder="Sub Total" value="0"
+                            readonly disabled>
+                        <input type="text" class="form-control input-discount" placeholder="Diskon" value="0"
+                            name="discount">
+                        <input type="text" class="form-control input-total" placeholder="Grand Total" value="0"
+                            readonly disabled>
+                    </div>
+
+                    <div class="card card-order">
+                        <div class="card-body">
                             <div class="form-group row mb-3">
-                                <label class="col-md-5 col-form-label">Nama Customer</label>
+                                <label class="col-md-5 col-form-label">Tanggal </label>
                                 <div class="col-md-7">
-                                    <input type="text" class="form-control" name="customer_name"
-                                        placeholder="Nama Customer">
+                                    <input type="text" class="form-control" placeholder="Tanggal"
+                                        value="{{ date('d-m-Y') }}" readonly disabled>
                                 </div>
                             </div>
                             <div class="form-group row mb-3">
-                                <label class="col-md-5 col-form-label">Telp. Customer</label>
+                                <label class="col-md-5 col-form-label">Customer</label>
                                 <div class="col-md-7">
-                                    <input type="text" class="form-control" name="customer_phone"
-                                        placeholder="Telp. Customer">
+                                    <select class="form-control select2 select-customer" name="customer_id"
+                                        style="width: 100%;">
+                                        <option value="">==Umum==</option>
+                                    </select>
                                 </div>
                             </div>
-                            <div class="form-group row mb-3">
-                                <label class="col-md-5 col-form-label">Email Customer</label>
-                                <div class="col-md-7">
-                                    <input type="email" class="form-control" name="customer_email"
-                                        placeholder="Email Customer">
+                            <div class="display-general-customer">
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-5 col-form-label">Nama Customer</label>
+                                    <div class="col-md-7">
+                                        <input type="text" class="form-control" name="customer_name"
+                                            placeholder="Nama Customer">
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-5 col-form-label">Telp. Customer</label>
+                                    <div class="col-md-7">
+                                        <input type="text" class="form-control" name="customer_phone"
+                                            placeholder="Telp. Customer">
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-5 col-form-label">Email Customer</label>
+                                    <div class="col-md-7">
+                                        <input type="email" class="form-control" name="customer_email"
+                                            placeholder="Email Customer">
+                                    </div>
+                                </div>
+                            </div>
+                            @if (in_array(Auth::user()->business->category->name ?? null, [\App\Enums\BusinessCategoryEnum::FNB]))
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-5 col-form-label">Dine In/Take Away</label>
+                                    <div class="col-md-7">
+                                        <select class="form-control select2" name="fnb_type" style="width: 100%;">
+                                            @foreach ($fnb_type as $index => $row)
+                                                <option value="{{ $index }}">{{ $row }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-5 col-form-label">Meja</label>
+                                    <div class="col-md-7">
+                                        <select class="form-control select2 select-table" name="table_id"
+                                            style="width: 100%;">
+                                            <option value="">==Pilih Meja==</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="split-card">
+                        </div>
+                        <div class="card-body pt-0 pb-4">
+                            <h6 class="card-title">Daftar Produk</h6>
+                            <div class="table-responsive">
+                                <div class="table">
+                                    <table class="table table-striped table-bordered">
+                                        <thead>
+                                            <th>No</th>
+                                            <th>Kode Produk</th>
+                                            <th>Nama Produk</th>
+                                            <th>Harga</th>
+                                            <th>Quantity</th>
+                                            <th>Diskon</th>
+                                            <th>Total</th>
+                                            <th>Aksi</th>
+                                        </thead>
+                                        <tbody class="tbody-product">
+
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
-                        @if (in_array(Auth::user()->business->category->name ?? null, [\App\Enums\BusinessCategoryEnum::FNB]))
-                            <div class="form-group row mb-3">
-                                <label class="col-md-5 col-form-label">Dine In/Take Away</label>
-                                <div class="col-md-7">
-                                    <select class="form-control select2" name="fnb_type" style="width: 100%;">
-                                        @foreach ($fnb_type as $index => $row)
+                        <div class="split-card">
+                        </div>
+                        <div class="card-body pt-0 pb-2">
+                            <div class="setvalue">
+                                <ul>
+                                    <li>
+                                        <h5>Subtotal </h5>
+                                        <h6>55.00$</h6>
+                                    </li>
+                                    <li>
+                                        <h5>Tax </h5>
+                                        <h6>5.00$</h6>
+                                    </li>
+                                    <li class="total-value">
+                                        <h5>Total </h5>
+                                        <h6>60.00$</h6>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="setvaluecash">
+
+                                <div class="form-group row mb-3">
+                                    <label>Jenis Transaksi</label>
+                                    <select class="form-control select2 select-type" name="type">
+                                        @foreach ($type as $index => $row)
                                             <option value="{{ $index }}">{{ $row }}</option>
                                         @endforeach
                                     </select>
                                 </div>
-                            </div>
-                            <div class="form-group row mb-3">
-                                <label class="col-md-5 col-form-label">Meja</label>
-                                <div class="col-md-7">
-                                    <select class="form-control select2 select-table" name="table_id"
-                                        style="width: 100%;">
-                                        <option value="">==Pilih Meja==</option>
+                                <div class="display-due-date d-none">
+                                    <div class="form-group row mb-3">
+                                        <label>Jatuh Tempo Setiap Tanggal</label>
+                                        <select class="form-control select2" name="repeat_order_at" style="width: 100%;">
+                                            <option value="">==Pilih Tanggal==</option>
+                                            @foreach (\DateHelper::date1to28() as $index => $row)
+                                                <option value="{{ $row }}">{{ $row }}</option>
+                                            @endforeach
+                                        </select>
+                                        {{-- <p class="text-info" style="margin-top: 0px;margin-bottom: 0px;padding-top: 0px;padding-bottom: 0px;"><small><i>Kosong = Tagihan baru di 30 hari kedepan</i></small></p> --}}
+                                    </div>
+                                </div>
+                                <div class="display-repeat-interval d-none">
+                                    <div class="form-group row mb-3">
+                                        <label>Interval Jatuh Tempo</label>
+                                        <select class="form-control select2" name="repeat_interval" style="width: 100%;">
+                                            <option value="">==Pilih Interval==</option>
+                                            <option value="1">1 Bulan</option>
+                                            <option value="3">3 Bulan</option>
+                                            <option value="6">6 Bulan</option>
+                                            <option value="12">12 Bulan</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label>Metode Pembayaran</label>
+                                    <select class="form-control select2" name="provider_id">
+                                        @foreach ($providers as $index => $row)
+                                            <option value="{{ $row->id }}"
+                                                @if ($row->id == old('provider_id')) selected @endif>{{ $row->name }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
-                            </div>
-                        @endif
-                    </div>
-                    <div class="split-card">
-                    </div>
-                    <div class="card-body pt-0">
-                        <div class="totalitem">
-                            <h4>Total items : 4</h4>
-                            <a href="javascript:void(0);">Clear all</a>
-                        </div>
-                        <div class="product-table">
-                            <ul class="product-lists">
-                                <li>
-                                    <div class="productimg">
-                                        <div class="productimgs">
-                                            <img src="assets/img/product/product30.jpg" alt="img">
-                                        </div>
-                                        <div class="productcontet">
-                                            <h4>Pineapple
-                                                <a href="javascript:void(0);" class="ms-2" data-bs-toggle="modal"
-                                                    data-bs-target="#edit"><img src="assets/img/icons/edit-5.svg"
-                                                        alt="img"></a>
-                                            </h4>
-                                            <div class="productlinkset">
-                                                <h5>PT001</h5>
-                                            </div>
-                                            <div class="increment-decrement">
-                                                <div class="input-groups">
-                                                    <input type="button" value="-" class="button-minus dec button">
-                                                    <input type="text" name="child" value="0"
-                                                        class="quantity-field">
-                                                    <input type="button" value="+" class="button-plus inc button ">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>3000.00 </li>
-                                <li><a class="confirm-text" href="javascript:void(0);"><img
-                                            src="assets/img/icons/delete-2.svg" alt="img"></a></li>
-                            </ul>
-                            <ul class="product-lists">
-                                <li>
-                                    <div class="productimg">
-                                        <div class="productimgs">
-                                            <img src="assets/img/product/product34.jpg" alt="img">
-                                        </div>
-                                        <div class="productcontet">
-                                            <h4>Green Nike
-                                                <a href="javascript:void(0);" class="ms-2" data-bs-toggle="modal"
-                                                    data-bs-target="#edit"><img src="assets/img/icons/edit-5.svg"
-                                                        alt="img"></a>
-                                            </h4>
-                                            <div class="productlinkset">
-                                                <h5>PT001</h5>
-                                            </div>
-                                            <div class="increment-decrement">
-                                                <div class="input-groups">
-                                                    <input type="button" value="-" class="button-minus dec button">
-                                                    <input type="text" name="child" value="0"
-                                                        class="quantity-field">
-                                                    <input type="button" value="+" class="button-plus inc button ">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>3000.00 </li>
-                                <li><a class="confirm-text" href="javascript:void(0);"><img
-                                            src="assets/img/icons/delete-2.svg" alt="img"></a></li>
-                            </ul>
-                            <ul class="product-lists">
-                                <li>
-                                    <div class="productimg">
-                                        <div class="productimgs">
-                                            <img src="assets/img/product/product35.jpg" alt="img">
-                                        </div>
-                                        <div class="productcontet">
-                                            <h4>Banana
-                                                <a href="javascript:void(0);" class="ms-2" data-bs-toggle="modal"
-                                                    data-bs-target="#edit"><img src="assets/img/icons/edit-5.svg"
-                                                        alt="img"></a>
-                                            </h4>
-                                            <div class="productlinkset">
-                                                <h5>PT001</h5>
-                                            </div>
-                                            <div class="increment-decrement">
-                                                <div class="input-groups">
-                                                    <input type="button" value="-" class="button-minus dec button">
-                                                    <input type="text" name="child" value="0"
-                                                        class="quantity-field">
-                                                    <input type="button" value="+" class="button-plus inc button ">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>3000.00 </li>
-                                <li><a class="confirm-text" href="javascript:void(0);"><img
-                                            src="assets/img/icons/delete-2.svg" alt="img"></a></li>
-                            </ul>
-                            <ul class="product-lists">
-                                <li>
-                                    <div class="productimg">
-                                        <div class="productimgs">
-                                            <img src="assets/img/product/product31.jpg" alt="img">
-                                        </div>
-                                        <div class="productcontet">
-                                            <h4>Strawberry
-                                                <a href="javascript:void(0);" class="ms-2" data-bs-toggle="modal"
-                                                    data-bs-target="#edit"><img src="assets/img/icons/edit-5.svg"
-                                                        alt="img"></a>
-                                            </h4>
-                                            <div class="productlinkset">
-                                                <h5>PT001</h5>
-                                            </div>
-                                            <div class="increment-decrement">
-                                                <div class="input-groups">
-                                                    <input type="button" value="-" class="button-minus dec button">
-                                                    <input type="text" name="child" value="0"
-                                                        class="quantity-field">
-                                                    <input type="button" value="+" class="button-plus inc button ">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>3000.00 </li>
-                                <li><a class="confirm-text" href="javascript:void(0);"><img
-                                            src="assets/img/icons/delete-2.svg" alt="img"></a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="split-card">
-                    </div>
-                    <div class="card-body pt-0 pb-2">
-                        <div class="setvalue">
-                            <ul>
-                                <li>
-                                    <h5>Subtotal </h5>
-                                    <h6>55.00$</h6>
-                                </li>
-                                <li>
-                                    <h5>Tax </h5>
-                                    <h6>5.00$</h6>
-                                </li>
-                                <li class="total-value">
-                                    <h5>Total </h5>
+                                <div class="form-group">
+                                    <label>Catatan</label>
+                                    <textarea name="note" class="form-control" rows="5"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-totallabel w-100" disabled>
+                                    <h5>Checkout</h5>
                                     <h6>60.00$</h6>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="setvaluecash">
-                            <ul>
-                                <li>
-                                    <a href="javascript:void(0);" class="paymentmethod">
-                                        <img src="assets/img/icons/cash.svg" alt="img" class="me-2">
-                                        Cash
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="javascript:void(0);" class="paymentmethod">
-                                        <img src="assets/img/icons/debitcard.svg" alt="img" class="me-2">
-                                        Debit
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="javascript:void(0);" class="paymentmethod">
-                                        <img src="assets/img/icons/scan.svg" alt="img" class="me-2">
-                                        Scan
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="btn-totallabel">
-                            <h5>Checkout</h5>
-                            <h6>60.00$</h6>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </form>
 
             </div>
         </div>
@@ -411,7 +349,6 @@
 
     @endsection
 </div>
-
 
 @section('script')
     <!-- Datatables -->
@@ -453,12 +390,22 @@
 
             $('.product_card').on('click', function() {
                 let self = $(this)
+                let id = $(this).data("id");
+                let code = $(this).data("code");
+
                 if (self.hasClass('active')) {
                     self.removeClass('active');
+                    $('#btn-delete-product' + code).trigger('click')
                 } else {
                     self.addClass('active');
+                    if (code == null || code == undefined || code == "") {
+                        responseFailed("Kode produk tidak boleh kosong");
+                        return false;
+                    }
+                    getProductShow(code, 1);
                 }
             })
+
             $('.product-details').on('click', function() {
                 let self = $(this)
                 let product_section = $(self.data('section'))
@@ -523,42 +470,6 @@
                     $('.display-expired-month').removeClass("d-none").addClass("d-none");
                 }
 
-            });
-
-            $(document).on("click", ".btn-select-product", function(e) {
-                e.preventDefault();
-                let id = $(this).data("id");
-                let code = $(this).data("code");
-
-                $('.code').val(code);
-                $('.input-qty').val(1);
-
-                $("#modalAddProduct").modal("hide");
-            });
-
-            $(document).on("click", ".btn-submit-product", function(e) {
-                e.preventDefault();
-                let code = $(".code").val();
-                let qty = $(".input-qty").val();
-
-                if (code == null || code == undefined || code == "") {
-                    responseFailed("Kode produk tidak boleh kosong");
-                    return false;
-                }
-
-                if (qty == null || qty == undefined || qty == "") {
-                    responseFailed("Quantity produk tidak boleh kosong");
-                    return false;
-                }
-
-                if (qty <= 0) {
-                    responseFailed("Quantity produk tidak boleh kurang dari 1");
-                    return false;
-                }
-
-                getProductShow(code, qty);
-
-                $(".code").val(null);
             });
 
             $(document).on("keyup", ".tbody-product-qty", function(e) {
@@ -1005,7 +916,7 @@
                                     <td class="tbody-product-total">${formatRupiah(total,undefined)}</td>
                                     <td>
                                         ${config}
-                                        <a href="#" class="btn btn-danger btn-sm mr-2 mb-2 btn-delete-product">Hapus</a>
+                                        <a href="#" class="btn btn-danger btn-sm mr-2 mb-2 btn-delete-product" id="btn-delete-product${resp.data.code}">Hapus</a>
                                     </td>
                                 </tr>
                         `;
