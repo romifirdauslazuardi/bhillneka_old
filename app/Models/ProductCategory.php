@@ -19,4 +19,10 @@ class ProductCategory extends Model
     public function business(){
         return $this->belongsTo(Business::class, 'business_id');
     }
+    public function image(){
+        if ($this->image) {
+            return asset($this->image);
+        }
+        return asset('assets/placeholder-image.webp');
+    }
 }

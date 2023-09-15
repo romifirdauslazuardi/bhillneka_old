@@ -111,11 +111,7 @@
                         <li class="" id="fruits">
                             <div class="product-details position-relative {{ $index == 0 ? 'active' : '' }}"
                                 data-section="#prdctg{{ $item->id }}">
-                                @if ($item->image)
-                                    <img src="{{ asset($item->image) }}" alt="{{ $item->name }}">
-                                @else
-                                    <span>Gambar Kosong</span>
-                                @endif
+                                <img src="{{ $item->image() }}" alt="{{ $item->name }}">
                                 <h6>{{ $item->name }}</h6>
                             </div>
                         </li>
@@ -132,7 +128,7 @@
                                     <div class="anjay bg-white rounded overflow-hidden shadow-sm"
                                         id="product{{ $product->id }}">
                                         <div class="overflow-hidden square">
-                                            <img src="{{ asset($product->image) }}"
+                                            <img src="{{ $product->image() }}"
                                                 style="object-fit: cover; width: 100%; height: 100%;">
                                         </div>
                                         <div class="text-center p-3">
@@ -328,7 +324,7 @@
                                 </div>
                                 <button type="submit" class="btn btn-totallabel w-100" disabled>
                                     <h5>Checkout</h5>
-                                    <h6>60.00$</h6>
+                                    <h6 class="text-total">0</h6>
                                 </button>
                             </div>
                         </div>

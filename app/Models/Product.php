@@ -131,4 +131,10 @@ class Product extends Model
     {
         return $this->weight . " gram";
     }
+    public function image(){
+        if ($this->image) {
+            return asset($this->image);
+        }
+        return asset('assets/placeholder-image.webp');
+    }
 }
