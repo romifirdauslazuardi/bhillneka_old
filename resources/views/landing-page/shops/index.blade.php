@@ -118,7 +118,7 @@
                         <li class="" id="fruits">
                             <div class="product-details position-relative {{ $index == 0 ? 'active' : '' }}"
                                 data-section="#prdctg{{ $item->id }}">
-                                <img src="{{ $item->image() }}" alt="{{ $item->name }}">
+                                <img src="{{ $item->image() }}" alt="{{ $item->name }}" onerror="this.src='{{ asset('assets/placeholder-image.webp') }}'">
                                 <h6>{{ $item->name }}</h6>
                             </div>
                         </li>
@@ -136,7 +136,7 @@
                                         id="product{{ $product->id }}">
                                         <div class="overflow-hidden square">
                                             <img src="{{ $product->image() }}"
-                                                style="object-fit: cover; width: 100%; height: 100%;">
+                                                style="object-fit: cover; width: 100%; height: 100%;" onerror="this.src='{{ asset('assets/placeholder-image.webp') }}'">
                                         </div>
                                         <div class="text-center p-3">
                                             <small class="d-block text-muted">{{ $category->name }}</small>

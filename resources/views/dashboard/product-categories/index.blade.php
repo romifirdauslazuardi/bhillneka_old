@@ -69,12 +69,8 @@
                                                 <td>{{ $data->firstItem() + $index }}</td>
                                                 <td>{{ $row->name }}</td>
                                                 <td>
-                                                    @if ($row->image)
-                                                        <img src="{{ asset($row->image) }}" class="img-fluid" width="200px"
-                                                            alt="{{ $row->name }}">
-                                                    @else
-                                                        <span>Gambar Kosong</span>
-                                                    @endif
+                                                    <img src="{{ $row->image() }}" class="img-fluid" width="200px"
+                                                            alt="{{ $row->name }}" onerror="this.src='{{ asset('assets/placeholder-image.webp') }}'">
                                                 </td>
                                                 <td>{{ date('d-m-Y H:i:s', strtotime($row->created_at)) }}</td>
                                             </tr>
