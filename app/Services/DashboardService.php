@@ -2,16 +2,17 @@
 
 namespace App\Services;
 
-use App\Enums\OrderEnum;
-use App\Services\BaseService;
-use Illuminate\Http\Request;
-use App\Models\Product;
+use Auth;
 use App\Models\Order;
 use App\Enums\RoleEnum;
-use App\Services\ProductService;
-use Spatie\Analytics\Facades\Analytics;
+use App\Models\Product;
+use App\Enums\OrderEnum;
+use Illuminate\Http\Request;
 use Spatie\Analytics\Period;
-use Auth;
+use App\Services\BaseService;
+use App\Services\ProductService;
+use Illuminate\Support\Facades\Log;
+use Spatie\Analytics\Facades\Analytics;
 
 /**
  * Class DashboardService
@@ -148,14 +149,19 @@ class DashboardService extends BaseService
     }
 
     public function totalVisitor(){
-        $table = Analytics::fetchMostVisitedPages(Period::months(6));
+        try {
+            $table = Analytics::fetchMostVisitedPages(Period::months(6));
 
-        $total = 0;
-        foreach($table as $index => $row){
-            $total += $row["screenPageViews"];
+            $total = 0;
+            foreach ($table as $index => $row) {
+                $total += $row["screenPageViews"];
+            }
+
+            return $total;
+        } catch (\Throwable $th) {
+            Log::error($th->getMessage());
+            return 0;
         }
-
-        return $total;
     }
 
     public function totalOrderSuccess(){
