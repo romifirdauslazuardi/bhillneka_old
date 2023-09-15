@@ -31,42 +31,46 @@ use App\Services\TestimonialService;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
-$business_category = BusinessCategory::with('template')->get();
+try {
+    $business_category = BusinessCategory::with('template')->get();
 
-foreach ($business_category as $item) {
-    $slug = Str::slug($item->name);
-    Route::group(['as' => $slug . ".", "prefix" => "/" . $slug], function () use ($item) {
-        Route::get('/', function () {
-            return redirect()->to('/');
-        });
-        $business = Business::where('category_id', $item->id)->get();
-        $view = $item->template?->slug;
-        foreach ($business as $bus) {
-            Route::group(['as' => $bus->slug . '.', 'prefix' => '/' . $bus->slug], function () use ($bus, $view) {
-                Route::get('/', function (Request $request) use ($bus, $view) {
-                    $business_id = $bus->id;
-                    $landing = LandingAgen::where('business_id', $business_id)->first();
-                    $headerSection = HeaderSetting::where('business_id', $business_id)->get();
-                    $testimoniSection = TestimoniSetting::where('business_id', $business_id)->get();
-                    $aboutSection = AboutSetting::where('business_id', $business_id)->first();
-                    $product = Product::where('business_id', $business_id)->with('category')->get();
-                    $categoryProduct = ProductCategory::where('business_id', $business_id)->with('products')->get();
-                    $data = [
-                        'data' => $landing,
-                        'business' => $bus,
-                        'headerSection' => $headerSection,
-                        'testimoniSection' => $testimoniSection,
-                        'aboutSection' => $aboutSection,
-                        'product' => $product,
-                        'categoryProduct' => $categoryProduct->sortBy(function ($categoryProduct) {
-                            return $categoryProduct->products->count();
-                        }, SORT_REGULAR, true)->values(),
-                    ];
-                    return view("templates." . $view, $data);
-                });
+    foreach ($business_category as $item) {
+        $slug = Str::slug($item->name);
+        Route::group(['as' => $slug . ".", "prefix" => "/" . $slug], function () use ($item) {
+            Route::get('/', function () {
+                return redirect()->to('/');
             });
-        }
-    });
+            $business = Business::where('category_id', $item->id)->get();
+            $view = $item->template?->slug;
+            foreach ($business as $bus) {
+                Route::group(['as' => $bus->slug . '.', 'prefix' => '/' . $bus->slug], function () use ($bus, $view) {
+                    Route::get('/', function (Request $request) use ($bus, $view) {
+                        $business_id = $bus->id;
+                        $landing = LandingAgen::where('business_id', $business_id)->first();
+                        $headerSection = HeaderSetting::where('business_id', $business_id)->get();
+                        $testimoniSection = TestimoniSetting::where('business_id', $business_id)->get();
+                        $aboutSection = AboutSetting::where('business_id', $business_id)->first();
+                        $product = Product::where('business_id', $business_id)->with('category')->get();
+                        $categoryProduct = ProductCategory::where('business_id', $business_id)->with('products')->get();
+                        $data = [
+                            'data' => $landing,
+                            'business' => $bus,
+                            'headerSection' => $headerSection,
+                            'testimoniSection' => $testimoniSection,
+                            'aboutSection' => $aboutSection,
+                            'product' => $product,
+                            'categoryProduct' => $categoryProduct->sortBy(function ($categoryProduct) {
+                                return $categoryProduct->products->count();
+                            }, SORT_REGULAR, true)->values(),
+                        ];
+                        return view("templates." . $view, $data);
+                    });
+                });
+            }
+        });
+    }
+} catch (\Throwable $th) {
+    //throw $th;
 }
 
 Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.auth.verification.notice']], function () use ($business_category) {
