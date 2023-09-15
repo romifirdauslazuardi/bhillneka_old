@@ -69,29 +69,28 @@ try {
             }
         });
     }
+    Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.auth.verification.notice']], function () use ($business_category) {
+        foreach ($business_category as $item) {
+            Route::group(["as" => "landing-page-agen.", "prefix" => "dashboard/landing-page-agen", "namespace" => "Dashboard"], function () use ($item) {
+                $template = Str::slug($item->template?->name);
+                Route::group(["as" => $template . ".", "prefix" => $template], function () use ($template) {
+                    Route::get('/', ucfirst($template) . 'Controller@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
+                    Route::post('/about', ucfirst($template) . 'Controller@about')->name("about")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
+                    Route::post('/testimoni', ucfirst($template) . 'Controller@testimoni')->name("testimoni")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
+                    Route::get('/testimoni/{id}', ucfirst($template) . 'Controller@testimoniShow')->name("testimoniShow")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
+                    Route::put('/testimoni/{id}', ucfirst($template) . 'Controller@testimoniUpdate')->name("testimoniUpdate")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
+                    Route::delete('/testimoni/{id}', ucfirst($template) . 'Controller@testimoniDelete')->name("testimoniDelete")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
+                    Route::post('/header', ucfirst($template) . 'Controller@header')->name("header")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
+                    Route::get('/header/{id}', ucfirst($template) . 'Controller@headerShow')->name("headerShow")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
+                    Route::put('/header/{id}', ucfirst($template) . 'Controller@headerUpdate')->name("headerUpdate")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
+                    Route::delete('/header/{id}', ucfirst($template) . 'Controller@headerDelete')->name("headerDelete")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
+                });
+            });
+        }
+    });
 } catch (\Throwable $th) {
     //throw $th;
 }
-
-Route::group(['middleware' => ['auth', 'dashboard.access', 'verified:dashboard.auth.verification.notice']], function () use ($business_category) {
-    foreach ($business_category as $item) {
-        Route::group(["as" => "landing-page-agen.", "prefix" => "dashboard/landing-page-agen", "namespace" => "Dashboard"], function () use ($item) {
-            $template = Str::slug($item->template?->name);
-            Route::group(["as" => $template . ".", "prefix" => $template], function () use ($template) {
-                Route::get('/', ucfirst($template) . 'Controller@index')->name("index")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
-                Route::post('/about', ucfirst($template) . 'Controller@about')->name("about")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
-                Route::post('/testimoni', ucfirst($template) . 'Controller@testimoni')->name("testimoni")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
-                Route::get('/testimoni/{id}', ucfirst($template) . 'Controller@testimoniShow')->name("testimoniShow")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
-                Route::put('/testimoni/{id}', ucfirst($template) . 'Controller@testimoniUpdate')->name("testimoniUpdate")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
-                Route::delete('/testimoni/{id}', ucfirst($template) . 'Controller@testimoniDelete')->name("testimoniDelete")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
-                Route::post('/header', ucfirst($template) . 'Controller@header')->name("header")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
-                Route::get('/header/{id}', ucfirst($template) . 'Controller@headerShow')->name("headerShow")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
-                Route::put('/header/{id}', ucfirst($template) . 'Controller@headerUpdate')->name("headerUpdate")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
-                Route::delete('/header/{id}', ucfirst($template) . 'Controller@headerDelete')->name("headerDelete")->middleware(['role:' . implode('|', [RoleEnum::AGEN, RoleEnum::OWNER])]);
-            });
-        });
-    }
-});
 
 Route::get('/', function () {
     return redirect()->route("landing-page.home.index");
