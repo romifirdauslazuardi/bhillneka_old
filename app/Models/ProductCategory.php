@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ProductCategory extends Model
 {
@@ -21,7 +22,7 @@ class ProductCategory extends Model
     }
     public function image(){
         if ($this->image) {
-            return asset($this->image);
+            return Storage::url($this->image);
         }
         return asset('assets/placeholder-image.webp');
     }
