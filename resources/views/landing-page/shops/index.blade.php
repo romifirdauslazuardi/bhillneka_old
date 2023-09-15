@@ -329,7 +329,7 @@
                                 </div>
                                 <button type="submit" class="btn btn-totallabel w-100" disabled>
                                     <h5>Checkout</h5>
-                                    <h6>60.00$</h6>
+                                    <h6 class="text-total">0</h6>
                                 </button>
                             </div>
                         </div>
