@@ -76,6 +76,9 @@
         .product_card.active .check_select {
             display: block
         }
+        .product-details img{
+                height: 50px !important
+        }
 
         @media(max-width:768px) {
             .product_card .anjay {
