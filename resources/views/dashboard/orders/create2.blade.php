@@ -19,6 +19,10 @@
     <link href="{{ URL::to('/') }}/templates/dashboard/assets/libs/owl.carousel/dist/assets/owl.theme.default.min.css"
         type="text/css" rel="stylesheet" />
     <style>
+        .page-wrapper {
+            height: auto !important;
+        }
+
         .owl-dots {
             display: none
         }
@@ -69,9 +73,9 @@
         .product_card.active .check_select {
             display: block
         }
-        
-        .product-details img{
-                height: 50px !important
+
+        .product-details img {
+            height: 50px !important
         }
 
         @media(max-width:768px) {
@@ -115,7 +119,8 @@
                         <li class="" id="fruits">
                             <div class="product-details position-relative {{ $index == 0 ? 'active' : '' }}"
                                 data-section="#prdctg{{ $item->id }}">
-                                <img src="{{ $item->image() }}" alt="{{ $item->name }}" onerror="this.src='{{ asset('assets/placeholder-image.webp') }}'">
+                                <img src="{{ $item->image() }}" alt="{{ $item->name }}"
+                                    onerror="this.src='{{ asset('assets/placeholder-image.webp') }}'">
                                 <h6>{{ $item->name }}</h6>
                             </div>
                         </li>
@@ -133,7 +138,8 @@
                                         id="product{{ $product->id }}">
                                         <div class="overflow-hidden square">
                                             <img src="{{ $product->image() }}"
-                                                style="object-fit: cover; width: 100%; height: 100%;" onerror="this.src='{{ asset('assets/placeholder-image.webp') }}'">
+                                                style="object-fit: cover; width: 100%; height: 100%;"
+                                                onerror="this.src='{{ asset('assets/placeholder-image.webp') }}'">
                                         </div>
                                         <div class="text-center p-3">
                                             <small class="d-block text-muted">{{ $category->name }}</small>

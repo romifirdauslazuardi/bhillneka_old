@@ -24,7 +24,8 @@
         }
         .page-wrapper{
             margin: 0 !important;
-            padding-top: 0 !important
+            padding-top: 0 !important;
+            height: auto !important
         }
         .owl-dots {
             display: none
@@ -79,6 +80,9 @@
         .product-details img{
                 height: 50px !important
         }
+        .start_main{
+                margin-top: -10px
+            }
 
         @media(max-width:768px) {
             .product_card .anjay {
@@ -91,10 +95,16 @@
                 padding-right: 98px;
             }
         }
+
+        @media(min-width:768px){
+            .start_main{
+                margin-top: -30px
+            }
+        }
     </style>
 @endsection
 
-<div style="margin-top: -30px">
+<div class="start_main">
     @section('content')
         <div class="row">
             <div class="col-12 col-lg-8">
